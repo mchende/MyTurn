@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-labelledby="banana-title banana-desc">
+  <title id="banana-title">Banana</title>
+  <desc id="banana-desc">Simple banana flashcard illustration with label.</desc>
+  <rect width="512" height="512" rx="48" fill="#FFFCE6" />
+  <path d="M148 228c54 130 144 170 246 122 10-5 22 3 20 14-7 44-55 79-120 88-115 16-215-46-220-176-1-25 47-70 74-48Z" fill="#F4D34F" />
+  <path d="M360 324c9 13 18 23 27 29-44 26-90 38-138 35 47-7 84-29 111-64Z" fill="#D5A72F" />
+  <text x="256" y="438" text-anchor="middle" font-family="Arial, sans-serif" font-size="42" font-weight="700" fill="#1D1D1F">BANANA</text>
+</svg>

@@ -1,5 +1,8 @@
 import { describe, expect, it } from 'vitest';
 
+import { lessonWeek01Lesson01 } from '../../content/lessons/week-01/lesson-01';
+import { defaultWeekdayScheduleTemplate } from '../../content/schedules/default-weekday';
+import { loadLesson } from '@/features/lesson-config/load-lesson';
 import { lessonSchema } from '@/features/lesson-config/lesson-schema';
 import { buildDaySessions } from '@/features/schedule/build-day-sessions';
 import { scheduleTemplateSchema } from '@/features/schedule/schedule-schema';
@@ -210,5 +213,54 @@ describe('lesson schema contracts', () => {
         ...baseInput,
       }),
     ).toBe('completed');
+  });
+
+  it('loads the seeded week 01 lesson package with local image assets', () => {
+    const lesson = loadLesson('week-01-lesson-01');
+
+    expect(lesson).toEqual(lessonWeek01Lesson01);
+    expect(lesson.items.map((item) => item.id)).toEqual([
+      'apple',
+      'banana',
+      'cat',
+      'dog',
+      'sun',
+    ]);
+    expect(
+      lesson.items.every((item) => {
+        return (
+          item.imageSrc.startsWith('/lessons/week-01/') &&
+          item.imageSrc.endsWith('.svg') &&
+          item.imageAlt.trim().length > 0
+        );
+      }),
+    ).toBe(true);
+  });
+
+  it('parses the default weekday schedule seed for 15-minute sessions', () => {
+    expect(defaultWeekdayScheduleTemplate.slots).toHaveLength(3);
+    expect(
+      defaultWeekdayScheduleTemplate.slots.map((slot) => ({
+        sessionId: slot.sessionId,
+        durationMinutes: slot.durationMinutes,
+        entryOpensMinutesBeforeStart: slot.entryOpensMinutesBeforeStart,
+      })),
+    ).toEqual([
+      {
+        sessionId: 'weekday-1000',
+        durationMinutes: 15,
+        entryOpensMinutesBeforeStart: 5,
+      },
+      {
+        sessionId: 'weekday-1400',
+        durationMinutes: 15,
+        entryOpensMinutesBeforeStart: 5,
+      },
+      {
+        sessionId: 'weekday-1930',
+        durationMinutes: 15,
+        entryOpensMinutesBeforeStart: 5,
+      },
+    ]);
   });
 });

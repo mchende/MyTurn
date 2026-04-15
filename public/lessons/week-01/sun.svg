@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-labelledby="sun-title sun-desc">
+  <title id="sun-title">Sun</title>
+  <desc id="sun-desc">Simple sun flashcard illustration with label.</desc>
+  <rect width="512" height="512" rx="48" fill="#F2F8FF" />
+  <circle cx="256" cy="246" r="96" fill="#F6C74F" />
+  <g stroke="#F2A93B" stroke-linecap="round" stroke-width="18">
+    <path d="M256 76v42" />
+    <path d="M256 374v42" />
+    <path d="M86 246h42" />
+    <path d="M384 246h42" />
+    <path d="M136 126l30 30" />
+    <path d="M346 336l30 30" />
+    <path d="M136 366l30-30" />
+    <path d="M346 156l30-30" />
+  </g>
+  <text x="256" y="438" text-anchor="middle" font-family="Arial, sans-serif" font-size="42" font-weight="700" fill="#1D1D1F">SUN</text>
+</svg>

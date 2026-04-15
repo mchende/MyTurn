@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-labelledby="apple-title apple-desc">
+  <title id="apple-title">Apple</title>
+  <desc id="apple-desc">Simple apple flashcard illustration with label.</desc>
+  <rect width="512" height="512" rx="48" fill="#FFF8EF" />
+  <ellipse cx="256" cy="280" rx="116" ry="128" fill="#E54C3C" />
+  <path d="M256 156c24-34 54-48 90-44-10 28-34 46-70 54-8 2-14-2-20-10Z" fill="#3A8D4E" />
+  <path d="M242 154c-3-28 11-51 40-68 11 33 2 57-26 72-8 4-13 3-14-4Z" fill="#6F4B2F" />
+  <text x="256" y="438" text-anchor="middle" font-family="Arial, sans-serif" font-size="42" font-weight="700" fill="#1D1D1F">APPLE</text>
+</svg>
