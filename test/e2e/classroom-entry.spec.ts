@@ -1,8 +1,15 @@
 import { expect, test } from '@playwright/test';
 
-// Remove test.skip in 01-04 after homepage, lesson-entry link, and lesson route exist.
-test.skip('home schedule allows lesson entry', async ({ page }) => {
+test('home schedule allows lesson entry', async ({ page }) => {
   await page.goto('/');
-  await expect(page.getByText('今日课表')).toBeVisible();
-  await expect(page.getByRole('link', { name: '进入课堂' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: '我的课堂' }).first()).toBeVisible();
+
+  const entryLink = page.getByRole('link', { name: '进入课堂' }).first();
+  await expect(entryLink).toBeVisible();
+  await expect(entryLink).toHaveAttribute('href', /\/lesson\//);
+
+  await entryLink.click();
+
+  await expect(page).toHaveURL(/\/lesson\//);
+  await expect(page.getByText('Teacher Mia')).toBeVisible();
 });
