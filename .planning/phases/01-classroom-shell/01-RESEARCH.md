@@ -105,6 +105,7 @@ Phase 1 适合直接采用当前标准的 `Next.js App Router + React 19 + TypeS
 ### Supporting
 | Library | Version | Purpose | When to Use |
 |---------|---------|---------|-------------|
+| `shadcn/ui` | registry-based | High-quality app-shell components built on Radix primitives | 需要按钮、卡片、sheet、dialog、tabs、tooltip、form control 等基础课堂 UI 组件时使用，避免从零搭基础件 |
 | `zod` | `4.3.6` | Runtime validation for lesson and schedule schema | 读取 seed lesson、校验配置、从 schema 自动推导 TS 类型时使用 |
 | `vitest` | `4.1.4` | Unit/component tests | 对 schema、状态选择器、入口状态逻辑、纯展示组件做快速测试 |
 | `@testing-library/react` | `16.3.2` | React component behavior tests | 需要从用户视角验证课表卡片、入口 CTA、课堂舞台静态渲染时使用 |
@@ -116,10 +117,12 @@ Phase 1 适合直接采用当前标准的 `Next.js App Router + React 19 + TypeS
 |------------|-----------|----------|
 | `Next.js App Router` | `Vite + React Router` | 可以更轻，但会失去根布局、`next/image`、`next/font`、Server Component 默认层，后续要补更多壳层能力 |
 | `Tailwind CSS v4` | CSS Modules only | 对少量页面可行，但本项目需要稳定 token、断点和可复用课堂空间语义，v4 更适合快速固化设计系统 |
+| `shadcn/ui + Radix primitives` | 手写基础组件库 | 手写按钮、弹层、sheet、tabs、form primitives 成本高且易出一致性与可访问性问题；本项目更适合在成熟组件之上做课堂化改造 |
 | `Zod` | 纯 TypeScript type/interface | 只能静态约束，不能在 seed 配置加载时做运行时校验，后期容易积累脏数据 |
 
 **Installation:**
 ```bash
+npx shadcn@latest init
 npm install next react react-dom typescript tailwindcss @tailwindcss/postcss postcss zod
 npm install -D vitest @testing-library/react @testing-library/jest-dom playwright
 ```
@@ -281,6 +284,7 @@ app/
 - **在 root layout 里读课次 URL 状态:** Next.js layout 不会按页面导航重渲染，容易出现过期状态。
 - **为图片直接手写裸 `<img>` 列表:** 会放弃 Next.js 的尺寸约束和性能保护，也更容易产生布局抖动。
 - **自己发明 design token 约定但不接 Tailwind `@theme`:** token 不能自动生成 utility，维护成本高。
+- **为了“更贴产品感”而手写整套基础组件:** 课堂感应该建立在成熟 primitives 之上，而不是从按钮、对话框、sheet、tooltip 重新造轮子。
 
 ## Don't Hand-Roll
 
@@ -288,12 +292,13 @@ app/
 |---------|-------------|-------------|-----|
 | 图片渲染与尺寸稳定 | 自定义图片懒加载和占位逻辑 | `next/image` | 官方组件已处理尺寸约束、优化和远程来源白名单；手写容易产生 CLS 和安全洞 |
 | 字体加载 | 手动 `<link>` 外链 Google Fonts | `next/font` | 自动优化和 self-hosting，减少额外请求与布局抖动 |
+| 基础 UI primitives | 手写 Button/Card/Dialog/Sheet/Tabs 等组件 | `shadcn/ui` + Radix primitives | 成熟度高、可访问性更稳，且便于在 Tailwind token 上继续做课堂视觉定制 |
 | 课程配置校验 | 手写 `if/else` 校验器 | `zod` | schema、运行时校验、类型推导一次完成 |
 | 组件行为测试 | 自己拼 DOM 查询工具 | `@testing-library/react` | 已形成事实标准，测试语义更接近用户行为 |
 | 跨浏览器冒烟 | 自写 Puppeteer/脚本 | `playwright` | 官方文档和社区都已成熟，隔离和浏览器矩阵现成 |
 | 设计 token 到 utility 的映射 | 自写 JS token -> class 生成器 | Tailwind v4 `@theme` | 官方已支持 token 与 utility/variant 直连 |
 
-**Key insight:** 本 phase 最贵的错误不是“库选错”，而是提前手写一层替代官方能力的薄框架。后面所有 phase 都会踩到这些基础能力，越早手搓，越早欠债。
+**Key insight:** 本 phase 最贵的错误不是“库选错”，而是提前手写一层替代官方能力或成熟社区方案的薄框架。后面所有 phase 都会踩到这些基础能力，越早手搓，越早欠债。
 
 ## Common Pitfalls
 

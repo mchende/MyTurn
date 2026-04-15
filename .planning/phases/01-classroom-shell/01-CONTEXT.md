@@ -51,6 +51,9 @@ Phase 1 交付的是课堂外壳、课程配置结构、课次进入方式，以
 - **D-25:** 核心互动机制仍采用老师点名，由老师一次点名 1 个孩子上台作答。
 - **D-26:** 课堂必须保留真实孩子“先看别人回答、再准备、再轮到自己”的喘息节奏。
 - **D-27:** 课堂中的主要理解输入仍是图片，孩子主流程尽量保持英文沉浸。
+- **D-28:** 技术栈应补充 `shadcn/ui` 作为基础 UI 组件体系的一部分，用于加速搭建成熟、可维护的课堂界面基础件。
+- **D-29:** 基础能力库不要手搓，应优先选择社区成熟方案，尤其是 UI primitive、表单、状态校验、测试、媒体与交互基础设施。
+- **D-30:** Phase 1 的 UI 设计应以 `DESIGN.md` 作为正式设计依据；后续 UI-SPEC、planning 和实现都需要遵循其中定义的视觉语言、排版与颜色原则。
 
 ### the agent's Discretion
 - 课表页的具体视觉风格、卡片样式和倒计时表现形式
@@ -71,6 +74,9 @@ Phase 1 交付的是课堂外壳、课程配置结构、课次进入方式，以
 - `.planning/REQUIREMENTS.md` — Phase 1 相关需求映射，尤其是 CLAS-01、CONT-01、CONT-02、PLAT-01
 - `.planning/ROADMAP.md` — Phase 1「Classroom Shell」的目标、成功标准与计划占位
 - `.planning/STATE.md` — 当前项目位置与本阶段前的阻塞信息
+
+### UI and design authority
+- `DESIGN.md` — Phase 1 的正式 UI 设计依据；定义 Apple-inspired 的字体、颜色、布局、组件与交互原则
 
 ### Prior phase discussion artifact
 - `Phase 1 CONTEXT.md` — 本次 discuss 之前已有的 Phase 1 决策基础，包含课堂感、老师角色、AI 同学、反馈策略等先前锁定方向

@@ -18,6 +18,7 @@ MyTurn 是一个面向儿童英语口语练习的网页端课堂 MVP，重点是
 - 下一步推荐命令是 `$gsd-discuss-phase 1` 或 `$gsd-plan-phase 1`。
 - 始终让 MVP 聚焦“课堂感”验证，而不是内容规模或平台扩张。
 - GSD 生成的文档正文默认使用中文，但保留现有英文标题和结构，除非某个 workflow 明确要求其他格式。
+- 技术选型优先使用成熟社区包，不手搓基础能力库；当前项目明确将 `shadcn/ui` 纳入 UI 基础栈。
 
 ## Product Guardrails
 

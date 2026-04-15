@@ -38,10 +38,14 @@ created: 2026-04-15
 
 | Task ID | Plan | Wave | Requirement | Test Type | Automated Command | File Exists | Status |
 |---------|------|------|-------------|-----------|-------------------|-------------|--------|
-| 01-W0-01 | 01 | 1 | CLAS-01 | e2e smoke | `npx playwright test test/e2e/classroom-entry.spec.ts` | ❌ W0 | ⬜ pending |
-| 01-W0-02 | 02 | 1 | CONT-01 | unit | `npx vitest run test/unit/lesson-schema.test.ts` | ❌ W0 | ⬜ pending |
-| 01-W0-03 | 02 | 1 | CONT-02 | unit | `npx vitest run test/unit/lesson-schema.test.ts` | ❌ W0 | ⬜ pending |
-| 01-W0-04 | 03 | 2 | PLAT-01 | component | `npx vitest run test/unit/classroom-shell.test.tsx` | ❌ W0 | ⬜ pending |
+| 01-W0-01 | 01 | 1 | CLAS-01 | e2e placeholder | `npx playwright test test/e2e/classroom-entry.spec.ts` | ✅ W0 | ⬜ pending |
+| 01-W0-02 | 01 | 1 | CONT-01 | unit placeholder | `npx vitest run test/unit/lesson-schema.test.ts` | ✅ W0 | ⬜ pending |
+| 01-W0-03 | 01 | 1 | PLAT-01 | component placeholder | `npx vitest run test/unit/classroom-shell.test.tsx` | ✅ W0 | ⬜ pending |
+| 01-02-01 | 02 | 2 | CONT-01 | unit | `npx vitest run test/unit/lesson-schema.test.ts` | ✅ planned | ⬜ pending |
+| 01-02-02 | 02 | 2 | CONT-02 | unit | `npx vitest run test/unit/lesson-schema.test.ts` | ✅ planned | ⬜ pending |
+| 01-03-01 | 03 | 3 | CLAS-01 / PLAT-01 | render-level unit | `npx vitest run test/unit/homepage-shell.test.tsx` | ✅ planned | ⬜ pending |
+| 01-04-01a | 04 | 4 | PLAT-01 | component | `npx vitest run test/unit/classroom-shell.test.tsx` | ✅ planned | ⬜ pending |
+| 01-04-01b | 04 | 4 | CLAS-01 | e2e smoke | `npx playwright test test/e2e/classroom-entry.spec.ts` | ✅ planned | ⬜ pending |
 
 *Status: ⬜ pending · ✅ green · ❌ red · ⚠️ flaky*
 
@@ -62,7 +66,7 @@ created: 2026-04-15
 
 | Behavior | Requirement | Why Manual | Test Instructions |
 |----------|-------------|------------|-------------------|
-| 课堂首页是否首先传达“今天有课、现在能不能进去”的感受 | CLAS-01 | 这是体验层与叙事层判断，自动化只能覆盖结构和状态，不能完全覆盖课堂感 | 在平板横屏视口打开首页，确认首屏先看到今日课表、当前状态与下一节引导，而不是工具型 dashboard 信息 |
+| 课堂首页是否首先传达“今天有课、现在能不能进去”的感受 | CLAS-01 | 这是体验层与叙事层判断，自动化只能覆盖结构和状态，不能完全覆盖课堂感 | 在平板横屏视口打开首页，确认首屏呈现 Stitch 风格的 `我的课堂` 页面：左侧轻导航、右侧课程卡片网格、当前可入场课次最突出，而不是工具型 dashboard 信息 |
 | 课堂三段式空间是否像“班级”而不是普通内容页 | PLAT-01 | 视觉主次、空间感和角色关系需要人工评估 | 在平板横屏视口进入课堂页，确认顶部学生席、左侧课件主屏、右侧讲台/教师区同时存在，且课件主屏视觉权重最高 |
 
 ---
