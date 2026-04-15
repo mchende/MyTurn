@@ -14,8 +14,8 @@
 
 ### Lesson Content
 
-- [ ] **CONT-01**: 运营或配置者可以为每节课配置 5 个目标词或短句
-- [ ] **CONT-02**: 运营或配置者可以为每个目标项绑定 1 张图片，供示范与提问环节使用
+- [x] **CONT-01**: 运营或配置者可以为每节课配置 5 个目标词或短句
+- [x] **CONT-02**: 运营或配置者可以为每个目标项绑定 1 张图片，供示范与提问环节使用
 - [ ] **CONT-03**: 课堂流程以图片作为主要理解线索，而不是依赖中文解释
 - [ ] **CONT-04**: 同一节课内容可以支撑多轮重复练习，并逐步提高输出要求
 
@@ -76,8 +76,8 @@
 | Requirement | Phase | Status |
 |-------------|-------|--------|
 | CLAS-01 | Phase 1 | Pending |
-| CONT-01 | Phase 1 | Pending |
-| CONT-02 | Phase 1 | Pending |
+| CONT-01 | Phase 1 | Complete |
+| CONT-02 | Phase 1 | Complete |
 | PLAT-01 | Phase 1 | Complete |
 | CLAS-02 | Phase 2 | Pending |
 | CLAS-03 | Phase 2 | Pending |
