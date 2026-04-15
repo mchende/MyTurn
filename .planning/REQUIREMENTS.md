@@ -41,7 +41,7 @@
 
 ### Platform and Presentation
 
-- [ ] **PLAT-01**: 用户看到的界面应首先面向平板横屏设计，同时兼容手机和桌面端使用
+- [x] **PLAT-01**: 用户看到的界面应首先面向平板横屏设计，同时兼容手机和桌面端使用
 - [ ] **PLAT-02**: 用户无需安装原生 App，就能在网页中完成整节 MVP 课程
 
 ## v2 Requirements
@@ -78,7 +78,7 @@
 | CLAS-01 | Phase 1 | Pending |
 | CONT-01 | Phase 1 | Pending |
 | CONT-02 | Phase 1 | Pending |
-| PLAT-01 | Phase 1 | Pending |
+| PLAT-01 | Phase 1 | Complete |
 | CLAS-02 | Phase 2 | Pending |
 | CLAS-03 | Phase 2 | Pending |
 | CLAS-04 | Phase 2 | Pending |
