@@ -1,10 +1,14 @@
-import { render, screen } from '@testing-library/react';
-import { describe, expect, it } from 'vitest';
+import { cleanup, render, screen } from '@testing-library/react';
+import { afterEach, describe, expect, it } from 'vitest';
 
 import { ClassroomShell } from '@/features/classroom-shell/classroom-shell';
 import { loadLesson } from '@/features/lesson-config/load-lesson';
 
 const lesson = loadLesson('week-01-lesson-01');
+
+afterEach(() => {
+  cleanup();
+});
 
 describe('classroom shell layout', () => {
   it('renders the seat strip, lesson board, stage panel, and teacher panel together', () => {
@@ -40,7 +44,7 @@ describe('classroom shell layout', () => {
 
     expect(shell.className).toContain('flex-col');
     expect(shell.className).toContain('md:grid');
-    expect(shell.className).toContain('xl:px-10');
+    expect(shell.className).toContain('xl:gap-8');
     expect(roleColumn.className).toContain('flex-col');
     expect(roleColumn.className).toContain('sm:grid');
     expect(roleColumn.className).toContain('md:flex');

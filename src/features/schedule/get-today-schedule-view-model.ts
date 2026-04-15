@@ -30,7 +30,7 @@ const HOMEPAGE_TITLE = '每日语感启蒙';
 const CAMP_LABEL = '语感启蒙营 4月班';
 const LEARNERS = ['5638Cora', '5612Hippo', '5610Joey', '5604Kiki'];
 
-export function getTodayScheduleViewModel(now: Date = new Date()): TodayScheduleViewModel {
+export function getTodayScheduleViewModel(now: Date = getReferenceNow()): TodayScheduleViewModel {
   const sessions = buildDaySessions({
     template: defaultWeekdayScheduleTemplate,
     date: now,
@@ -64,6 +64,16 @@ export function getTodayScheduleViewModel(now: Date = new Date()): TodaySchedule
     nextSession: sessions.find((session) => session.accessState !== 'completed') ?? null,
     sessions,
   };
+}
+
+function getReferenceNow() {
+  const fixedNow = process.env.MYTURN_FIXED_NOW;
+
+  if (fixedNow) {
+    return new Date(fixedNow);
+  }
+
+  return new Date();
 }
 
 function formatTodayLabel(date: Date) {

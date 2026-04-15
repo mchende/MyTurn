@@ -12,7 +12,9 @@ MyTurn 是一个面向儿童英语口语练习的网页端课堂 MVP，目标是
 
 ### Validated
 
-（暂无，待上线验证）
+- [x] 用户可以在浏览器中打开产品，并从 `我的课堂` 首页进入真实课堂路由。Validated in Phase 1: Classroom Shell
+- [x] 课程数据可以配置为 5 个目标项，每个目标项都带有配套图片。Validated in Phase 1: Classroom Shell
+- [x] 界面以平板横屏为优先目标，同时兼容手机和桌面端的课堂语义。Validated in Phase 1: Classroom Shell
 
 ### Active
 
@@ -33,6 +35,10 @@ MyTurn 是一个面向儿童英语口语练习的网页端课堂 MVP，目标是
 ## Context
 
 这个产品的灵感来自真实存在的线上少儿英语课堂：老师使用以图片为主的课件，全程尽量不用中文，并频繁点名让孩子开口。核心洞察不只是“练口语”本身，而是“在班里上课”的情绪结构：先听别人回答、边看边准备、然后轮到自己。Phase 1 被有意定义为一个“课堂引擎”而不是“内容库”，目标是在一节 15 分钟的课里，围绕 5 个可配置目标项、一个老师角色和一个真实感足够的 AI 同学，验证课堂体验是否成立。
+
+## Current State
+
+Phase 1 已完成：产品现在具备 Stitch 风格的 `我的课堂` 首页、基于 seed 数据的课堂路由，以及平板优先的课堂三段式空间（顶部学生席、深色课件区、讲台/教师区）。下一步进入 Phase 2，为这套稳定壳体接入老师带班循环和 AI 同学行为。
 
 ## Constraints
 
@@ -74,4 +80,4 @@ MyTurn 是一个面向儿童英语口语练习的网页端课堂 MVP，目标是
 4. 用最新状态更新 Context
 
 ---
-*Last updated: 2026-04-15 after initialization*
+*Last updated: 2026-04-15 after Phase 1 completion*
