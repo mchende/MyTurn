@@ -7,7 +7,7 @@
 
 ### Classroom Experience
 
-- [ ] **CLAS-01**: 用户可以在浏览器中进入课程并启动一节固定 15 分钟的课堂
+- [x] **CLAS-01**: 用户可以在浏览器中进入课程并启动一节固定 15 分钟的课堂
 - [ ] **CLAS-02**: 用户体验到固定 2 人小班结构，包含 1 位老师、1 个真实孩子和 1 个 AI 同学
 - [ ] **CLAS-03**: 用户能感受到由老师主导的一次点名一个孩子作答的课堂节奏
 - [ ] **CLAS-04**: 用户可以通过先看或穿插观看 AI 同学作答来获得自然的准备和喘息空间
@@ -75,7 +75,7 @@
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| CLAS-01 | Phase 1 | Pending |
+| CLAS-01 | Phase 1 | Complete |
 | CONT-01 | Phase 1 | Complete |
 | CONT-02 | Phase 1 | Complete |
 | PLAT-01 | Phase 1 | Complete |

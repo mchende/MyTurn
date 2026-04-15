@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: Completed 01-classroom-shell-02-PLAN.md
-last_updated: "2026-04-15T14:02:07.937Z"
+stopped_at: Completed 01-classroom-shell-03-PLAN.md
+last_updated: "2026-04-15T14:11:42.267Z"
 last_activity: 2026-04-15
 progress:
   total_phases: 5
   completed_phases: 0
   total_plans: 4
-  completed_plans: 2
-  percent: 50
+  completed_plans: 3
+  percent: 75
 ---
 
 # Project State
@@ -26,33 +26,34 @@ See: .planning/PROJECT.md (updated 2026-04-15)
 ## Current Position
 
 Phase: 01 (classroom-shell) — EXECUTING
-Plan: 3 of 4
+Plan: 4 of 4
 Status: Ready to execute
 Last activity: 2026-04-15
 
-Progress: [█████░░░░░] 50%
+Progress: [████████░░] 75%
 
 ## Performance Metrics
 
 **Velocity:**
 
-- Total plans completed: 2
-- Average duration: 4min
-- Total execution time: 0.1 hours
+- Total plans completed: 3
+- Average duration: 5min
+- Total execution time: 0.2 hours
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
-| 01-classroom-shell | 2 | 8min | 4min |
+| 01-classroom-shell | 3 | 14min | 5min |
 
 **Recent Trend:**
 
-- Last 5 plans: 01-01, 01-02
+- Last 5 plans: 01-01, 01-02, 01-03
 - Trend: Stable
 
 | Phase 01-classroom-shell P01 | 2m | 2 tasks | 15 files |
 | Phase 01-classroom-shell P02 | 6min | 2 tasks | 13 files |
+| Phase 01-classroom-shell P03 | 6min | 1 tasks | 10 files |
 
 ## Accumulated Context
 
@@ -70,6 +71,9 @@ Progress: [█████░░░░░] 50%
 - [Phase 01-classroom-shell]: Keep lesson stages fixed in schema and let pages consume exported contracts instead of redefining stage IDs.
 - [Phase 01-classroom-shell]: Model entry timing as a pure selector plus a day-session builder so homepage and lesson routes share one access-state rule.
 - [Phase 01-classroom-shell]: Seed week-01 lesson content locally with parsed TS modules and stable SVG assets to support image-first classroom screens.
+- [Phase 01-classroom-shell]: Move the homepage shell into src/app/(marketing)/page.tsx so the real root route follows the Stitch schedule contract.
+- [Phase 01-classroom-shell]: Homepage data is mapped into a server-safe schedule view-model before rendering cards and CTA state.
+- [Phase 01-classroom-shell]: Keep mobile top bar and desktop left rail in parallel so 主页 and 设置 remain reachable across breakpoints.
 
 ### Pending Todos
 
@@ -82,6 +86,6 @@ Progress: [█████░░░░░] 50%
 
 ## Session Continuity
 
-Last session: 2026-04-15T14:02:07.934Z
-Stopped at: Completed 01-classroom-shell-02-PLAN.md
+Last session: 2026-04-15T14:11:42.264Z
+Stopped at: Completed 01-classroom-shell-03-PLAN.md
 Resume file: None
