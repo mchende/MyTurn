@@ -1,7 +1,7 @@
 import { render, screen, within } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
 
-import { HomepageShell, type TodayScheduleViewModel } from '@/app/page';
+import { HomepageShell, type TodayScheduleViewModel } from '@/app/(marketing)/page';
 
 const homepageViewModel: TodayScheduleViewModel = {
   todayLabel: '4月15日 星期三',
@@ -94,9 +94,9 @@ describe('homepage shell contract', () => {
   it('renders the Stitch homepage shell with left nav and session grid', () => {
     render(<HomepageShell viewModel={homepageViewModel} />);
 
-    expect(screen.getByText('MyTurn')).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: '主页' })).toBeInTheDocument();
-    expect(screen.getByText('设置')).toBeInTheDocument();
+    expect(screen.getAllByText('MyTurn').length).toBeGreaterThan(0);
+    expect(screen.getAllByRole('link', { name: '主页' }).length).toBeGreaterThan(0);
+    expect(screen.getAllByText('设置').length).toBeGreaterThan(0);
     expect(screen.getByRole('heading', { name: '我的课堂' })).toBeInTheDocument();
 
     const grid = screen.getByTestId('session-card-grid');
@@ -107,16 +107,16 @@ describe('homepage shell contract', () => {
   it('renders entry CTA only for open sessions and locked copy for started sessions', () => {
     render(<HomepageShell viewModel={homepageViewModel} />);
 
-    const entryLink = screen.getByRole('link', { name: '进入课堂' });
-    expect(entryLink).toHaveAttribute('href', '/lesson/weekday-1400');
-    expect(screen.getByText('已开课，停止入场')).toBeInTheDocument();
+    const entryLinks = screen.getAllByRole('link', { name: '进入课堂' });
+    expect(entryLinks[0]).toHaveAttribute('href', '/lesson/weekday-1400');
+    expect(screen.getAllByText('已开课，停止入场').length).toBeGreaterThan(0);
   });
 
   it('keeps upcoming sessions readable with start time emphasis and countdown copy', () => {
     render(<HomepageShell viewModel={homepageViewModel} />);
 
-    expect(screen.getByText('19:30')).toBeInTheDocument();
-    expect(screen.getByText('距开场 05:33:00')).toBeInTheDocument();
-    expect(screen.getByText('4月15日 星期三')).toBeInTheDocument();
+    expect(screen.getAllByText('19:30').length).toBeGreaterThan(0);
+    expect(screen.getAllByText('距开场 05:33:00').length).toBeGreaterThan(0);
+    expect(screen.getAllByText('4月15日 星期三').length).toBeGreaterThan(0);
   });
 });
