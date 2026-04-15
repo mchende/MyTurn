@@ -1,75 +1,75 @@
 # Requirements: MyTurn
 
 **Defined:** 2026-04-15
-**Core Value:** A child should feel like they are truly in a small English class and stay willing to speak throughout the lesson.
+**Core Value:** 孩子在整节课里都应真实地感受到自己“正在上一节英语小班课”，并且持续愿意开口说。
 
 ## v1 Requirements
 
 ### Classroom Experience
 
-- [ ] **CLAS-01**: User can enter a lesson from the browser and start a fixed 15-minute classroom session
-- [ ] **CLAS-02**: User experiences a fixed 2-student classroom with one teacher, one real child, and one AI classmate
-- [ ] **CLAS-03**: User sees teacher-led one-at-a-time calling so only one child is on the spot at any moment
-- [ ] **CLAS-04**: User gets natural breathing room by watching the AI classmate answer before or between their own turns
+- [ ] **CLAS-01**: 用户可以在浏览器中进入课程并启动一节固定 15 分钟的课堂
+- [ ] **CLAS-02**: 用户体验到固定 2 人小班结构，包含 1 位老师、1 个真实孩子和 1 个 AI 同学
+- [ ] **CLAS-03**: 用户能感受到由老师主导的一次点名一个孩子作答的课堂节奏
+- [ ] **CLAS-04**: 用户可以通过先看或穿插观看 AI 同学作答来获得自然的准备和喘息空间
 
 ### Lesson Content
 
-- [ ] **CONT-01**: Operator can configure each lesson with five target words or short phrases
-- [ ] **CONT-02**: Operator can attach one image to each target item for use in teaching and questioning
-- [ ] **CONT-03**: Lesson flow uses images as the primary comprehension cue instead of Chinese explanation
-- [ ] **CONT-04**: The same lesson content can support repeated practice rounds with increasing output demands
+- [ ] **CONT-01**: 运营或配置者可以为每节课配置 5 个目标词或短句
+- [ ] **CONT-02**: 运营或配置者可以为每个目标项绑定 1 张图片，供示范与提问环节使用
+- [ ] **CONT-03**: 课堂流程以图片作为主要理解线索，而不是依赖中文解释
+- [ ] **CONT-04**: 同一节课内容可以支撑多轮重复练习，并逐步提高输出要求
 
 ### Teacher Facilitation
 
-- [ ] **TEAC-01**: User hears a teacher persona that demonstrates target language with clear classroom-style transitions
-- [ ] **TEAC-02**: User receives gentle wait time, encouragement, and clear point-to-answer prompts from the teacher
-- [ ] **TEAC-03**: When the child struggles, the teacher first offers a light hint before asking for another attempt
-- [ ] **TEAC-04**: After repeated failed attempts, the teacher can fall back to model-and-repeat to restore momentum
+- [ ] **TEAC-01**: 用户能听到具有老师风格的课堂引导，包括示范目标语言和清晰的过渡话术
+- [ ] **TEAC-02**: 用户能从老师那里获得温和的等待、鼓励和明确的点名作答提示
+- [ ] **TEAC-03**: 当孩子作答困难时，老师会先给出轻量提示，再让孩子重新尝试
+- [ ] **TEAC-04**: 当孩子连续几次仍无法作答时，老师可以退回到“示范 + 跟读”的兜底方式以恢复课堂节奏
 
 ### AI Classmate
 
-- [ ] **AICL-01**: User hears an AI classmate respond like a believable peer rather than a perfect answer player
-- [ ] **AICL-02**: AI classmate responses can include slight hesitation or mild imperfection while still following the lesson
+- [ ] **AICL-01**: 用户听到的 AI 同学应像一个可信的同龄同学，而不是一个完美播报器
+- [ ] **AICL-02**: AI 同学的回答可以带有轻微犹豫或不完美，但整体仍应跟得上课堂
 
 ### Speaking and Evaluation
 
-- [ ] **SPKG-01**: User can complete early practice rounds by repeating target language after the teacher
-- [ ] **SPKG-02**: User can complete later rounds by answering teacher prompts from the picture with meaning-equivalent speech
-- [ ] **SPKG-03**: System evaluates repetition rounds with close-match rules focused on the target phrase itself
-- [ ] **SPKG-04**: System evaluates picture-answer rounds with more lenient meaning-based matching
-- [ ] **SPKG-05**: System uses judgment and correction behavior that supports confidence and classroom flow instead of strict scoring
+- [ ] **SPKG-01**: 用户可以在前期练习轮次中跟随老师复述目标语言
+- [ ] **SPKG-02**: 用户可以在后期练习轮次中根据图片回答老师提问，并允许表达与标准答案意义相近
+- [ ] **SPKG-03**: 系统在复述环节使用更贴近目标词句本身的近似匹配规则
+- [ ] **SPKG-04**: 系统在看图作答环节使用更宽松的基于语义的匹配规则
+- [ ] **SPKG-05**: 系统的判断与纠错方式应服务于信心建立和课堂推进，而不是严格打分
 
 ### Platform and Presentation
 
-- [ ] **PLAT-01**: User sees a classroom-style interface designed first for landscape tablet and still usable on phone and desktop
-- [ ] **PLAT-02**: User can complete the full MVP lesson in a web experience without native app installation
+- [ ] **PLAT-01**: 用户看到的界面应首先面向平板横屏设计，同时兼容手机和桌面端使用
+- [ ] **PLAT-02**: 用户无需安装原生 App，就能在网页中完成整节 MVP 课程
 
 ## v2 Requirements
 
 ### Content System
 
-- **CONT-05**: Operator can manage a larger reusable lesson library and multi-lesson progression
-- **CONT-06**: Operator can author lessons with richer structures than target item plus image pairs
+- **CONT-05**: 运营或配置者可以管理更大的可复用课程库和多课次进阶体系
+- **CONT-06**: 运营或配置者可以创建比“目标项 + 图片”更丰富的课程结构
 
 ### Classroom Expansion
 
-- **CLAS-05**: Multiple real children can join the same live classroom
-- **CLAS-06**: Session history and repeat scheduling can span multiple class meetings
+- **CLAS-05**: 多个真实孩子可以加入同一节实时课堂
+- **CLAS-06**: 课堂记录与重复上课安排可以跨越多次上课会话
 
 ### Business and Ops
 
-- **BIZ-01**: Parent-facing subscription, management, and reporting flows are available
-- **BIZ-02**: Native mobile or tablet app distribution is supported
+- **BIZ-01**: 提供面向家长的订阅、管理和反馈查看流程
+- **BIZ-02**: 支持原生手机或平板 App 形态发布
 
 ## Out of Scope
 
 | Feature | Reason |
 |---------|--------|
-| App store release | Web-first validation is faster and lower risk for the MVP |
-| Real-time multiplayer with multiple real children | Would add major infra and interaction complexity before classroom feel is validated |
-| Full curriculum management backend | Not required to prove one lesson can feel like a class |
-| Parent dashboard and operations tooling | Outside the child classroom loop being validated now |
-| Production pronunciation scoring | Strict scoring is not the MVP's value proposition |
+| 应用商店发布 | 对当前 MVP 而言，网页优先验证更快、风险更低 |
+| 多个真实孩子的实时多人课堂 | 会在课堂感尚未验证前显著增加基础设施和交互复杂度 |
+| 完整课程管理后台 | 当前目标不是验证内容体系，而是验证一节课能否成立 |
+| 家长后台与运营工具 | 不属于当前要验证的孩子课堂主流程 |
+| 生产级发音评分 | 严格评分不是当前 MVP 的核心价值 |
 
 ## Traceability
 
@@ -98,8 +98,8 @@
 | PLAT-02 | Phase 5 | Pending |
 
 **Coverage:**
-- v1 requirements: 21 total
-- Mapped to phases: 21
+- v1 requirements: 共 21 条
+- Mapped to phases: 已映射 21 条
 - Unmapped: 0 ✓
 
 ---
