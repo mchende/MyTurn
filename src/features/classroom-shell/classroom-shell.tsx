@@ -6,8 +6,9 @@ import { motion, AnimatePresence } from 'framer-motion';
 import type { Lesson } from '@/features/lesson-config/lesson-schema';
 
 import { LessonBoard } from './lesson-board';
+import type { PodiumViewModel } from './podium-view-model';
 import { StudentSeatStrip } from './student-seat-strip';
-import { useClassroomFlow } from './use-classroom-flow';
+import { useClassroomOrchestrator } from './use-classroom-orchestrator';
 
 type ClassroomShellProps = {
   lesson: Lesson;
@@ -24,9 +25,9 @@ export function ClassroomShell({
   sessionStatus,
   showReward = false,
 }: ClassroomShellProps) {
-  const flow = useClassroomFlow({
+  const classroom = useClassroomOrchestrator({
     lesson,
-    forceReward: showReward,
+    showReward,
   });
 
   return (
@@ -47,7 +48,10 @@ export function ClassroomShell({
           </div>
 
           <div className="flex flex-1 justify-center">
-            <StudentSeatStrip activeSeat={flow.activeSeat} sessionId={sessionId} />
+            <StudentSeatStrip
+              seats={classroom.podiumViewModel.seats}
+              sessionId={sessionId}
+            />
           </div>
 
           <div className="flex w-1/4 min-w-[220px] items-center justify-end gap-3">
@@ -59,28 +63,26 @@ export function ClassroomShell({
         <div className="flex min-h-0 flex-1 gap-6">
           <section className="min-w-0 flex-[3]">
             <LessonBoard
-              currentItem={flow.currentItem}
-              currentItemIndex={flow.currentItemIndex}
-              progressCount={flow.progressCount}
+              currentItem={classroom.currentItem}
+              currentItemIndex={classroom.currentItemIndex}
+              progressCount={classroom.progressCount}
               sessionStatus={sessionStatus}
-              stageBadge={flow.stageBadge}
-              stagePrompt={flow.stagePrompt}
+              stageBadge={classroom.stageBadge}
+              stagePrompt={classroom.stagePrompt}
             />
           </section>
 
           <aside className="flex w-full max-w-[360px] flex-1 flex-col gap-6">
-            <TeacherColumn hint={flow.teacherHint} message={flow.teacherMessage} />
-            <PodiumColumn
-              activeSeat={flow.activeSeat}
-              currentItem={flow.currentItem}
-              podiumCaption={flow.podiumCaption}
-              rewardVisible={flow.rewardVisible}
+            <TeacherColumn
+              hint={classroom.teacherHint}
+              message={classroom.teacherMessage}
             />
+            <PodiumColumn podiumViewModel={classroom.podiumViewModel} />
           </aside>
         </div>
       </div>
 
-      <CelebrateOverlay show={flow.rewardVisible} />
+      <CelebrateOverlay show={classroom.rewardVisible} />
     </main>
   );
 }
@@ -147,23 +149,14 @@ function TeacherColumn({
 }
 
 function PodiumColumn({
-  activeSeat,
-  currentItem,
-  podiumCaption,
-  rewardVisible,
+  podiumViewModel,
 }: {
-  activeSeat: 'me' | 'ai' | null;
-  currentItem: {
-    imageSrc: string;
-    text: string;
-  };
-  podiumCaption: string;
-  rewardVisible: boolean;
+  podiumViewModel: PodiumViewModel;
 }) {
   const bars = [0.42, 0.62, 1, 0.72, 0.5];
-  const isStudentTurn = activeSeat === 'me';
-  const liveAvatarSrc = activeSeat === 'ai' ? '/avatars/student-bobby.svg' : '/avatars/reward-student.svg';
-  const liveAvatarAlt = activeSeat === 'ai' ? 'Bobby 讲台画面' : '我的摄像头占位';
+  const isStudentTurn = podiumViewModel.seats.some(
+    (seat) => seat.id === 'me' && seat.isOnStage,
+  );
 
   return (
     <section
@@ -189,20 +182,27 @@ function PodiumColumn({
 
         <div className="flex flex-1 items-center justify-center bg-[radial-gradient(circle_at_50%_10%,rgba(255,255,255,0.06),transparent_32%),linear-gradient(180deg,#111827_0%,#0b1220_100%)]">
           <div className="flex h-[76%] w-[76%] flex-col items-center justify-center rounded-[32px] border border-white/5 bg-[#162238]">
-            <img
-              alt={liveAvatarAlt}
-              className="h-[82%] w-[82%] object-contain opacity-90"
-              src={liveAvatarSrc}
-            />
+            <AnimatePresence mode="wait">
+              <motion.img
+                alt={podiumViewModel.liveAvatarAlt}
+                animate={{ opacity: 0.9, scale: 1 }}
+                className="h-[82%] w-[82%] object-contain"
+                exit={{ opacity: 0, scale: 0.96 }}
+                initial={{ opacity: 0, scale: 0.98 }}
+                key={podiumViewModel.liveAvatarSrc}
+                src={podiumViewModel.liveAvatarSrc}
+                transition={{ duration: 0.22, ease: 'easeOut' }}
+              />
+            </AnimatePresence>
             <div className="mt-4 rounded-full border border-white/10 bg-black/20 px-3 py-1 text-[11px] font-bold tracking-[0.12em] text-white/65">
-              {podiumCaption}
+              {podiumViewModel.podiumCaption}
             </div>
           </div>
         </div>
 
         <div className="absolute bottom-16 left-6 right-6 flex items-center justify-center">
           <p className="rounded-full border border-white/10 bg-black/30 px-3 py-1.5 text-[11px] font-bold text-white/70">
-            {rewardVisible ? 'GREAT JOB!' : currentItem.text.toUpperCase()}
+            {podiumViewModel.podiumStatus}
           </p>
         </div>
 
@@ -212,7 +212,12 @@ function PodiumColumn({
               animate={{ height: [`${Math.max(bar * 70, 20)}%`, `${Math.min(bar * 100 + 12, 100)}%`, `${Math.max(bar * 62, 24)}%`] }}
               className={index === 2 ? 'w-2 rounded-full bg-[#10B981] shadow-[0_0_15px_#10B981]' : 'w-2 rounded-full bg-[#10B981]'}
               key={`${bar}-${index}`}
-              transition={{ duration: 0.9 + index * 0.1, repeat: Number.POSITIVE_INFINITY, ease: 'easeInOut' }}
+              transition={{
+                duration:
+                  podiumViewModel.pulseDurationMs / 1000 + index * 0.08,
+                repeat: Number.POSITIVE_INFINITY,
+                ease: 'easeInOut',
+              }}
             />
           ))}
         </div>

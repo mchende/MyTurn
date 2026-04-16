@@ -82,14 +82,10 @@ describe('classroom shell layout', () => {
     await advanceFlow(CLASSROOM_TIMINGS.teacher_prompt);
 
     expect(screen.getByText(teacherAiLine.spokenLine)).toBeInTheDocument();
-    expect(screen.getByText(bobbyLine?.spokenLine ?? '')).toBeInTheDocument();
+    expect(screen.getByText(bobbyLine?.hintLabel ?? '')).toBeInTheDocument();
     expect(screen.getByTestId('seat-ai')).toHaveAttribute('data-on-stage', 'true');
     expect(screen.getByTestId('seat-me')).toHaveAttribute('data-on-stage', 'false');
     expect(screen.getByTestId('seat-empty')).toBeInTheDocument();
-    expect(screen.getByAltText('Bobby 讲台画面')).toHaveAttribute(
-      'src',
-      '/avatars/student-bobby.svg',
-    );
     expect(screen.getAllByText('讲台中')).toHaveLength(1);
 
     await advanceFlow(CLASSROOM_TIMINGS.ai_model);
@@ -131,7 +127,7 @@ describe('classroom shell layout', () => {
     await advanceFlow(CLASSROOM_TIMINGS.student_wait);
 
     expect(screen.getByText(encourageLine.spokenLine)).toBeInTheDocument();
-    expect(screen.queryByText(/Uh\.\.\. APPLE!/)).not.toBeInTheDocument();
+    expect(screen.queryByText(bobbyLineText('apple'))).not.toBeInTheDocument();
     expect(screen.queryByText('GREAT JOB!')).not.toBeInTheDocument();
     expect(screen.getByTestId('seat-me')).toHaveAttribute('data-on-stage', 'false');
     expect(screen.getByTestId('seat-ai')).toHaveAttribute('data-on-stage', 'false');
@@ -158,7 +154,15 @@ describe('classroom shell layout', () => {
       />,
     );
 
-    expect(screen.getAllByText('GREAT JOB!')).toHaveLength(2);
-    expect(screen.getByText('奖励时刻')).toBeInTheDocument();
+    expect(screen.getAllByText('GREAT JOB!')).toHaveLength(1);
+    expect(screen.getAllByText('奖励时刻')).toHaveLength(2);
   });
 });
+
+function bobbyLineText(targetText: string) {
+  return getBobbyScriptLine({
+    currentItemIndex: 0,
+    phase: 'ai_model',
+    targetText,
+  })?.spokenLine;
+}

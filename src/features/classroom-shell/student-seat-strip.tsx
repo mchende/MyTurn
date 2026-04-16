@@ -1,32 +1,38 @@
 import { Plus } from 'lucide-react';
 
+import type { StudentSeatViewModel } from './podium-view-model';
+
 type StudentSeatStripProps = {
-  activeSeat: 'me' | 'ai' | null;
+  seats: readonly StudentSeatViewModel[];
   sessionId: string;
 };
 
-export function StudentSeatStrip({ activeSeat, sessionId }: StudentSeatStripProps) {
+export function StudentSeatStrip({ seats, sessionId }: StudentSeatStripProps) {
   return (
     <section className="w-full max-w-[420px]" data-testid="classroom-seat-strip">
       <div className="flex items-center gap-4 rounded-[24px] border border-white/5 bg-white/5 p-2 backdrop-blur-md">
-        <SeatAvatar
-          imageAlt="我的席位"
-          imageSrc="/avatars/reward-student.svg"
-          isOnStage={activeSeat === 'me'}
-          label="我"
-          sessionId={sessionId}
-          testId="seat-me"
-        />
-        <SeatAvatar
-          imageAlt="AI 同学 Bobby"
-          imageSrc="/avatars/student-bobby.svg"
-          isOnStage={activeSeat === 'ai'}
-          label="AI"
-          testId="seat-ai"
-        />
-        <div className="flex h-14 w-14 items-center justify-center rounded-2xl border-2 border-dashed border-slate-800 text-slate-700">
-          <Plus className="h-5 w-5 opacity-40" />
-        </div>
+        {seats.map((seat) =>
+          seat.isEmpty ? (
+            <div
+              className="flex h-14 w-14 items-center justify-center rounded-2xl border-2 border-dashed border-slate-800 text-slate-700"
+              data-testid={seat.testId}
+              key={seat.id}
+            >
+              <Plus className="h-5 w-5 opacity-40" />
+              <span className="sr-only">{seat.label}</span>
+            </div>
+          ) : (
+            <SeatAvatar
+              imageAlt={seat.imageAlt ?? seat.label}
+              imageSrc={seat.imageSrc ?? ''}
+              isOnStage={seat.isOnStage}
+              key={seat.id}
+              label={seat.label}
+              sessionId={seat.id === 'me' ? sessionId : undefined}
+              testId={seat.testId}
+            />
+          ),
+        )}
       </div>
     </section>
   );
