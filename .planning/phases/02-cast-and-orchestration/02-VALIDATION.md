@@ -44,7 +44,7 @@ created: 2026-04-16
 | 02-02-02 | 02-02 | 2 | TEAC-01, CLAS-03 | unit | `npm run test:unit -- test/unit/lesson-board.test.tsx test/unit/teacher-script.test.ts` | ❌ planned | ⬜ pending |
 | 02-03-01 | 02-03 | 3 | AICL-01, AICL-02, CLAS-04 | unit | `npm run test:unit -- test/unit/bobby-script.test.ts` | ❌ planned | ⬜ pending |
 | 02-03-02 | 02-03 | 3 | TEAC-01, CLAS-02, CLAS-04, AICL-01, AICL-02 | unit | `npm run test:unit -- test/unit/classroom-shell.test.tsx test/unit/classroom-orchestrator.test.ts test/unit/teacher-script.test.ts test/unit/bobby-script.test.ts` | ✅ partial / ❌ planned | ⬜ pending |
-| 02-03-03 | 02-03 | 3 | TEAC-01, CLAS-02, CLAS-04 | e2e | `npm run test:unit && npm run test:e2e` | ✅ | ⬜ pending |
+| 02-03-03 | 02-03 | 3 | TEAC-01, CLAS-02, CLAS-04 | e2e smoke | `npm run test:unit -- test/unit/classroom-shell.test.tsx test/unit/bobby-script.test.ts && npm run test:e2e -- test/e2e/classroom-entry.spec.ts` | ✅ / ❌ planned | ⬜ pending |
 
 *Status: ⬜ pending · ✅ green · ❌ red · ⚠️ flaky*
 
