@@ -1,6 +1,7 @@
 import { defaultWeekdayScheduleTemplate } from '../../../content/schedules/default-weekday';
 import { buildDaySessions } from './build-day-sessions';
 import type { SessionAccessState } from '@/lib/time/session-access-state';
+import { getReferenceNow } from '@/lib/time/reference-now';
 
 export type TodayScheduleSessionViewModel = {
   sessionId: string;
@@ -88,16 +89,6 @@ export function getTodayScheduleViewModel(now: Date = getReferenceNow()): TodayS
     nextSession: sessions.find((session) => session.accessState !== 'completed') ?? null,
     sessions,
   };
-}
-
-function getReferenceNow() {
-  const fixedNow = process.env.MYTURN_FIXED_NOW;
-
-  if (fixedNow) {
-    return new Date(fixedNow);
-  }
-
-  return new Date();
 }
 
 function formatTodayLabel(date: Date) {

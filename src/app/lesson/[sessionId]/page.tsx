@@ -4,6 +4,7 @@ import { ClassroomShell } from '@/features/classroom-shell/classroom-shell';
 import { loadLesson } from '@/features/lesson-config/load-lesson';
 import { getTodayScheduleViewModel } from '@/features/schedule/get-today-schedule-view-model';
 import { buildDaySessions } from '@/features/schedule/build-day-sessions';
+import { getReferenceNow } from '@/lib/time/reference-now';
 import { defaultWeekdayScheduleTemplate } from '../../../../content/schedules/default-weekday';
 
 type LessonPageProps = {
@@ -42,16 +43,6 @@ export default async function LessonPage({ params, searchParams }: LessonPagePro
       sessionStatus={getSessionStatus(sessionView)}
     />
   );
-}
-
-function getReferenceNow() {
-  const fixedNow = process.env.MYTURN_FIXED_NOW;
-
-  if (fixedNow) {
-    return new Date(fixedNow);
-  }
-
-  return new Date();
 }
 
 function getSessionStatus(session: { accessState: string; countdownLabel: string; startTimeLabel: string }) {

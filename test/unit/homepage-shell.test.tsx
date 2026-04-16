@@ -98,8 +98,7 @@ describe('homepage shell contract', () => {
     const cta = screen.getByRole('link', { name: '进入教室' });
     expect(cta).toHaveAttribute('href', '/lesson/weekday-1700');
     expect(screen.getByText('Cora 老师')).toBeInTheDocument();
-    expect(screen.getByText('AI 同学 Bobby')).toBeInTheDocument();
-    expect(screen.getByText('主讲老师')).toBeInTheDocument();
+    expect(screen.getByText('Bobby 同学')).toBeInTheDocument();
   });
 
   it('renders the right-side session timeline states from the prototype', () => {

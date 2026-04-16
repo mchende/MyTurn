@@ -37,8 +37,8 @@ export function HomepageShell({ viewModel }: { viewModel: TodayScheduleViewModel
   }
 
   return (
-    <main className="min-h-screen bg-[#F9FAFB] text-[#1F2937]">
-      <div className="flex min-h-screen overflow-hidden">
+    <main className="h-screen overflow-hidden bg-[#F9FAFB] text-[#1F2937]">
+      <div className="flex h-screen overflow-hidden">
         <aside className="flex w-28 shrink-0 flex-col items-center justify-between border-r border-[#E5E7EB] bg-white py-8">
           <div className="flex w-full flex-col items-center gap-10">
             <div className="flex h-16 w-16 items-center justify-center rounded-[24px] bg-[#10B981] text-white shadow-[0_20px_45px_rgba(16,185,129,0.22)]">
@@ -70,7 +70,7 @@ export function HomepageShell({ viewModel }: { viewModel: TodayScheduleViewModel
           </div>
         </aside>
 
-        <section className="flex min-w-0 flex-1 flex-col">
+        <section className="flex min-w-0 flex-1 flex-col overflow-hidden">
           <header className="flex h-24 shrink-0 items-center justify-between border-b border-[#E5E7EB] bg-white/70 px-8 backdrop-blur-md xl:px-10">
             <div className="flex items-center gap-4">
               <div className="flex h-12 w-12 items-center justify-center rounded-[20px] bg-[#10B981] text-white shadow-[0_14px_30px_rgba(16,185,129,0.2)]">
@@ -103,16 +103,16 @@ export function HomepageShell({ viewModel }: { viewModel: TodayScheduleViewModel
             </div>
           </header>
 
-          <div className="flex flex-1 gap-8 overflow-hidden p-8 xl:p-10">
+          <div className="flex flex-1 gap-8 overflow-hidden p-6 xl:p-8">
             <motion.section
               animate={{ opacity: 1, y: 0 }}
-              className="flex min-w-0 flex-[2] flex-col"
+              className="flex min-w-0 flex-[2] flex-col overflow-hidden"
               initial={{ opacity: 0, y: 24 }}
               transition={{ duration: 0.35, ease: 'easeOut' }}
               data-testid="hero-card"
             >
-              <div className="flex flex-1 flex-col justify-between rounded-[48px] border border-[#E5E7EB] bg-white p-10 shadow-[0_24px_60px_rgba(15,23,42,0.05)]">
-                <div className="space-y-8">
+              <div className="flex h-full flex-col justify-between rounded-[48px] border border-[#E5E7EB] bg-white p-8 shadow-[0_24px_60px_rgba(15,23,42,0.05)] xl:p-10">
+                <div className="space-y-6">
                   <div className="flex items-start justify-between gap-6">
                     <motion.div
                       animate={{
@@ -135,11 +135,11 @@ export function HomepageShell({ viewModel }: { viewModel: TodayScheduleViewModel
 
                     <motion.div
                       animate={{ opacity: 1, scale: 1 }}
-                      className="rounded-[32px] bg-[#1F2937] px-7 py-5 text-white shadow-[0_18px_40px_rgba(31,41,55,0.18)]"
+                      className="rounded-[32px] border border-[#E5E7EB] bg-[#F9FAFB] px-7 py-5 text-right shadow-[0_12px_28px_rgba(15,23,42,0.04)]"
                       initial={{ opacity: 0, scale: 0.96 }}
                       transition={{ delay: 0.08, duration: 0.3, ease: 'easeOut' }}
                     >
-                      <p className="text-[10px] font-black uppercase tracking-[0.28em] text-white/50">
+                      <p className="text-[10px] font-black uppercase tracking-[0.28em] text-[#9CA3AF]">
                         距离开课
                       </p>
                       <p className="mt-2 font-mono text-5xl font-black tracking-[-0.08em] text-[#10B981]">
@@ -152,18 +152,17 @@ export function HomepageShell({ viewModel }: { viewModel: TodayScheduleViewModel
                     <h2 className="text-6xl font-black tracking-[-0.08em] text-[#1F2937]">
                       {focusSession.title}
                     </h2>
-                    <p className="mt-3 text-2xl font-black italic tracking-[-0.04em] text-[#9CA3AF]">
+                    <p className="mt-3 text-xl font-black italic tracking-[-0.04em] text-[#9CA3AF]">
                       {focusSession.campLabel}
                     </p>
                   </div>
                 </div>
 
-                <div className="my-8 flex items-center gap-10 border-y border-[#F3F4F6] py-8">
+                <div className="my-6 flex items-center gap-8 border-y border-[#F3F4F6] py-6">
                   <RoleCard
                     imageAlt="Cora 老师"
                     imageSrc="/avatars/teacher-cora.svg"
                     label="Cora 老师"
-                    role="主讲老师"
                     tone="emerald"
                   />
 
@@ -172,14 +171,13 @@ export function HomepageShell({ viewModel }: { viewModel: TodayScheduleViewModel
                   <RoleCard
                     imageAlt="同学 Bobby"
                     imageSrc="/avatars/student-bobby.svg"
-                    label="AI 同学 Bobby"
-                    role="同学"
+                    label="Bobby 同学"
                     tone="blue"
                   />
                 </div>
 
                 <Link
-                  className="inline-flex w-full items-center justify-center gap-4 rounded-[36px] bg-[#10B981] py-10 text-3xl font-black text-white shadow-[0_24px_50px_rgba(16,185,129,0.25)] transition-all hover:bg-[#0EA271] active:scale-[0.985]"
+                  className="inline-flex w-full items-center justify-center gap-4 rounded-[36px] bg-[#10B981] py-8 text-3xl font-black text-white shadow-[0_24px_50px_rgba(16,185,129,0.25)] transition-all hover:bg-[#0EA271] active:scale-[0.985]"
                   href={`/lesson/${focusSession.sessionId}`}
                 >
                   <DoorOpen className="h-8 w-8" />
@@ -190,26 +188,26 @@ export function HomepageShell({ viewModel }: { viewModel: TodayScheduleViewModel
 
             <motion.aside
               animate={{ opacity: 1, y: 0 }}
-              className="flex min-w-[320px] flex-1 flex-col"
+              className="flex min-w-[320px] flex-1 flex-col overflow-hidden"
               initial={{ opacity: 0, y: 24 }}
               transition={{ delay: 0.06, duration: 0.35, ease: 'easeOut' }}
               data-testid="session-timeline"
             >
-              <div className="flex flex-1 flex-col rounded-[48px] border border-[#E5E7EB] bg-white p-8 shadow-[0_18px_50px_rgba(15,23,42,0.04)]">
-                <div className="mb-8 flex items-center justify-between">
+              <div className="flex h-full flex-col rounded-[48px] border border-[#E5E7EB] bg-white p-7 shadow-[0_18px_50px_rgba(15,23,42,0.04)] xl:p-8">
+                <div className="mb-6 flex items-center justify-between">
                   <h3 className="text-[28px] font-black tracking-[-0.05em]">今日课堂场次</h3>
                   <span className="rounded-[16px] bg-[#ECFDF5] px-3 py-1.5 text-[11px] font-black text-[#10B981]">
                     每节 15 分钟
                   </span>
                 </div>
 
-                <div className="flex-1 space-y-4">
+                <div className="flex-1 space-y-4 overflow-hidden">
                   {viewModel.sessions.map((session) => (
                     <TimelineSessionRow key={session.sessionId} session={session} />
                   ))}
                 </div>
 
-                <div className="mt-6 border-t border-[#F3F4F6] pt-6">
+                <div className="mt-5 border-t border-[#F3F4F6] pt-5">
                   <div className="flex items-start gap-3 text-[#9CA3AF]">
                     <Info className="mt-0.5 h-4 w-4 shrink-0" />
                     <p className="text-xs font-black leading-relaxed">
@@ -230,17 +228,15 @@ function RoleCard({
   imageSrc,
   imageAlt,
   label,
-  role,
   tone,
 }: {
   imageSrc: string;
   imageAlt: string;
   label: string;
-  role: string;
   tone: 'emerald' | 'blue';
 }) {
   return (
-    <div className="flex items-center gap-5">
+    <div className="flex items-center gap-4">
       <div className="relative shrink-0">
         <img
           alt={imageAlt}
@@ -250,22 +246,9 @@ function RoleCard({
           )}
           src={imageSrc}
         />
-        <span
-          className={cn(
-            'absolute -bottom-2 left-1/2 inline-flex -translate-x-1/2 rounded-xl px-3 py-1 text-[10px] font-black text-white',
-            tone === 'emerald' ? 'bg-[#10B981]' : 'bg-[#3B82F6]',
-          )}
-        >
-          {role}
-        </span>
       </div>
 
-      <p
-        className={cn(
-          'text-[32px] font-black italic tracking-[-0.05em]',
-          tone === 'emerald' ? 'text-[#1F2937]' : 'text-[#2563EB]',
-        )}
-      >
+      <p className="text-[26px] font-black tracking-[-0.04em] text-[#1F2937]">
         {label}
       </p>
     </div>

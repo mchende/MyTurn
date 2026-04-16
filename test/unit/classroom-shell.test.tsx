@@ -11,7 +11,7 @@ afterEach(() => {
 });
 
 describe('classroom shell layout', () => {
-  it('renders the approved dark classroom shell with stage, strip, and side panels', () => {
+  it('renders the immersive classroom shell with stage, strip, and side panels', () => {
     render(
       <ClassroomShell
         lesson={lesson}
@@ -22,15 +22,16 @@ describe('classroom shell layout', () => {
     );
 
     expect(screen.getByText('MyTurn')).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: '退出课堂' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: '退出' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: '设置' })).toBeInTheDocument();
     expect(screen.getByText('Cora 老师')).toBeInTheDocument();
-    expect(screen.getByText(`"It's your turn! Say LION!"`)).toBeInTheDocument();
-    expect(screen.getByText('榜单奖励时刻')).toBeInTheDocument();
+    expect(screen.getByText("It's your turn! Say LION!")).toBeInTheDocument();
+    expect(screen.getByText('你的发言时间')).toBeInTheDocument();
     expect(screen.getByTestId('classroom-seat-strip')).toBeInTheDocument();
     expect(screen.getByTestId('classroom-stage')).toBeInTheDocument();
   });
 
-  it('keeps the reward preview card visible beside the stage in default mode', () => {
+  it('keeps the podium live area and occupied seat states visible in default mode', () => {
     render(
       <ClassroomShell
         lesson={lesson}
@@ -40,8 +41,11 @@ describe('classroom shell layout', () => {
       />,
     );
 
-    expect(screen.getByAltText('奖励中的同学')).toHaveAttribute('src', '/avatars/reward-student.svg');
-    expect(screen.getByAltText('讲台中的 Cora 老师')).toHaveAttribute('src', '/avatars/teacher-cora.svg');
+    expect(screen.getByAltText('动物课堂主画面')).toHaveAttribute('src', '/stage/zoo-immersive-stage.svg');
+    expect(screen.getByAltText('我的席位')).toHaveAttribute('src', '/avatars/reward-student.svg');
+    expect(screen.getByAltText('AI 同学 Bobby')).toHaveAttribute('src', '/avatars/student-bobby.svg');
+    expect(screen.getByText('LIVE')).toBeInTheDocument();
+    expect(screen.getByText('讲台中')).toBeInTheDocument();
   });
 
   it('switches the main stage into the reward feedback state when requested', () => {

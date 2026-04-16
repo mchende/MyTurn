@@ -5,6 +5,15 @@ test.setTimeout(60_000);
 test('home schedule allows lesson entry', async ({ page }) => {
   await page.goto('/', { waitUntil: 'domcontentloaded' });
   await expect(page.getByText('每日语感启蒙')).toBeVisible();
+  await expect(page.getByText('Bobby 同学')).toBeVisible();
+
+  const hasViewportOverflow = await page.evaluate(() => {
+    return (
+      document.documentElement.scrollHeight > window.innerHeight ||
+      document.documentElement.scrollWidth > window.innerWidth
+    );
+  });
+  expect(hasViewportOverflow).toBe(false);
 
   const entryLink = page.getByRole('link', { name: '进入教室' });
   await expect(entryLink).toBeVisible();
@@ -14,7 +23,8 @@ test('home schedule allows lesson entry', async ({ page }) => {
 
   await expect(page).toHaveURL(/\/lesson\//);
   await expect(page.getByText('Cora 老师')).toBeVisible();
-  await expect(page.getByText('榜单奖励时刻')).toBeVisible();
+  await expect(page.getByText('你的发言时间')).toBeVisible();
+  await expect(page.getByText('LIVE')).toBeVisible();
 });
 
 test('classroom reward mode reproduces the celebration overlay', async ({ page }) => {
