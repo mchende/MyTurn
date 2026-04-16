@@ -73,9 +73,6 @@ export function HomepageShell({ viewModel }: { viewModel: TodayScheduleViewModel
         <section className="flex min-w-0 flex-1 flex-col overflow-hidden">
           <header className="flex h-24 shrink-0 items-center justify-between border-b border-[#E5E7EB] bg-white/70 px-8 backdrop-blur-md xl:px-10">
             <div className="flex items-center gap-4">
-              <div className="flex h-12 w-12 items-center justify-center rounded-[20px] bg-[#10B981] text-white shadow-[0_14px_30px_rgba(16,185,129,0.2)]">
-                <Sparkles className="h-6 w-6 fill-current" />
-              </div>
               <h1 className="text-3xl font-black tracking-[-0.05em]">MyTurn</h1>
               <span className="text-[#D1D5DB]">|</span>
               <p className="text-sm font-black text-[#9CA3AF]">{viewModel.todayLabel}</p>

@@ -1,18 +1,13 @@
 'use client';
 
-import {
-  Plus,
-  Settings2,
-  Sparkles,
-  Volume2,
-  X,
-} from 'lucide-react';
+import { Settings2, Sparkles, Volume2, X } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 import type { Lesson } from '@/features/lesson-config/lesson-schema';
 
 import { LessonBoard } from './lesson-board';
 import { StudentSeatStrip } from './student-seat-strip';
+import { useClassroomFlow } from './use-classroom-flow';
 
 type ClassroomShellProps = {
   lesson: Lesson;
@@ -29,6 +24,11 @@ export function ClassroomShell({
   sessionStatus,
   showReward = false,
 }: ClassroomShellProps) {
+  const flow = useClassroomFlow({
+    lesson,
+    forceReward: showReward,
+  });
+
   return (
     <main className="relative h-screen overflow-hidden bg-[#0F172A] px-4 py-4 text-white lg:px-6 lg:py-6">
       <div className="absolute left-0 top-0 h-[36vh] w-[36vw] rounded-full bg-[#10B981]/8 blur-[120px]" />
@@ -47,7 +47,7 @@ export function ClassroomShell({
           </div>
 
           <div className="flex flex-1 justify-center">
-            <StudentSeatStrip sessionId={sessionId} />
+            <StudentSeatStrip activeSeat={flow.activeSeat} sessionId={sessionId} />
           </div>
 
           <div className="flex w-1/4 min-w-[220px] items-center justify-end gap-3">
@@ -58,17 +58,29 @@ export function ClassroomShell({
 
         <div className="flex min-h-0 flex-1 gap-6">
           <section className="min-w-0 flex-[3]">
-            <LessonBoard lesson={lesson} sessionStatus={sessionStatus} showReward={showReward} />
+            <LessonBoard
+              currentItem={flow.currentItem}
+              currentItemIndex={flow.currentItemIndex}
+              progressCount={flow.progressCount}
+              sessionStatus={sessionStatus}
+              stageBadge={flow.stageBadge}
+              stagePrompt={flow.stagePrompt}
+            />
           </section>
 
           <aside className="flex w-full max-w-[360px] flex-1 flex-col gap-6">
-            <TeacherColumn showReward={showReward} />
-            <PodiumColumn />
+            <TeacherColumn hint={flow.teacherHint} message={flow.teacherMessage} />
+            <PodiumColumn
+              activeSeat={flow.activeSeat}
+              currentItem={flow.currentItem}
+              podiumCaption={flow.podiumCaption}
+              rewardVisible={flow.rewardVisible}
+            />
           </aside>
         </div>
       </div>
 
-      <CelebrateOverlay show={showReward} />
+      <CelebrateOverlay show={flow.rewardVisible} />
     </main>
   );
 }
@@ -91,7 +103,13 @@ function TopActionButton({
   );
 }
 
-function TeacherColumn({ showReward }: { showReward: boolean }) {
+function TeacherColumn({
+  hint,
+  message,
+}: {
+  hint: string;
+  message: string;
+}) {
   return (
     <section className="relative flex-[0.8] overflow-hidden rounded-[40px] border-2 border-slate-700 bg-slate-800/80 p-6">
       <div className="absolute inset-x-8 top-8 h-24 rounded-full bg-[#10B981]/10 blur-2xl" />
@@ -120,18 +138,41 @@ function TeacherColumn({ showReward }: { showReward: boolean }) {
         <p className="text-[28px] font-black italic tracking-[-0.05em]">Cora 老师</p>
         <div className="mt-2 inline-flex items-center gap-2 rounded-full border border-[#10B981]/20 bg-[#10B981]/10 px-3 py-2 text-[11px] font-bold text-[#10B981]">
           <Volume2 className="h-4 w-4" />
-          <span>{showReward ? 'Excellent!' : "It's your turn! Say LION!"}</span>
+          <span>{message}</span>
         </div>
+        <p className="mt-3 text-xs font-bold tracking-[0.18em] text-white/45">{hint}</p>
       </div>
     </section>
   );
 }
 
-function PodiumColumn() {
+function PodiumColumn({
+  activeSeat,
+  currentItem,
+  podiumCaption,
+  rewardVisible,
+}: {
+  activeSeat: 'me' | 'ai' | null;
+  currentItem: {
+    imageSrc: string;
+    text: string;
+  };
+  podiumCaption: string;
+  rewardVisible: boolean;
+}) {
   const bars = [0.42, 0.62, 1, 0.72, 0.5];
+  const isStudentTurn = activeSeat === 'me';
+  const liveAvatarSrc = activeSeat === 'ai' ? '/avatars/student-bobby.svg' : '/avatars/reward-student.svg';
+  const liveAvatarAlt = activeSeat === 'ai' ? 'Bobby 讲台画面' : '我的摄像头占位';
 
   return (
-    <section className="relative flex-1 overflow-hidden rounded-[40px] border-4 border-[#10B981] bg-slate-800 p-2 shadow-[0_0_40px_rgba(16,185,129,0.18)]">
+    <section
+      className={`relative flex-1 overflow-hidden rounded-[40px] border-4 bg-slate-800 p-2 ${
+        isStudentTurn
+          ? 'border-[#10B981] shadow-[0_0_40px_rgba(16,185,129,0.18)]'
+          : 'border-white/15 shadow-[0_0_24px_rgba(15,23,42,0.32)]'
+      }`}
+    >
       <div className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full bg-[#10B981] px-4 py-1 text-[10px] font-black text-white shadow-lg">
         你的发言时间
       </div>
@@ -147,13 +188,22 @@ function PodiumColumn() {
         </div>
 
         <div className="flex flex-1 items-center justify-center bg-[radial-gradient(circle_at_50%_10%,rgba(255,255,255,0.06),transparent_32%),linear-gradient(180deg,#111827_0%,#0b1220_100%)]">
-          <div className="flex h-[76%] w-[76%] items-center justify-center rounded-[32px] border border-white/5 bg-[#162238]">
+          <div className="flex h-[76%] w-[76%] flex-col items-center justify-center rounded-[32px] border border-white/5 bg-[#162238]">
             <img
-              alt="我的摄像头占位"
+              alt={liveAvatarAlt}
               className="h-[82%] w-[82%] object-contain opacity-90"
-              src="/avatars/reward-student.svg"
+              src={liveAvatarSrc}
             />
+            <div className="mt-4 rounded-full border border-white/10 bg-black/20 px-3 py-1 text-[11px] font-bold tracking-[0.12em] text-white/65">
+              {podiumCaption}
+            </div>
           </div>
+        </div>
+
+        <div className="absolute bottom-16 left-6 right-6 flex items-center justify-center">
+          <p className="rounded-full border border-white/10 bg-black/30 px-3 py-1.5 text-[11px] font-bold text-white/70">
+            {rewardVisible ? 'GREAT JOB!' : currentItem.text.toUpperCase()}
+          </p>
         </div>
 
         <div className="absolute bottom-6 left-6 right-6 flex h-12 items-end justify-center gap-1.5">

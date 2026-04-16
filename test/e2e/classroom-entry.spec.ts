@@ -23,6 +23,8 @@ test('home schedule allows lesson entry', async ({ page }) => {
 
   await expect(page).toHaveURL(/\/lesson\//);
   await expect(page.getByText('Cora 老师')).toBeVisible();
+  await expect(page.getByText('Look carefully. Can you find the APPLE?')).toBeVisible();
+  await expect(page.getByTestId('classroom-stage').getByText('apple', { exact: true })).toBeVisible();
   await expect(page.getByText('你的发言时间')).toBeVisible();
   await expect(page.getByText('LIVE')).toBeVisible();
 });
@@ -30,6 +32,6 @@ test('home schedule allows lesson entry', async ({ page }) => {
 test('classroom reward mode reproduces the celebration overlay', async ({ page }) => {
   await page.goto('/lesson/weekday-1700?reward=1', { waitUntil: 'domcontentloaded' });
 
-  await expect(page.getByText('GREAT JOB!')).toBeVisible();
+  await expect(page.locator('text=GREAT JOB!').last()).toBeVisible();
   await expect(page.getByText('Excellent!')).toBeVisible();
 });

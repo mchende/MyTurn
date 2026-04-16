@@ -1,21 +1,29 @@
 import { Plus } from 'lucide-react';
 
 type StudentSeatStripProps = {
+  activeSeat: 'me' | 'ai' | null;
   sessionId: string;
 };
 
-export function StudentSeatStrip({ sessionId }: StudentSeatStripProps) {
+export function StudentSeatStrip({ activeSeat, sessionId }: StudentSeatStripProps) {
   return (
     <section className="w-full max-w-[420px]" data-testid="classroom-seat-strip">
       <div className="flex items-center gap-4 rounded-[24px] border border-white/5 bg-white/5 p-2 backdrop-blur-md">
         <SeatAvatar
           imageAlt="我的席位"
           imageSrc="/avatars/reward-student.svg"
-          isOnStage
+          isOnStage={activeSeat === 'me'}
           label="我"
           sessionId={sessionId}
+          testId="seat-me"
         />
-        <SeatAvatar imageAlt="AI 同学 Bobby" imageSrc="/avatars/student-bobby.svg" label="AI" />
+        <SeatAvatar
+          imageAlt="AI 同学 Bobby"
+          imageSrc="/avatars/student-bobby.svg"
+          isOnStage={activeSeat === 'ai'}
+          label="AI"
+          testId="seat-ai"
+        />
         <div className="flex h-14 w-14 items-center justify-center rounded-2xl border-2 border-dashed border-slate-800 text-slate-700">
           <Plus className="h-5 w-5 opacity-40" />
         </div>
@@ -30,15 +38,17 @@ function SeatAvatar({
   label,
   isOnStage = false,
   sessionId,
+  testId,
 }: {
   imageSrc: string;
   imageAlt: string;
   label: string;
   isOnStage?: boolean;
   sessionId?: string;
+  testId?: string;
 }) {
   return (
-    <div className="relative">
+    <div className="relative" data-on-stage={isOnStage} data-testid={testId}>
       <div
         className={`flex h-14 w-14 items-center justify-center rounded-2xl p-0.5 ${
           isOnStage ? 'border-2 border-[#10B981] bg-[#10B981] opacity-50' : 'border border-slate-700 bg-slate-800'
