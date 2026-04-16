@@ -10,10 +10,14 @@ type LessonPageProps = {
   params: Promise<{
     sessionId: string;
   }>;
+  searchParams?: Promise<{
+    reward?: string;
+  }>;
 };
 
-export default async function LessonPage({ params }: LessonPageProps) {
+export default async function LessonPage({ params, searchParams }: LessonPageProps) {
   const { sessionId } = await params;
+  const resolvedSearchParams = searchParams ? await searchParams : {};
   const today = getReferenceNow();
   const sessions = buildDaySessions({
     template: defaultWeekdayScheduleTemplate,
@@ -33,6 +37,7 @@ export default async function LessonPage({ params }: LessonPageProps) {
     <ClassroomShell
       lesson={lesson}
       sessionId={session.sessionId}
+      showReward={resolvedSearchParams.reward === '1'}
       sessionTitle={sessionView.title}
       sessionStatus={getSessionStatus(sessionView)}
     />
@@ -51,7 +56,7 @@ function getReferenceNow() {
 
 function getSessionStatus(session: { accessState: string; countdownLabel: string; startTimeLabel: string }) {
   if (session.accessState === 'open_for_entry') {
-    return `将要开课: ${session.countdownLabel.replace('距开场 ', '')}`;
+    return `检票入场中: ${session.countdownLabel.replace('距开场 ', '')}`;
   }
 
   if (session.accessState === 'in_progress_locked') {
@@ -62,5 +67,5 @@ function getSessionStatus(session: { accessState: string; countdownLabel: string
     return '已结束';
   }
 
-  return `将要开课: ${session.startTimeLabel}`;
+  return `等待开课: ${session.startTimeLabel}`;
 }

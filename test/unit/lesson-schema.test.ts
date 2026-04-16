@@ -247,17 +247,17 @@ describe('lesson schema contracts', () => {
       })),
     ).toEqual([
       {
-        sessionId: 'weekday-1000',
+        sessionId: 'weekday-1600',
         durationMinutes: 15,
         entryOpensMinutesBeforeStart: 5,
       },
       {
-        sessionId: 'weekday-1400',
+        sessionId: 'weekday-1700',
         durationMinutes: 15,
         entryOpensMinutesBeforeStart: 5,
       },
       {
-        sessionId: 'weekday-1930',
+        sessionId: 'weekday-1800',
         durationMinutes: 15,
         entryOpensMinutesBeforeStart: 5,
       },

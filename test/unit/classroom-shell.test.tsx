@@ -11,58 +11,51 @@ afterEach(() => {
 });
 
 describe('classroom shell layout', () => {
-  it('renders the dark classroom chrome with title bar, participant strip, and stage', () => {
+  it('renders the approved dark classroom shell with stage, strip, and side panels', () => {
     render(
       <ClassroomShell
         lesson={lesson}
-        sessionId="weekday-1900"
-        sessionStatus="将要开课: 01:00"
-        sessionTitle="118语感启蒙营（4月） - 113"
+        sessionId="weekday-1700"
+        sessionStatus="检票入场中: 02:45"
+        sessionTitle="每日语感启蒙"
       />,
     );
 
-    expect(screen.getByText('118语感启蒙营（4月） - 113')).toBeInTheDocument();
-    expect(screen.getAllByText('将要开课: 01:00').length).toBeGreaterThan(0);
-    expect(screen.getByText('cherry11801265')).toBeInTheDocument();
-    expect(screen.getByText('Carl11801154')).toBeInTheDocument();
-    expect(screen.getByText('yilia11801081')).toBeInTheDocument();
+    expect(screen.getByText('MyTurn')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: '退出课堂' })).toBeInTheDocument();
+    expect(screen.getByText('Cora 老师')).toBeInTheDocument();
+    expect(screen.getByText(`"It's your turn! Say LION!"`)).toBeInTheDocument();
+    expect(screen.getByText('榜单奖励时刻')).toBeInTheDocument();
     expect(screen.getByTestId('classroom-seat-strip')).toBeInTheDocument();
     expect(screen.getByTestId('classroom-stage')).toBeInTheDocument();
   });
 
-  it('keeps the lesson content available inside the stage overlay', () => {
+  it('keeps the reward preview card visible beside the stage in default mode', () => {
     render(
       <ClassroomShell
         lesson={lesson}
-        sessionId="weekday-1900"
-        sessionStatus="将要开课: 01:00"
-        sessionTitle="118语感启蒙营（4月） - 113"
+        sessionId="weekday-1700"
+        sessionStatus="检票入场中: 02:45"
+        sessionTitle="每日语感启蒙"
       />,
     );
 
-    expect(screen.getByText('APPLE')).toBeInTheDocument();
-    expect(screen.getByAltText('A red apple with a green leaf.')).toHaveAttribute(
-      'src',
-      '/lessons/week-01/apple.svg',
-    );
+    expect(screen.getByAltText('奖励中的同学')).toHaveAttribute('src', '/avatars/reward-student.svg');
+    expect(screen.getByAltText('讲台中的 Cora 老师')).toHaveAttribute('src', '/avatars/teacher-cora.svg');
   });
 
-  it('uses a top video-strip layout and full-stage responsive shell markers', () => {
+  it('switches the main stage into the reward feedback state when requested', () => {
     render(
       <ClassroomShell
         lesson={lesson}
-        sessionId="weekday-1900"
-        sessionStatus="将要开课: 01:00"
-        sessionTitle="118语感启蒙营（4月） - 113"
+        sessionId="weekday-1700"
+        sessionStatus="检票入场中: 02:45"
+        sessionTitle="每日语感启蒙"
+        showReward
       />,
     );
 
-    const strip = screen.getByTestId('classroom-seat-strip');
-    const stage = screen.getByTestId('classroom-stage');
-
-    expect(strip.className).toContain('overflow-x-auto');
-    expect(strip.className).toContain('md:px-6');
-    expect(stage.className).toContain('flex-1');
-    expect(stage.className).toContain('overflow-hidden');
+    expect(screen.getByText('GREAT JOB!')).toBeInTheDocument();
+    expect(screen.getByText('Excellent!')).toBeInTheDocument();
   });
 });

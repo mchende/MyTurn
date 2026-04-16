@@ -29,40 +29,22 @@ export type TodayScheduleViewModel = {
 const HOMEPAGE_TITLE = '每日语感启蒙';
 const SESSION_META = [
   {
-    title: '118语感启蒙营（4月） - 108',
-    campLabel: '118语感启蒙营（4月）',
-    learnerLabel: '5638Cora',
-    attendanceLabel: '出勤 10/144',
+    title: HOMEPAGE_TITLE,
+    campLabel: '第 4 周：动物园大冒险',
+    learnerLabel: 'Cora 老师',
+    attendanceLabel: '已结束',
   },
   {
-    title: '118语感启蒙营（4月） - 113',
-    campLabel: '118语感启蒙营（4月）',
-    learnerLabel: '5612Hippo',
-    attendanceLabel: '出勤 12/144',
+    title: HOMEPAGE_TITLE,
+    campLabel: '第 4 周：动物园大冒险',
+    learnerLabel: '同学 Bobby',
+    attendanceLabel: '正在检票',
   },
   {
-    title: '118语感启蒙营（4月） - 118',
-    campLabel: '118语感启蒙营（4月）',
-    learnerLabel: '5610Joey',
-    attendanceLabel: '出勤 18/144',
-  },
-  {
-    title: '118语感启蒙营（4月） - 123',
-    campLabel: '118语感启蒙营（4月）',
-    learnerLabel: '5604Kiki',
-    attendanceLabel: '出勤 20/144',
-  },
-  {
-    title: '118语感启蒙营（4月） - 128',
-    campLabel: '118语感启蒙营（4月）',
-    learnerLabel: '5010Zoe',
-    attendanceLabel: '出勤 6/144',
-  },
-  {
-    title: '118语感启蒙营（4月） - 133',
-    campLabel: '118语感启蒙营（4月）',
-    learnerLabel: '5529Aurora',
-    attendanceLabel: '出勤 2/144',
+    title: HOMEPAGE_TITLE,
+    campLabel: '第 4 周：动物园大冒险',
+    learnerLabel: '同学 Bobby',
+    attendanceLabel: '尚未开放',
   },
 ] as const;
 
@@ -74,7 +56,7 @@ export function getTodayScheduleViewModel(now: Date = getReferenceNow()): TodayS
   }).map((session, index) => {
     const meta = SESSION_META[index] ?? {
       title: HOMEPAGE_TITLE,
-      campLabel: '118语感启蒙营（4月）',
+      campLabel: '第 4 周：动物园大冒险',
       learnerLabel: `Student ${index + 1}`,
       attendanceLabel: `出勤 ${index + 1}/144`,
     };
