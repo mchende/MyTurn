@@ -45,9 +45,9 @@ Plans:
 **Plans**: 3 plans
 
 Plans:
-- [ ] 02-01: 建模课堂角色、轮次和状态切换
-- [ ] 02-02: 实现老师话术引擎与课堂过渡行为
-- [ ] 02-03: 实现 AI 同学的回答行为与出场顺序
+- [ ] 02-01-PLAN.md — 建立 reducer 驱动的课堂编排核心、集中时序常量与 Wave 0 orchestrator 单测
+- [ ] 02-02-PLAN.md — 实现老师英文话术模块并移除儿童主视图中的目标词句泄露
+- [ ] 02-03-PLAN.md — 接入 Bobby persona、席位/讲台联动与 Phase 2 的 unit/e2e 回归验证
 
 ### Phase 3: Guided Speaking Flow
 **Goal**: 让孩子在一节英文优先、图片驱动的课堂中主动参与，并从复述开始进入口语练习。
