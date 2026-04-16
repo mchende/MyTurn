@@ -10,7 +10,7 @@ export default defineConfig({
     command: 'npx next dev --hostname 127.0.0.1 --port 3201',
     env: {
       ...process.env,
-      MYTURN_FIXED_NOW: '2026-04-15T13:57:00+08:00',
+      MYTURN_FIXED_NOW: '2026-04-15T18:59:00+08:00',
     },
     timeout: 120_000,
     port: 3201,

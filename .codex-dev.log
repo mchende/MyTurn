@@ -1,0 +1,22 @@
+
+> myturn@0.1.0 dev
+> next dev --hostname 127.0.0.1 --port 3000
+
+▲ Next.js 16.2.3 (Turbopack)
+- Local:         http://127.0.0.1:3000
+- Network:       http://127.0.0.1:3000
+✓ Ready in 594ms
+
+ GET / 200 in 577ms (next.js: 214ms, application-code: 363ms)
+ GET /lesson/weekday-1400 200 in 605ms (next.js: 466ms, application-code: 139ms)
+✓ Compiled in 117ms
+✓ Compiled in 294ms
+✓ Compiled in 200ms
+✓ Compiled in 140ms
+✓ Compiled in 170ms
+✓ Compiled in 106ms
+✓ Compiled in 90ms
+✓ Compiled in 55ms
+ GET / 200 in 703ms (next.js: 106ms, application-code: 598ms)
+ GET /lesson/weekday-1900 200 in 421ms (next.js: 108ms, application-code: 313ms)
+[?25h

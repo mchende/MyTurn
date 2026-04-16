@@ -27,8 +27,44 @@ export type TodayScheduleViewModel = {
 };
 
 const HOMEPAGE_TITLE = '每日语感启蒙';
-const CAMP_LABEL = '语感启蒙营 4月班';
-const LEARNERS = ['5638Cora', '5612Hippo', '5610Joey', '5604Kiki'];
+const SESSION_META = [
+  {
+    title: '118语感启蒙营（4月） - 108',
+    campLabel: '118语感启蒙营（4月）',
+    learnerLabel: '5638Cora',
+    attendanceLabel: '出勤 10/144',
+  },
+  {
+    title: '118语感启蒙营（4月） - 113',
+    campLabel: '118语感启蒙营（4月）',
+    learnerLabel: '5612Hippo',
+    attendanceLabel: '出勤 12/144',
+  },
+  {
+    title: '118语感启蒙营（4月） - 118',
+    campLabel: '118语感启蒙营（4月）',
+    learnerLabel: '5610Joey',
+    attendanceLabel: '出勤 18/144',
+  },
+  {
+    title: '118语感启蒙营（4月） - 123',
+    campLabel: '118语感启蒙营（4月）',
+    learnerLabel: '5604Kiki',
+    attendanceLabel: '出勤 20/144',
+  },
+  {
+    title: '118语感启蒙营（4月） - 128',
+    campLabel: '118语感启蒙营（4月）',
+    learnerLabel: '5010Zoe',
+    attendanceLabel: '出勤 6/144',
+  },
+  {
+    title: '118语感启蒙营（4月） - 133',
+    campLabel: '118语感启蒙营（4月）',
+    learnerLabel: '5529Aurora',
+    attendanceLabel: '出勤 2/144',
+  },
+] as const;
 
 export function getTodayScheduleViewModel(now: Date = getReferenceNow()): TodayScheduleViewModel {
   const sessions = buildDaySessions({
@@ -36,6 +72,12 @@ export function getTodayScheduleViewModel(now: Date = getReferenceNow()): TodayS
     date: now,
     now,
   }).map((session, index) => {
+    const meta = SESSION_META[index] ?? {
+      title: HOMEPAGE_TITLE,
+      campLabel: '118语感启蒙营（4月）',
+      learnerLabel: `Student ${index + 1}`,
+      attendanceLabel: `出勤 ${index + 1}/144`,
+    };
     const startsAt = session.startsAt.toISOString();
     const endsAt = session.endsAt.toISOString();
     const entryOpensAt = session.entryOpensAt.toISOString();
@@ -43,7 +85,7 @@ export function getTodayScheduleViewModel(now: Date = getReferenceNow()): TodayS
     return {
       sessionId: session.sessionId,
       lessonId: session.lessonId,
-      title: HOMEPAGE_TITLE,
+      title: meta.title,
       startsAt,
       endsAt,
       durationMinutes: session.durationMinutes,
@@ -52,9 +94,9 @@ export function getTodayScheduleViewModel(now: Date = getReferenceNow()): TodayS
       startTimeLabel: formatTimeLabel(session.startsAt),
       timeRangeLabel: `${formatTimeLabel(session.startsAt)} - ${formatTimeLabel(session.endsAt)}`,
       countdownLabel: getCountdownLabel(session.entryOpensAt, session.startsAt, now, session.accessState),
-      learnerLabel: LEARNERS[index % LEARNERS.length],
-      campLabel: CAMP_LABEL,
-      attendanceLabel: `出勤 ${Math.min(index + 2, 12)}/${Math.max(index + 2, 2)}`,
+      learnerLabel: meta.learnerLabel,
+      campLabel: meta.campLabel,
+      attendanceLabel: meta.attendanceLabel,
     };
   });
 

@@ -1,68 +1,87 @@
+import {
+  ChevronDown,
+  Grid2x2,
+  MicOff,
+  Minimize2,
+  Signal,
+  UserCircle2,
+  UsersRound,
+  Volume2,
+  VolumeX,
+} from 'lucide-react';
+
 import type { Lesson } from '@/features/lesson-config/lesson-schema';
 
 import { LessonBoard } from './lesson-board';
-import { StagePanel } from './stage-panel';
-import { StudentSeatStrip, type StudentSeat } from './student-seat-strip';
-import { TeacherPanel } from './teacher-panel';
+import { StudentSeatStrip } from './student-seat-strip';
 
 type ClassroomShellProps = {
   lesson: Lesson;
   sessionId: string;
-  activeSeatId?: string | null;
+  sessionTitle: string;
+  sessionStatus: string;
 };
-
-// D-24/D-25/D-26: fixed one teacher + one real child + one AI classmate,
-// with one student on stage at a time while others keep visible breathing space in seats.
-const classroomSeats: StudentSeat[] = [
-  { id: 'you', name: 'You', roleLabel: 'Real child', tone: 'student' },
-  { id: 'milo', name: 'Milo', roleLabel: 'AI classmate', tone: 'ai' },
-  { id: 'seat-3', name: 'Seat 3', roleLabel: 'Atmosphere', tone: 'placeholder' },
-  { id: 'seat-4', name: 'Seat 4', roleLabel: 'Atmosphere', tone: 'placeholder' },
-];
 
 export function ClassroomShell({
   lesson,
   sessionId,
-  activeSeatId = null,
+  sessionTitle,
+  sessionStatus,
 }: ClassroomShellProps) {
-  const activeSeat = classroomSeats.find((seat) => seat.id === activeSeatId) ?? null;
-
   return (
-    <main className="min-h-screen bg-[linear-gradient(180deg,#f8fafc_0%,#eefbf3_100%)] px-4 py-4 md:px-6 md:py-6 xl:px-10">
-      <div className="mx-auto flex max-w-[1600px] flex-col gap-4 md:gap-6">
-        <div className="flex items-center justify-between gap-4">
-          <div>
-            <p className="text-xs font-semibold uppercase tracking-[0.16em] text-classroom-accent-strong">
-              Classroom
-            </p>
-            <h1 className="mt-2 font-display text-3xl font-bold tracking-[-0.05em] text-classroom-ink md:text-[2.55rem]">
-              {lesson.title}
-            </h1>
-          </div>
-          <div className="rounded-full border border-black/6 bg-white/88 px-4 py-2 text-sm font-semibold text-classroom-ink/64">
-            Session {sessionId}
+    <main className="min-h-screen overflow-hidden bg-[#252525] text-white">
+      <header className="flex h-[4.65rem] items-center justify-between border-b border-white/8 bg-[#262626] px-4 md:px-6">
+        <div className="flex items-center gap-3 text-white/75">
+          <Signal className="size-5" />
+        </div>
+
+        <div className="flex items-center gap-8">
+          <h1 className="max-w-[55vw] truncate text-center font-body text-[1.05rem] font-medium text-white/88 md:text-[1.1rem]">
+            {sessionTitle}
+          </h1>
+          <p className="hidden font-body text-[1rem] text-white/72 md:block">{sessionStatus}</p>
+        </div>
+
+        <div className="flex items-center gap-3 text-white/72">
+          <VolumeX className="size-5" />
+          <ChevronDown className="size-4" />
+          <UserCircle2 className="size-5" />
+          <ChevronDown className="size-4" />
+          <Grid2x2 className="size-5" />
+          <Minimize2 className="size-5" />
+        </div>
+      </header>
+
+      <div className="relative flex min-h-[calc(100vh-4.65rem)] flex-col bg-[#222222]">
+        <StudentSeatStrip sessionId={sessionId} />
+        <LessonBoard lesson={lesson} sessionStatus={sessionStatus} />
+
+        <div className="pointer-events-none absolute bottom-7 left-5 hidden md:flex">
+          <div className="flex size-9 items-center justify-center rounded-full bg-[#1b1b1b] text-sm font-bold text-white/85 shadow-[0_10px_24px_rgba(0,0,0,0.35)] ring-1 ring-white/10">
+            N
           </div>
         </div>
 
-        <StudentSeatStrip activeSeatId={activeSeatId} seats={classroomSeats} />
-
-        <section
-          className="flex flex-col gap-4 md:grid md:grid-cols-[minmax(0,1.7fr)_minmax(18rem,0.95fr)] md:gap-6 xl:gap-8"
-          data-testid="classroom-shell"
-        >
-          <LessonBoard lesson={lesson} />
-
-          <div
-            className="flex flex-col gap-4 sm:grid sm:grid-cols-2 md:flex md:min-h-[620px] md:grid-cols-none md:justify-between"
-            data-testid="classroom-role-column"
+        <div className="absolute bottom-8 right-6 flex flex-col gap-4">
+          <button
+            className="flex size-16 items-center justify-center rounded-full bg-white/8 text-white/78 shadow-[0_18px_30px_rgba(0,0,0,0.22)] backdrop-blur-sm ring-1 ring-white/8 transition-colors hover:bg-white/12"
+            type="button"
           >
-            <StagePanel
-              activeStudentName={activeSeat?.name ?? null}
-              activeStudentRole={activeSeat?.roleLabel ?? null}
-            />
-            <TeacherPanel lessonTitle={lesson.title} />
-          </div>
-        </section>
+            <UsersRound className="size-7" />
+          </button>
+          <button
+            className="flex size-16 items-center justify-center rounded-full bg-white/8 text-white/78 shadow-[0_18px_30px_rgba(0,0,0,0.22)] backdrop-blur-sm ring-1 ring-white/8 transition-colors hover:bg-white/12"
+            type="button"
+          >
+            <MicOff className="size-7" />
+          </button>
+          <button
+            className="flex size-16 items-center justify-center rounded-full bg-white/8 text-white/78 shadow-[0_18px_30px_rgba(0,0,0,0.22)] backdrop-blur-sm ring-1 ring-white/8 transition-colors hover:bg-white/12"
+            type="button"
+          >
+            <Volume2 className="size-7" />
+          </button>
+        </div>
       </div>
     </main>
   );

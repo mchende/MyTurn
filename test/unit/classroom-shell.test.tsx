@@ -11,44 +11,58 @@ afterEach(() => {
 });
 
 describe('classroom shell layout', () => {
-  it('renders the seat strip, lesson board, stage panel, and teacher panel together', () => {
-    render(<ClassroomShell lesson={lesson} sessionId="weekday-1400" />);
+  it('renders the dark classroom chrome with title bar, participant strip, and stage', () => {
+    render(
+      <ClassroomShell
+        lesson={lesson}
+        sessionId="weekday-1900"
+        sessionStatus="将要开课: 01:00"
+        sessionTitle="118语感启蒙营（4月） - 113"
+      />,
+    );
 
-    expect(screen.getByText('You')).toBeInTheDocument();
-    expect(screen.getByText('Milo')).toBeInTheDocument();
-    expect(screen.getByText('Seat 3')).toBeInTheDocument();
-    expect(screen.getByText('Seat 4')).toBeInTheDocument();
-    expect(screen.getByText('待上台')).toBeInTheDocument();
-    expect(screen.getByText('Teacher Mia')).toBeInTheDocument();
+    expect(screen.getByText('118语感启蒙营（4月） - 113')).toBeInTheDocument();
+    expect(screen.getAllByText('将要开课: 01:00').length).toBeGreaterThan(0);
+    expect(screen.getByText('cherry11801265')).toBeInTheDocument();
+    expect(screen.getByText('Carl11801154')).toBeInTheDocument();
+    expect(screen.getByText('yilia11801081')).toBeInTheDocument();
     expect(screen.getByTestId('classroom-seat-strip')).toBeInTheDocument();
-    expect(screen.getByTestId('classroom-lesson-board')).toBeInTheDocument();
-    expect(screen.getByTestId('classroom-stage-panel')).toBeInTheDocument();
-    expect(screen.getByTestId('classroom-teacher-panel')).toBeInTheDocument();
+    expect(screen.getByTestId('classroom-stage')).toBeInTheDocument();
   });
 
-  it('renders the seed lesson image with stable alt text', () => {
-    render(<ClassroomShell lesson={lesson} sessionId="weekday-1400" />);
+  it('keeps the lesson content available inside the stage overlay', () => {
+    render(
+      <ClassroomShell
+        lesson={lesson}
+        sessionId="weekday-1900"
+        sessionStatus="将要开课: 01:00"
+        sessionTitle="118语感启蒙营（4月） - 113"
+      />,
+    );
 
+    expect(screen.getByText('APPLE')).toBeInTheDocument();
     expect(screen.getByAltText('A red apple with a green leaf.')).toHaveAttribute(
       'src',
       '/lessons/week-01/apple.svg',
     );
   });
 
-  it('exposes phone, tablet, and desktop layout markers in the classroom shell', () => {
-    render(<ClassroomShell lesson={lesson} sessionId="weekday-1400" />);
+  it('uses a top video-strip layout and full-stage responsive shell markers', () => {
+    render(
+      <ClassroomShell
+        lesson={lesson}
+        sessionId="weekday-1900"
+        sessionStatus="将要开课: 01:00"
+        sessionTitle="118语感启蒙营（4月） - 113"
+      />,
+    );
 
-    const shell = screen.getByTestId('classroom-shell');
-    const roleColumn = screen.getByTestId('classroom-role-column');
-    const seatStrip = screen.getByTestId('classroom-seat-strip');
+    const strip = screen.getByTestId('classroom-seat-strip');
+    const stage = screen.getByTestId('classroom-stage');
 
-    expect(shell.className).toContain('flex-col');
-    expect(shell.className).toContain('md:grid');
-    expect(shell.className).toContain('xl:gap-8');
-    expect(roleColumn.className).toContain('flex-col');
-    expect(roleColumn.className).toContain('sm:grid');
-    expect(roleColumn.className).toContain('md:flex');
-    expect(seatStrip.className).toContain('overflow-x-auto');
-    expect(seatStrip.className).toContain('md:grid');
+    expect(strip.className).toContain('overflow-x-auto');
+    expect(strip.className).toContain('md:px-6');
+    expect(stage.className).toContain('flex-1');
+    expect(stage.className).toContain('overflow-hidden');
   });
 });

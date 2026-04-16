@@ -1,0 +1,27 @@
+
+> myturn@0.1.0 dev
+> next dev --hostname 127.0.0.1 --port 3000
+
+▲ Next.js 16.2.3 (Turbopack)
+- Local:         http://127.0.0.1:3000
+- Network:       http://127.0.0.1:3000
+✓ Ready in 597ms
+
+ GET / 200 in 610ms (next.js: 182ms, application-code: 428ms)
+ GET /lesson/weekday-1900 200 in 652ms (next.js: 486ms, application-code: 166ms)
+ GET / 200 in 229ms (next.js: 28ms, application-code: 200ms)
+ HEAD / 200 in 165ms (next.js: 7ms, application-code: 158ms)
+ GET /lesson/weekday-1900 200 in 54ms (next.js: 15ms, application-code: 39ms)
+ HEAD /lesson/weekday-1900 200 in 68ms (next.js: 3ms, application-code: 64ms)
+ HEAD / 200 in 108ms (next.js: 3ms, application-code: 105ms)
+ GET / 200 in 138ms (next.js: 4ms, application-code: 134ms)
+ HEAD / 200 in 148ms (next.js: 6ms, application-code: 142ms)
+ GET / 200 in 120ms (next.js: 5ms, application-code: 115ms)
+ HEAD / 200 in 145ms (next.js: 5ms, application-code: 140ms)
+✓ Compiled in 160ms
+ GET / 200 in 198ms (next.js: 16ms, application-code: 182ms)
+ HEAD / 200 in 172ms (next.js: 6ms, application-code: 167ms)
+ GET /lesson/weekday-2035 200 in 70ms (next.js: 18ms, application-code: 51ms)
+ HEAD /lesson/weekday-2035 200 in 68ms (next.js: 3ms, application-code: 65ms)
+ HEAD / 200 in 81ms (next.js: 3ms, application-code: 78ms)
+^C^C
