@@ -2,8 +2,10 @@ import { act, cleanup, render, screen } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { ClassroomShell } from '@/features/classroom-shell/classroom-shell';
+import { CLASSROOM_TIMINGS } from '@/features/classroom-shell/classroom-orchestrator';
+import { getBobbyScriptLine } from '@/features/classroom-shell/bobby-script';
+import { getTeacherScriptLine } from '@/features/classroom-shell/teacher-script';
 import { loadLesson } from '@/features/lesson-config/load-lesson';
-import { CLASSROOM_FLOW_DURATIONS } from '@/features/classroom-shell/use-classroom-flow';
 
 const lesson = loadLesson('week-01-lesson-01');
 
@@ -23,7 +25,13 @@ async function advanceFlow(duration: number) {
 }
 
 describe('classroom shell layout', () => {
-  it('renders the immersive classroom shell with stage, strip, and side panels', () => {
+  it('renders the immersive shell with fixed seats and teacher-script copy', () => {
+    const teacherLine = getTeacherScriptLine({
+      currentItemIndex: 0,
+      phase: 'teacher_prompt',
+      targetText: 'apple',
+    });
+
     render(
       <ClassroomShell
         lesson={lesson}
@@ -34,51 +42,34 @@ describe('classroom shell layout', () => {
     );
 
     expect(screen.getByText('MyTurn')).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: '退出' })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: '设置' })).toBeInTheDocument();
     expect(screen.getByText('Cora 老师')).toBeInTheDocument();
-    expect(screen.getByText('Look carefully. Can you find the APPLE?')).toBeInTheDocument();
-    expect(screen.getByText('你的发言时间')).toBeInTheDocument();
+    expect(screen.getByText(teacherLine.spokenLine)).toBeInTheDocument();
+    expect(screen.getByText(teacherLine.hintLabel)).toBeInTheDocument();
     expect(screen.getByTestId('classroom-seat-strip')).toBeInTheDocument();
     expect(screen.getByTestId('classroom-stage')).toBeInTheDocument();
-    expect(screen.getByText('老师点名中')).toBeInTheDocument();
-    expect(screen.getByText('apple')).toBeInTheDocument();
-  });
-
-  it('rotates the classroom flow from teacher cue to Bobby demo and then to the student turn', async () => {
-    render(
-      <ClassroomShell
-        lesson={lesson}
-        sessionId="weekday-1700"
-        sessionStatus="检票入场中: 02:45"
-        sessionTitle="每日语感启蒙"
-      />,
-    );
-
-    expect(screen.getByAltText('我的席位')).toHaveAttribute('src', '/avatars/reward-student.svg');
-    expect(screen.getByAltText('AI 同学 Bobby')).toHaveAttribute('src', '/avatars/student-bobby.svg');
-    expect(screen.getByText('LIVE')).toBeInTheDocument();
-    expect(screen.queryByText('讲台中')).not.toBeInTheDocument();
     expect(screen.getByTestId('seat-me')).toHaveAttribute('data-on-stage', 'false');
-
-    await advanceFlow(CLASSROOM_FLOW_DURATIONS.teacher_prompt);
-
-    expect(screen.getByText('Listen to Bobby first: "APPLE!"')).toBeInTheDocument();
-    expect(screen.getByText('Bobby 示范中')).toBeInTheDocument();
-    expect(screen.getByText('Bobby 正在示范 APPLE')).toBeInTheDocument();
-    expect(screen.getByAltText('Bobby 讲台画面')).toHaveAttribute('src', '/avatars/student-bobby.svg');
-    expect(screen.getByTestId('seat-ai')).toHaveAttribute('data-on-stage', 'true');
-
-    await advanceFlow(CLASSROOM_FLOW_DURATIONS.ai_model);
-
-    expect(screen.getByText('Now it\'s your turn. Say "APPLE!"')).toBeInTheDocument();
-    expect(screen.getByText('轮到你开口')).toBeInTheDocument();
-    expect(screen.getByText('现在轮到你说 APPLE')).toBeInTheDocument();
-    expect(screen.getByText('讲台中')).toBeInTheDocument();
-    expect(screen.getByTestId('seat-me')).toHaveAttribute('data-on-stage', 'true');
+    expect(screen.getByTestId('seat-ai')).toHaveAttribute('data-on-stage', 'false');
+    expect(screen.getByTestId('seat-empty')).toBeInTheDocument();
+    expect(screen.queryByText(/^apple$/i)).not.toBeInTheDocument();
   });
 
-  it('shows reward feedback and advances to the next lesson item after celebration', async () => {
+  it('keeps three fixed seats while Bobby demos before the student turn', async () => {
+    const bobbyLine = getBobbyScriptLine({
+      currentItemIndex: 0,
+      phase: 'ai_model',
+      targetText: 'apple',
+    });
+    const teacherAiLine = getTeacherScriptLine({
+      currentItemIndex: 0,
+      phase: 'ai_model',
+      targetText: 'apple',
+    });
+    const teacherStudentLine = getTeacherScriptLine({
+      currentItemIndex: 0,
+      phase: 'student_wait',
+      targetText: 'apple',
+    });
+
     render(
       <ClassroomShell
         lesson={lesson}
@@ -88,22 +79,75 @@ describe('classroom shell layout', () => {
       />,
     );
 
-    await advanceFlow(CLASSROOM_FLOW_DURATIONS.teacher_prompt);
-    await advanceFlow(CLASSROOM_FLOW_DURATIONS.ai_model);
-    await advanceFlow(CLASSROOM_FLOW_DURATIONS.student_turn);
-    await advanceFlow(CLASSROOM_FLOW_DURATIONS.teacher_feedback);
+    await advanceFlow(CLASSROOM_TIMINGS.teacher_prompt);
 
-    expect(screen.getAllByText('GREAT JOB!')).toHaveLength(2);
-    expect(screen.getByText('Excellent!')).toBeInTheDocument();
+    expect(screen.getByText(teacherAiLine.spokenLine)).toBeInTheDocument();
+    expect(screen.getByText(bobbyLine?.spokenLine ?? '')).toBeInTheDocument();
+    expect(screen.getByTestId('seat-ai')).toHaveAttribute('data-on-stage', 'true');
+    expect(screen.getByTestId('seat-me')).toHaveAttribute('data-on-stage', 'false');
+    expect(screen.getByTestId('seat-empty')).toBeInTheDocument();
+    expect(screen.getByAltText('Bobby 讲台画面')).toHaveAttribute(
+      'src',
+      '/avatars/student-bobby.svg',
+    );
+    expect(screen.getAllByText('讲台中')).toHaveLength(1);
 
-    await advanceFlow(CLASSROOM_FLOW_DURATIONS.celebration);
+    await advanceFlow(CLASSROOM_TIMINGS.ai_model);
 
-    expect(screen.getByText('Look carefully. Can you find the BANANA?')).toBeInTheDocument();
-    expect(screen.getByText('banana')).toBeInTheDocument();
-    expect(screen.getByText('第 2/5 轮')).toBeInTheDocument();
+    expect(screen.getByText(teacherStudentLine.spokenLine)).toBeInTheDocument();
+    expect(screen.getByTestId('seat-me')).toHaveAttribute('data-on-stage', 'true');
+    expect(screen.getByTestId('seat-ai')).toHaveAttribute('data-on-stage', 'false');
+    expect(screen.getByTestId('seat-empty')).toBeInTheDocument();
   });
 
-  it('switches the main stage into the reward feedback state when requested', () => {
+  it('keeps the teacher in control during silence handling and does not auto-show reward', async () => {
+    const encourageLine = getTeacherScriptLine({
+      currentItemIndex: 0,
+      phase: 'teacher_encourage',
+      targetText: 'apple',
+    });
+    const echoLine = getTeacherScriptLine({
+      currentItemIndex: 0,
+      phase: 'teacher_echo',
+      targetText: 'apple',
+    });
+    const bananaPromptLine = getTeacherScriptLine({
+      currentItemIndex: 1,
+      phase: 'teacher_prompt',
+      targetText: 'banana',
+    });
+
+    render(
+      <ClassroomShell
+        lesson={lesson}
+        sessionId="weekday-1700"
+        sessionStatus="检票入场中: 02:45"
+        sessionTitle="每日语感启蒙"
+      />,
+    );
+
+    await advanceFlow(CLASSROOM_TIMINGS.teacher_prompt);
+    await advanceFlow(CLASSROOM_TIMINGS.ai_model);
+    await advanceFlow(CLASSROOM_TIMINGS.student_wait);
+
+    expect(screen.getByText(encourageLine.spokenLine)).toBeInTheDocument();
+    expect(screen.queryByText(/Uh\.\.\. APPLE!/)).not.toBeInTheDocument();
+    expect(screen.queryByText('GREAT JOB!')).not.toBeInTheDocument();
+    expect(screen.getByTestId('seat-me')).toHaveAttribute('data-on-stage', 'false');
+    expect(screen.getByTestId('seat-ai')).toHaveAttribute('data-on-stage', 'false');
+
+    await advanceFlow(CLASSROOM_TIMINGS.teacher_encourage);
+
+    expect(screen.getByText(echoLine.spokenLine)).toBeInTheDocument();
+
+    await advanceFlow(CLASSROOM_TIMINGS.teacher_echo);
+    await advanceFlow(CLASSROOM_TIMINGS.move_next);
+
+    expect(screen.getByText(bananaPromptLine.spokenLine)).toBeInTheDocument();
+    expect(screen.queryByText('GREAT JOB!')).not.toBeInTheDocument();
+  });
+
+  it('switches the main stage into the reward feedback state only when requested', () => {
     render(
       <ClassroomShell
         lesson={lesson}
@@ -115,7 +159,6 @@ describe('classroom shell layout', () => {
     );
 
     expect(screen.getAllByText('GREAT JOB!')).toHaveLength(2);
-    expect(screen.getByText('Excellent!')).toBeInTheDocument();
     expect(screen.getByText('奖励时刻')).toBeInTheDocument();
   });
 });
