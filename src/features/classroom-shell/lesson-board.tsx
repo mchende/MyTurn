@@ -9,19 +9,25 @@ type LessonBoardProps = {
   stageBadge: string;
   stagePrompt: string;
   sessionStatus: string;
+  debugTargetText?: string;
+  showDebugTarget?: boolean;
 };
 
 export function LessonBoard({
   currentItem,
   currentItemIndex,
+  debugTargetText,
   progressCount,
   stageBadge,
   stagePrompt,
   sessionStatus,
+  showDebugTarget = false,
 }: LessonBoardProps) {
+  const shouldShowDebugTarget = showDebugTarget && Boolean(debugTargetText);
+
   return (
     <section
-      aria-label={`${currentItem.text} 课堂舞台`}
+      aria-label="Classroom stage"
       className="relative h-full min-h-0 overflow-hidden rounded-[48px] border-4 border-slate-800 bg-slate-900 shadow-2xl"
       data-testid="classroom-stage"
     >
@@ -49,10 +55,14 @@ export function LessonBoard({
       </div>
 
       <div className="absolute bottom-8 left-8 max-w-[520px] rounded-[28px] border border-white/10 bg-slate-950/45 px-6 py-5 backdrop-blur-md">
-        <p className="text-[clamp(2rem,4vw,3.3rem)] font-black uppercase tracking-[-0.06em] text-white">
-          {currentItem.text}
+        {shouldShowDebugTarget ? (
+          <p className="text-[clamp(2rem,4vw,3.3rem)] font-black uppercase tracking-[-0.06em] text-white">
+            {debugTargetText}
+          </p>
+        ) : null}
+        <p className={shouldShowDebugTarget ? 'mt-2 text-sm leading-6 text-white/70' : 'text-sm leading-6 text-white/70'}>
+          {stagePrompt}
         </p>
-        <p className="mt-2 text-sm leading-6 text-white/70">{stagePrompt}</p>
       </div>
 
       <div className="absolute bottom-8 right-8 flex items-center gap-2.5">
