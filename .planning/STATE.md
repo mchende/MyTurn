@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: planning
-stopped_at: Phase 2 context gathered (interactive discuss)
-last_updated: "2026-04-16T14:17:59.412Z"
-last_activity: 2026-04-15
+status: executing
+stopped_at: Phase 2 completed and handed off to Phase 3 planning
+last_updated: "2026-04-17T07:48:39.316+08:00"
+last_activity: 2026-04-17 -- Phase 02 verified and completed
 progress:
   total_phases: 5
-  completed_phases: 1
-  total_plans: 4
-  completed_plans: 4
-  percent: 20
+  completed_phases: 2
+  total_plans: 15
+  completed_plans: 7
+  percent: 40
 ---
 
 # Project State
@@ -21,40 +21,42 @@ progress:
 See: .planning/PROJECT.md (updated 2026-04-15)
 
 **Core value:** 孩子在整节课里都应真实地感受到自己“正在上一节英语小班课”，并且持续愿意开口说。
-**Current focus:** Phase 02 — cast-and-orchestration
+**Current focus:** Phase 03 — guided-speaking-flow
 
 ## Current Position
 
-Phase: 02 (cast-and-orchestration) — READY TO PLAN
+Phase: 03 (guided-speaking-flow) — READY TO PLAN
 Plan: Not started
-Status: Ready to plan
-Last activity: 2026-04-15
+Status: Phase 02 complete
+Last activity: 2026-04-17 -- Phase 02 verified and completed
 
-Progress: [██░░░░░░░░] 20%
+Progress: [████░░░░░░] 40%
 
 ## Performance Metrics
 
 **Velocity:**
 
-- Total plans completed: 4
-- Average duration: 5min
-- Total execution time: 0.3 hours
+- Total plans completed: 7
+- Average duration: 7min
+- Total execution time: 0.8 hours
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
 | 01-classroom-shell | 4 | 20min | 5min |
+| 02-cast-and-orchestration | 3 | 26min | 8.7min |
 
 **Recent Trend:**
 
-- Last 5 plans: 01-01, 01-02, 01-03, 01-04
+- Last 5 plans: 01-03, 01-04, 02-01, 02-02, 02-03
 - Trend: Stable
 
-| Phase 01-classroom-shell P01 | 2m | 2 tasks | 15 files |
-| Phase 01-classroom-shell P02 | 6min | 2 tasks | 13 files |
 | Phase 01-classroom-shell P03 | 6min | 1 tasks | 10 files |
 | Phase 01-classroom-shell P04 | 6min | 1 tasks | 10 files |
+| Phase 02-cast-and-orchestration P01 | 10min | 2 tasks | 4 files |
+| Phase 02-cast-and-orchestration P02 | 4min | 2 tasks | 5 files |
+| Phase 02-cast-and-orchestration P03 | 12min | 3 tasks | 9 files |
 
 ## Accumulated Context
 
@@ -77,6 +79,9 @@ Progress: [██░░░░░░░░] 20%
 - [Phase 01-classroom-shell]: Keep mobile top bar and desktop left rail in parallel so 主页 and 设置 remain reachable across breakpoints.
 - [Phase 01-classroom-shell]: Resolve `/lesson/[sessionId]` from the seeded weekday schedule and keep unknown sessions on `notFound()` rather than rendering a broken classroom shell.
 - [Phase 01-classroom-shell]: Run Playwright against an isolated dedicated dev-server port because Next.js blocks concurrent repo-local `next dev` instances during smoke validation.
+- [Phase 02-cast-and-orchestration]: Use a reducer-driven classroom orchestrator so teacher-led turn order and silence handling live in one deterministic state graph.
+- [Phase 02-cast-and-orchestration]: Keep target words out of the child-facing classroom surface by default and expose them only behind debug metadata.
+- [Phase 02-cast-and-orchestration]: Let Bobby demo only in the `ai_model` phase with mild hesitation, while silence recovery remains teacher-owned.
 
 ### Pending Todos
 
@@ -85,10 +90,10 @@ Progress: [██░░░░░░░░] 20%
 ### Blockers/Concerns
 
 - 语音采集、转写和响应延迟方案仍需在技术规划阶段明确
-- 网页语音栈和课堂编排模式的研究文档尚未补齐
+- 网页语音采集、转写和实时响应延迟方案仍需在 Phase 3/4 技术规划中继续明确
 
 ## Session Continuity
 
 Last session: 2026-04-16T14:17:59.408Z
-Stopped at: Phase 2 context gathered (interactive discuss)
-Resume file: .planning/phases/02-cast-and-orchestration/02-CONTEXT.md
+Stopped at: Phase 02 verified and completed
+Resume file: .planning/ROADMAP.md

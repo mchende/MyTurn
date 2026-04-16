@@ -8,9 +8,9 @@
 ### Classroom Experience
 
 - [x] **CLAS-01**: 用户可以在浏览器中进入课程并启动一节固定 15 分钟的课堂
-- [ ] **CLAS-02**: 用户体验到固定 2 人小班结构，包含 1 位老师、1 个真实孩子和 1 个 AI 同学
-- [ ] **CLAS-03**: 用户能感受到由老师主导的一次点名一个孩子作答的课堂节奏
-- [ ] **CLAS-04**: 用户可以通过先看或穿插观看 AI 同学作答来获得自然的准备和喘息空间
+- [x] **CLAS-02**: 用户体验到固定 2 人小班结构，包含 1 位老师、1 个真实孩子和 1 个 AI 同学
+- [x] **CLAS-03**: 用户能感受到由老师主导的一次点名一个孩子作答的课堂节奏
+- [x] **CLAS-04**: 用户可以通过先看或穿插观看 AI 同学作答来获得自然的准备和喘息空间
 
 ### Lesson Content
 
@@ -21,15 +21,15 @@
 
 ### Teacher Facilitation
 
-- [ ] **TEAC-01**: 用户能听到具有老师风格的课堂引导，包括示范目标语言和清晰的过渡话术
+- [x] **TEAC-01**: 用户能听到具有老师风格的课堂引导，包括示范目标语言和清晰的过渡话术
 - [ ] **TEAC-02**: 用户能从老师那里获得温和的等待、鼓励和明确的点名作答提示
 - [ ] **TEAC-03**: 当孩子作答困难时，老师会先给出轻量提示，再让孩子重新尝试
 - [ ] **TEAC-04**: 当孩子连续几次仍无法作答时，老师可以退回到“示范 + 跟读”的兜底方式以恢复课堂节奏
 
 ### AI Classmate
 
-- [ ] **AICL-01**: 用户听到的 AI 同学应像一个可信的同龄同学，而不是一个完美播报器
-- [ ] **AICL-02**: AI 同学的回答可以带有轻微犹豫或不完美，但整体仍应跟得上课堂
+- [x] **AICL-01**: 用户听到的 AI 同学应像一个可信的同龄同学，而不是一个完美播报器
+- [x] **AICL-02**: AI 同学的回答可以带有轻微犹豫或不完美，但整体仍应跟得上课堂
 
 ### Speaking and Evaluation
 
@@ -79,12 +79,12 @@
 | CONT-01 | Phase 1 | Complete |
 | CONT-02 | Phase 1 | Complete |
 | PLAT-01 | Phase 1 | Complete |
-| CLAS-02 | Phase 2 | Pending |
-| CLAS-03 | Phase 2 | Pending |
-| CLAS-04 | Phase 2 | Pending |
-| TEAC-01 | Phase 2 | Pending |
-| AICL-01 | Phase 2 | Pending |
-| AICL-02 | Phase 2 | Pending |
+| CLAS-02 | Phase 2 | Complete |
+| CLAS-03 | Phase 2 | Complete |
+| CLAS-04 | Phase 2 | Complete |
+| TEAC-01 | Phase 2 | Complete |
+| AICL-01 | Phase 2 | Complete |
+| AICL-02 | Phase 2 | Complete |
 | CONT-03 | Phase 3 | Pending |
 | CONT-04 | Phase 3 | Pending |
 | TEAC-02 | Phase 3 | Pending |
@@ -104,4 +104,4 @@
 
 ---
 *Requirements defined: 2026-04-15*
-*Last updated: 2026-04-15 after initial definition*
+*Last updated: 2026-04-17 after Phase 2 completion*
