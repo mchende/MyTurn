@@ -15,14 +15,15 @@ MyTurn 是一个面向儿童英语口语练习的网页端课堂 MVP，目标是
 - [x] 用户可以在浏览器中打开产品，并从 `我的课堂` 首页进入真实课堂路由。Validated in Phase 1: Classroom Shell
 - [x] 课程数据可以配置为 5 个目标项，每个目标项都带有配套图片。Validated in Phase 1: Classroom Shell
 - [x] 界面以平板横屏为优先目标，同时兼容手机和桌面端的课堂语义。Validated in Phase 1: Classroom Shell
+- [x] 老师、真实孩子与 AI 同学以固定三角色课堂结构持续出现。Validated in Phase 2: Cast and Orchestration
+- [x] 老师会用英文短句、明确点名与沉默接住机制推动课堂轮次。Validated in Phase 2: Cast and Orchestration
+- [x] AI 同学会先示范、保留轻微犹豫感，并在孩子沉默时不越权接管课堂。Validated in Phase 2: Cast and Orchestration
 
 ### Active
 
 - [ ] 交付一节完整的 15 分钟网页英语口语课，并优先适配平板横屏使用
-- [ ] 还原老师带班的小班课节奏，包括轮流作答、等待、点名上台等机制
 - [ ] 支持以“目标词 / 短句 + 图片”方式配置课堂内容
 - [ ] 让真实孩子在同一节课内从跟读复述逐步过渡到看图作答
-- [ ] 让 AI 同学足够真实可信，从而减轻作答压力并强化课堂氛围
 
 ### Out of Scope
 
@@ -38,7 +39,7 @@ MyTurn 是一个面向儿童英语口语练习的网页端课堂 MVP，目标是
 
 ## Current State
 
-Phase 1 已完成：产品现在具备 Stitch 风格的 `我的课堂` 首页、基于 seed 数据的课堂路由，以及平板优先的课堂三段式空间（顶部学生席、深色课件区、讲台/教师区）。下一步进入 Phase 2，为这套稳定壳体接入老师带班循环和 AI 同学行为。
+Phase 2 已完成：产品现在在既有课堂壳体上具备 reducer 驱动的老师带班编排、Bobby 前置示范、固定三席位与默认无答案泄露的课堂主视图。下一步进入 Phase 3，把这套课堂节奏继续推进到“老师示范 -> 孩子复述 -> 图片驱动开口”的 guided speaking flow。
 
 ## Constraints
 
@@ -80,4 +81,4 @@ Phase 1 已完成：产品现在具备 Stitch 风格的 `我的课堂` 首页、
 4. 用最新状态更新 Context
 
 ---
-*Last updated: 2026-04-15 after Phase 1 completion*
+*Last updated: 2026-04-17 after Phase 2 completion*
