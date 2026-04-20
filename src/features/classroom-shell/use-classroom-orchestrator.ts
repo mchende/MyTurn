@@ -9,6 +9,7 @@ import {
   CLASSROOM_TIMINGS,
   classroomOrchestratorReducer,
   createInitialClassroomState,
+  type GuidedStageId,
   type ClassroomOrchestratorEvent,
 } from './classroom-orchestrator';
 import { buildPodiumViewModel } from './podium-view-model';
@@ -77,7 +78,10 @@ export function useClassroomOrchestrator({
       rewardVisible: state.rewardVisible,
       phase: state.phase,
     }),
-    stagePrompt: getStagePrompt(state.phase),
+    stagePrompt: getStagePrompt({
+      phase: state.phase,
+      stageId: state.currentStageId,
+    }),
     teacherHint: teacherScriptLine.hintLabel,
     teacherMessage: teacherScriptLine.spokenLine,
     teacherScriptLine,
@@ -87,8 +91,8 @@ export function useClassroomOrchestrator({
     hideReward: () => {
       dispatch({ type: 'reward_visibility_changed', visible: false });
     },
-    markStudentSpoke: () => {
-      dispatch({ type: 'student_spoke' });
+    confirmStudentParticipation: () => {
+      dispatch({ type: 'student_participation_confirmed' });
     },
   };
 }
@@ -115,14 +119,24 @@ function getStageBadge({
   return `第 ${currentItemIndex + 1}/${progressCount} 轮`;
 }
 
-function getStagePrompt(phase: keyof typeof CLASSROOM_TIMINGS | 'wrap_up') {
+function getStagePrompt({
+  phase,
+  stageId,
+}: {
+  phase: keyof typeof CLASSROOM_TIMINGS | 'wrap_up';
+  stageId: GuidedStageId;
+}) {
   switch (phase) {
     case 'teacher_prompt':
-      return '老师正在带你观察图片，马上会先听到 Bobby 的示范。';
+      return stageId === 'picture-talk'
+        ? '老师正在看图提问，马上就轮到你自己回答。'
+        : '老师正在带你观察图片，马上会先听到 Bobby 的示范。';
     case 'ai_model':
       return '先听 Bobby 一次，再轮到你开口。';
     case 'student_wait':
-      return '看着图片准备说，慢一点也没关系。';
+      return stageId === 'picture-talk'
+        ? '看着图片自己回答，慢一点也没关系。'
+        : '听完示范后跟着说一次，慢一点也没关系。';
     case 'teacher_encourage':
       return 'Cora 正在接住停顿，帮你把这一轮继续下去。';
     case 'teacher_echo':
