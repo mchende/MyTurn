@@ -1,4 +1,7 @@
-import type { ClassroomOrchestratorPhase } from './classroom-orchestrator';
+import type {
+  ClassroomOrchestratorPhase,
+  GuidedStageId,
+} from './classroom-orchestrator';
 
 type BobbyPersona = {
   allowedPhases: readonly ClassroomOrchestratorPhase[];
@@ -15,6 +18,7 @@ type BobbyScriptVariant = {
 type BobbyScriptRequest = {
   currentItemIndex: number;
   phase: ClassroomOrchestratorPhase;
+  stageId: GuidedStageId;
   targetText: string;
 };
 
@@ -59,9 +63,13 @@ const BOBBY_SCRIPT_VARIANTS: readonly BobbyScriptVariant[] = [
 export function getBobbyScriptLine({
   currentItemIndex,
   phase,
+  stageId,
   targetText,
 }: BobbyScriptRequest): BobbyScriptLine | null {
-  if (!BOBBY_PERSONA.allowedPhases.includes(phase)) {
+  if (
+    stageId !== 'repeat-after-teacher' ||
+    !BOBBY_PERSONA.allowedPhases.includes(phase)
+  ) {
     return null;
   }
 

@@ -1,13 +1,21 @@
-import type { ClassroomOrchestratorPhase } from './classroom-orchestrator';
+import type {
+  ClassroomOrchestratorPhase,
+  GuidedStageId,
+  ParticipationState,
+} from './classroom-orchestrator';
 
 type TeacherScriptVariant = {
   hintLabel: string;
-  spokenLine: string;
+  spokenModel: string;
+  visibleCaption: string;
 };
 
 export type TeacherScriptRequest = {
+  attemptIndex: number;
   currentItemIndex: number;
   phase: ClassroomOrchestratorPhase;
+  participationState: ParticipationState;
+  stageId: GuidedStageId;
   targetText: string;
 };
 
@@ -15,100 +23,73 @@ export type TeacherScriptLine = TeacherScriptVariant & {
   debugTargetText: string;
 };
 
-const SCRIPT_VARIANTS: Record<
-  ClassroomOrchestratorPhase,
+const SHARED_VARIANTS: Record<
+  Exclude<ClassroomOrchestratorPhase, 'teacher_prompt' | 'teacher_encourage' | 'teacher_echo'>,
   readonly TeacherScriptVariant[]
 > = {
-  teacher_prompt: [
-    {
-      hintLabel: 'Look first',
-      spokenLine: "It's your turn. Look at the picture and get ready.",
-    },
-    {
-      hintLabel: 'Eyes on the board',
-      spokenLine: 'Watch the picture. Your mouth is ready next.',
-    },
-    {
-      hintLabel: 'Get ready',
-      spokenLine: 'My eyes are on you. Take a breath and begin.',
-    },
-  ],
   ai_model: [
     {
       hintLabel: 'Listen to Bobby',
-      spokenLine: 'Listen to Bobby first. Then you try.',
+      spokenModel: 'Listen to Bobby first. Then it is your turn.',
+      visibleCaption: 'Listen to Bobby first. Then it is your turn.',
     },
     {
       hintLabel: 'Hear the model',
-      spokenLine: 'Bobby goes first. Use your listening ears.',
+      spokenModel: 'Bobby goes first. Use your listening ears.',
+      visibleCaption: 'Bobby goes first. Use your listening ears.',
     },
   ],
   student_wait: [
     {
       hintLabel: 'Your voice now',
-      spokenLine: 'Your mic is ready. I am listening.',
+      spokenModel: 'Your voice is ready. I am listening.',
+      visibleCaption: 'Your voice is ready. I am listening.',
     },
     {
       hintLabel: 'Say it now',
-      spokenLine: 'You can do it. Say it when you are ready.',
-    },
-  ],
-  teacher_encourage: [
-    {
-      hintLabel: 'Try with me',
-      spokenLine: "Let's say it together. Nice and slow.",
-    },
-    {
-      hintLabel: 'One more try',
-      spokenLine: "Let's say it together. Come with me.",
-    },
-    {
-      hintLabel: 'Big brave voice',
-      spokenLine: 'Take a brave breath. We can say it as a team.',
-    },
-  ],
-  teacher_echo: [
-    {
-      hintLabel: 'Hear the echo',
-      spokenLine: 'Listen to my echo. Then match my voice.',
-    },
-    {
-      hintLabel: 'Copy the sound',
-      spokenLine: 'Hear my smooth voice. Copy it with me.',
+      spokenModel: 'Say it when you are ready.',
+      visibleCaption: 'Say it when you are ready.',
     },
   ],
   teacher_feedback: [
     {
       hintLabel: 'Celebrate',
-      spokenLine: 'Good job. That was a strong try.',
+      spokenModel: 'Good job. That was a strong try.',
+      visibleCaption: 'Good job. That was a strong try.',
     },
     {
       hintLabel: 'Keep going',
-      spokenLine: 'Nice work. Your voice sounded brave.',
+      spokenModel: 'Nice work. Your voice sounded brave.',
+      visibleCaption: 'Nice work. Your voice sounded brave.',
     },
     {
       hintLabel: 'Teacher smile',
-      spokenLine: 'Yes. I heard you trying carefully.',
+      spokenModel: 'Yes. I heard you trying carefully.',
+      visibleCaption: 'Yes. I heard you trying carefully.',
     },
   ],
   move_next: [
     {
       hintLabel: 'Move on',
-      spokenLine: 'Next one. Eyes back to the board.',
+      spokenModel: 'Next one. Eyes back to the board.',
+      visibleCaption: 'Next one. Eyes back to the board.',
     },
     {
       hintLabel: 'Keep the rhythm',
-      spokenLine: 'Next one. Stay with me and look.',
+      spokenModel: 'Next one. Stay with me and look.',
+      visibleCaption: 'Next one. Stay with me and look.',
     },
   ],
   wrap_up: [
     {
       hintLabel: 'Class done',
-      spokenLine: 'Class is all done. See you next time.',
+      spokenModel: 'Class is all done. See you next time.',
+      visibleCaption: 'Class is all done. See you next time.',
     },
     {
       hintLabel: 'Wave goodbye',
-      spokenLine: 'You worked hard today. Wave goodbye.',
+      spokenModel: 'You worked hard today. Wave goodbye.',
+      visibleCaption: 'You worked hard today. Wave goodbye.',
     },
   ],
 };
@@ -125,11 +106,21 @@ const PHASE_HINTS: Record<ClassroomOrchestratorPhase, readonly string[]> = {
 };
 
 export function getTeacherScriptLine({
+  attemptIndex,
   currentItemIndex,
   phase,
+  participationState,
+  stageId,
   targetText,
 }: TeacherScriptRequest): TeacherScriptLine {
-  const variant = pickVariant(SCRIPT_VARIANTS[phase], currentItemIndex);
+  const variant = resolveStageAwareVariant({
+    attemptIndex,
+    currentItemIndex,
+    phase,
+    participationState,
+    stageId,
+    targetText,
+  });
 
   return {
     ...variant,
@@ -146,6 +137,138 @@ export function getTeacherHint(
 
 function pickVariant<T>(variants: readonly T[], currentItemIndex: number): T {
   return variants[currentItemIndex % variants.length];
+}
+
+function resolveStageAwareVariant({
+  attemptIndex,
+  currentItemIndex,
+  phase,
+  participationState,
+  stageId,
+  targetText,
+}: TeacherScriptRequest): TeacherScriptVariant {
+  if (phase === 'teacher_prompt') {
+    return stageId === 'repeat-after-teacher'
+      ? getRepeatAfterTeacherPrompt(targetText)
+      : getPictureTalkPrompt(currentItemIndex);
+  }
+
+  if (phase === 'teacher_encourage') {
+    return stageId === 'repeat-after-teacher'
+      ? getRepeatAfterTeacherEncourage(targetText, currentItemIndex)
+      : getPictureTalkSecondPrompt(
+          attemptIndex,
+          currentItemIndex,
+          participationState,
+        );
+  }
+
+  if (phase === 'teacher_echo') {
+    return stageId === 'repeat-after-teacher'
+      ? getRepeatAfterTeacherEcho(targetText, currentItemIndex)
+      : {
+          hintLabel: 'Keep going',
+          spokenModel: 'Thanks for trying. Let us keep going.',
+          visibleCaption: 'Thanks for trying. Let us keep going.',
+        };
+  }
+
+  return pickVariant(SHARED_VARIANTS[phase], currentItemIndex);
+}
+
+function getRepeatAfterTeacherPrompt(targetText: string): TeacherScriptVariant {
+  return {
+    hintLabel: 'Listen and say',
+    spokenModel: targetText.trim(),
+    visibleCaption: 'Listen first. Then it is your turn.',
+  };
+}
+
+function getPictureTalkPrompt(currentItemIndex: number): TeacherScriptVariant {
+  return pickVariant(
+    [
+      {
+        hintLabel: 'Look and answer',
+        spokenModel: 'What is it?',
+        visibleCaption: 'Look at the picture and answer.',
+      },
+      {
+        hintLabel: 'Tell me',
+        spokenModel: 'What do you see?',
+        visibleCaption: 'Look at the picture and answer.',
+      },
+    ],
+    currentItemIndex,
+  );
+}
+
+function getRepeatAfterTeacherEncourage(
+  targetText: string,
+  currentItemIndex: number,
+): TeacherScriptVariant {
+  return pickVariant(
+    [
+      {
+        hintLabel: 'Try with me',
+        spokenModel: `Say it with me: ${targetText.trim()}.`,
+        visibleCaption: 'Say it with me. Nice and slow.',
+      },
+      {
+        hintLabel: 'One more try',
+        spokenModel: `Come with me: ${targetText.trim()}.`,
+        visibleCaption: 'One more try. Nice and slow.',
+      },
+    ],
+    currentItemIndex,
+  );
+}
+
+function getPictureTalkSecondPrompt(
+  attemptIndex: number,
+  currentItemIndex: number,
+  participationState: ParticipationState,
+): TeacherScriptVariant {
+  const visibleCaption =
+    attemptIndex > 0 || participationState === 'silent'
+      ? 'Take a breath. Answer one more time.'
+      : 'Answer one more time.';
+
+  return pickVariant(
+    [
+      {
+        hintLabel: 'Try again',
+        spokenModel: 'Take a look. What is it?',
+        visibleCaption,
+      },
+      {
+        hintLabel: 'One more answer',
+        spokenModel: 'Look carefully. What do you see?',
+        visibleCaption,
+      },
+    ],
+    currentItemIndex,
+  );
+}
+
+function getRepeatAfterTeacherEcho(
+  targetText: string,
+  currentItemIndex: number,
+): TeacherScriptVariant {
+  return pickVariant(
+    [
+      {
+        hintLabel: 'Hear the echo',
+        spokenModel: `Listen and copy: ${targetText.trim()}.`,
+        visibleCaption: 'Listen and copy the sound.',
+      },
+      {
+        hintLabel: 'Copy the sound',
+        spokenModel: `Match my voice: ${targetText.trim()}.`,
+        visibleCaption: 'Copy the teacher voice.',
+      },
+    ],
+    currentItemIndex,
+  );
 }
 
 function formatDebugTargetText(targetText: string) {
