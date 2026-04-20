@@ -60,9 +60,9 @@ Plans:
 **Plans**: 3 plans
 
 Plans:
-- [ ] 03-01: 实现复述轮次的口语流程与学生作答捕捉
-- [ ] 03-02: 将图片驱动提示整合进课堂循环
-- [ ] 03-03: 增加随轮次逐步提高输出要求的推进逻辑
+- [ ] 03-01-PLAN.md — 建立 stage-aware guided queue、手动 participation confirmation 与 Phase 03 reducer/hook 基础合同
+- [ ] 03-02-PLAN.md — 解决老师 visible/spoken script 冲突，并在保留现有课堂壳的前提下接入 confirmation UI
+- [ ] 03-03-PLAN.md — 实现 picture-talk 二次机会、board copy 升级与 focused guided-flow 验证
 
 ### Phase 4: Hints and Judgment
 **Goal**: 用轻提示、兜底示范和分阶段判断策略维持课堂节奏与开口状态。
