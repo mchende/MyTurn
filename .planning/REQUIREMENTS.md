@@ -17,7 +17,7 @@
 - [x] **CONT-01**: 运营或配置者可以为每节课配置 5 个目标词或短句
 - [x] **CONT-02**: 运营或配置者可以为每个目标项绑定 1 张图片，供示范与提问环节使用
 - [ ] **CONT-03**: 课堂流程以图片作为主要理解线索，而不是依赖中文解释
-- [ ] **CONT-04**: 同一节课内容可以支撑多轮重复练习，并逐步提高输出要求
+- [x] **CONT-04**: 同一节课内容可以支撑多轮重复练习，并逐步提高输出要求
 
 ### Teacher Facilitation
 
@@ -33,7 +33,7 @@
 
 ### Speaking and Evaluation
 
-- [ ] **SPKG-01**: 用户可以在前期练习轮次中跟随老师复述目标语言
+- [x] **SPKG-01**: 用户可以在前期练习轮次中跟随老师复述目标语言
 - [ ] **SPKG-02**: 用户可以在后期练习轮次中根据图片回答老师提问，并允许表达与标准答案意义相近
 - [ ] **SPKG-03**: 系统在复述环节使用更贴近目标词句本身的近似匹配规则
 - [ ] **SPKG-04**: 系统在看图作答环节使用更宽松的基于语义的匹配规则
@@ -86,9 +86,9 @@
 | AICL-01 | Phase 2 | Complete |
 | AICL-02 | Phase 2 | Complete |
 | CONT-03 | Phase 3 | Pending |
-| CONT-04 | Phase 3 | Pending |
+| CONT-04 | Phase 3 | Complete |
 | TEAC-02 | Phase 3 | Pending |
-| SPKG-01 | Phase 3 | Pending |
+| SPKG-01 | Phase 3 | Complete |
 | TEAC-03 | Phase 4 | Pending |
 | TEAC-04 | Phase 4 | Pending |
 | SPKG-03 | Phase 4 | Pending |
@@ -104,4 +104,4 @@
 
 ---
 *Requirements defined: 2026-04-15*
-*Last updated: 2026-04-17 after Phase 2 completion*
+*Last updated: 2026-04-20 after Phase 03 Plan 1 completion*

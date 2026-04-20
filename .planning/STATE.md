@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: completed
-stopped_at: Phase 3 context gathered
-last_updated: "2026-04-20T01:45:12.543Z"
-last_activity: 2026-04-17 -- Phase 02 verified and completed
+status: executing
+stopped_at: Completed 03-guided-speaking-flow-01-PLAN.md
+last_updated: "2026-04-20T02:59:41.582Z"
+last_activity: 2026-04-20 -- Completed 03-01 guided-speaking-flow
 progress:
   total_phases: 5
   completed_phases: 2
-  total_plans: 7
-  completed_plans: 7
-  percent: 40
+  total_plans: 10
+  completed_plans: 8
+  percent: 80
 ---
 
 # Project State
@@ -25,20 +25,20 @@ See: .planning/PROJECT.md (updated 2026-04-15)
 
 ## Current Position
 
-Phase: 03 (guided-speaking-flow) — READY TO PLAN
-Plan: Not started
-Status: Phase 02 complete
-Last activity: 2026-04-17 -- Phase 02 verified and completed
+Phase: 03 (guided-speaking-flow) — EXECUTING
+Plan: 2 of 3
+Status: Ready to execute
+Last activity: 2026-04-20 -- Completed 03-01 guided-speaking-flow
 
-Progress: [████░░░░░░] 40%
+Progress: [████████░░] 80%
 
 ## Performance Metrics
 
 **Velocity:**
 
-- Total plans completed: 7
-- Average duration: 7min
-- Total execution time: 0.8 hours
+- Total plans completed: 8
+- Average duration: 6.4min
+- Total execution time: 0.9 hours
 
 **By Phase:**
 
@@ -49,7 +49,7 @@ Progress: [████░░░░░░] 40%
 
 **Recent Trend:**
 
-- Last 5 plans: 01-03, 01-04, 02-01, 02-02, 02-03
+- Last 5 plans: 01-04, 02-01, 02-02, 02-03, 03-01
 - Trend: Stable
 
 | Phase 01-classroom-shell P03 | 6min | 1 tasks | 10 files |
@@ -57,6 +57,7 @@ Progress: [████░░░░░░] 40%
 | Phase 02-cast-and-orchestration P01 | 10min | 2 tasks | 4 files |
 | Phase 02-cast-and-orchestration P02 | 4min | 2 tasks | 5 files |
 | Phase 02-cast-and-orchestration P03 | 12min | 3 tasks | 9 files |
+| Phase 03-guided-speaking-flow P01 | 5min | 2 tasks | 4 files |
 
 ## Accumulated Context
 
@@ -82,6 +83,9 @@ Progress: [████░░░░░░] 40%
 - [Phase 02-cast-and-orchestration]: Use a reducer-driven classroom orchestrator so teacher-led turn order and silence handling live in one deterministic state graph.
 - [Phase 02-cast-and-orchestration]: Keep target words out of the child-facing classroom surface by default and expose them only behind debug metadata.
 - [Phase 02-cast-and-orchestration]: Let Bobby demo only in the `ai_model` phase with mild hesitation, while silence recovery remains teacher-owned.
+- [Phase 03-guided-speaking-flow]: Derive guided speaking progress from lesson.stages so repeat-after-teacher fully completes before picture-talk begins.
+- [Phase 03-guided-speaking-flow]: Use student_participation_confirmed as the only speaking success signal instead of exposing auto-speech semantics in the hook API.
+- [Phase 03-guided-speaking-flow]: Keep useClassroomOrchestrator on one centralized CLASSROOM_TIMINGS scheduler while exposing stage metadata directly to shell consumers.
 
 ### Pending Todos
 
@@ -94,6 +98,6 @@ Progress: [████░░░░░░] 40%
 
 ## Session Continuity
 
-Last session: 2026-04-20T01:45:12.534Z
-Stopped at: Phase 3 context gathered
-Resume file: .planning/phases/03-guided-speaking-flow/03-CONTEXT.md
+Last session: 2026-04-20T02:59:41.578Z
+Stopped at: Completed 03-guided-speaking-flow-01-PLAN.md
+Resume file: None
