@@ -1,10 +1,11 @@
-import { act, cleanup, render, screen } from '@testing-library/react';
+import { act, cleanup, fireEvent, render, screen } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { ClassroomShell } from '@/features/classroom-shell/classroom-shell';
 import { CLASSROOM_TIMINGS } from '@/features/classroom-shell/classroom-orchestrator';
 import { getBobbyScriptLine } from '@/features/classroom-shell/bobby-script';
 import { getTeacherScriptLine } from '@/features/classroom-shell/teacher-script';
+import { useClassroomOrchestrator } from '@/features/classroom-shell/use-classroom-orchestrator';
 import { loadLesson } from '@/features/lesson-config/load-lesson';
 
 const lesson = loadLesson('week-01-lesson-01');
@@ -159,10 +160,51 @@ describe('classroom shell layout', () => {
   });
 });
 
+describe('classroom shell hook contract', () => {
+  it('exposes stage-aware fields and confirmStudentParticipation to shell consumers', async () => {
+    render(<ClassroomHookProbe />);
+
+    expect(screen.getByTestId('probe-stage-id')).toHaveTextContent('repeat-after-teacher');
+    expect(screen.getByTestId('probe-stage-index')).toHaveTextContent('0');
+    expect(screen.getByTestId('probe-stage-item-index')).toHaveTextContent('0');
+    expect(screen.getByTestId('probe-attempt-index')).toHaveTextContent('0');
+    expect(screen.getByTestId('probe-phase')).toHaveTextContent('teacher_prompt');
+
+    await advanceFlow(CLASSROOM_TIMINGS.teacher_prompt);
+    await advanceFlow(CLASSROOM_TIMINGS.ai_model);
+
+    expect(screen.getByTestId('probe-phase')).toHaveTextContent('student_wait');
+
+    fireEvent.click(screen.getByRole('button', { name: 'Confirm student participation' }));
+
+    expect(screen.getByTestId('probe-phase')).toHaveTextContent('teacher_feedback');
+    expect(screen.getByTestId('probe-attempt-index')).toHaveTextContent('1');
+  });
+});
+
 function bobbyLineText(targetText: string) {
   return getBobbyScriptLine({
     currentItemIndex: 0,
     phase: 'ai_model',
     targetText,
   })?.spokenLine;
+}
+
+function ClassroomHookProbe() {
+  const orchestrator = useClassroomOrchestrator({
+    lesson,
+  });
+
+  return (
+    <div>
+      <div data-testid="probe-stage-id">{orchestrator.currentStageId}</div>
+      <div data-testid="probe-stage-index">{orchestrator.currentStageIndex}</div>
+      <div data-testid="probe-stage-item-index">{orchestrator.currentStageItemIndex}</div>
+      <div data-testid="probe-attempt-index">{orchestrator.attemptIndex}</div>
+      <div data-testid="probe-phase">{orchestrator.phase}</div>
+      <button onClick={() => orchestrator.confirmStudentParticipation()} type="button">
+        Confirm student participation
+      </button>
+    </div>
+  );
 }

@@ -173,11 +173,51 @@ describe('useClassroomOrchestrator', () => {
     expect(result.current.phase).toBe('teacher_prompt');
     expect(result.current.currentItemIndex).toBe(0);
     expect(result.current.currentItem.id).toBe('apple');
+    expect(result.current.currentStageId).toBe('repeat-after-teacher');
+    expect(result.current.currentStageIndex).toBe(0);
+    expect(result.current.currentStageItemIndex).toBe(0);
+    expect(result.current.attemptIndex).toBe(0);
     expect(result.current.activeSeat).toBe(null);
     expect(result.current.activeSpeaker).toBe('teacher');
     expect(result.current.rewardVisible).toBe(false);
     expect(result.current.participationState).toBe('idle');
     expect(result.current.debugTargetText).toBe('APPLE');
+  });
+
+  it('only advances to teacher_feedback when confirmStudentParticipation is called during student_wait', async () => {
+    vi.useFakeTimers();
+
+    const { result } = renderHook(() =>
+      useClassroomOrchestrator({
+        lesson: lessonWeek01Lesson01,
+      }),
+    );
+
+    act(() => {
+      result.current.confirmStudentParticipation();
+    });
+    expect(result.current.phase).toBe('teacher_prompt');
+    expect(result.current.attemptIndex).toBe(0);
+
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(CLASSROOM_TIMINGS.teacher_prompt);
+    });
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(CLASSROOM_TIMINGS.ai_model);
+    });
+
+    expect(result.current.phase).toBe('student_wait');
+    expect(result.current.currentStageId).toBe('repeat-after-teacher');
+    expect(result.current.currentStageItemIndex).toBe(0);
+
+    act(() => {
+      result.current.confirmStudentParticipation();
+    });
+
+    expect(result.current.phase).toBe('teacher_feedback');
+    expect(result.current.attemptIndex).toBe(1);
+
+    vi.useRealTimers();
   });
 
   it('uses timer dispatches to move through the scripted order without component-level timeout chains', async () => {
@@ -189,20 +229,31 @@ describe('useClassroomOrchestrator', () => {
       }),
     );
 
+    expect(vi.getTimerCount()).toBe(1);
+
     await act(async () => {
       await vi.advanceTimersByTimeAsync(CLASSROOM_TIMINGS.teacher_prompt);
     });
     expect(result.current.phase).toBe('ai_model');
+    expect(vi.getTimerCount()).toBe(1);
 
     await act(async () => {
       await vi.advanceTimersByTimeAsync(CLASSROOM_TIMINGS.ai_model);
     });
     expect(result.current.phase).toBe('student_wait');
+    expect(vi.getTimerCount()).toBe(1);
+
+    act(() => {
+      result.current.confirmStudentParticipation();
+    });
+    expect(result.current.phase).toBe('teacher_feedback');
+    expect(vi.getTimerCount()).toBe(1);
 
     await act(async () => {
-      await vi.advanceTimersByTimeAsync(CLASSROOM_TIMINGS.student_wait);
+      await vi.advanceTimersByTimeAsync(CLASSROOM_TIMINGS.teacher_feedback);
     });
-    expect(result.current.phase).toBe('teacher_encourage');
+    expect(result.current.phase).toBe('move_next');
+    expect(vi.getTimerCount()).toBe(1);
 
     vi.useRealTimers();
   });
