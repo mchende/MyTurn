@@ -39,7 +39,10 @@ export function LessonBoard({
       />
       <div className="absolute inset-0 bg-black/10" />
 
-      <div className="absolute left-8 top-8 inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/8 px-4 py-2 text-xs font-black tracking-[0.18em] text-white/85 backdrop-blur-md">
+      <div
+        className="absolute left-8 top-8 inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/8 px-4 py-2 text-xs font-black tracking-[0.18em] text-white/85 backdrop-blur-md"
+        data-testid="lesson-stage-badge"
+      >
         <span className="h-2 w-2 rounded-full bg-[#10B981]" />
         {stageBadge}
       </div>
@@ -60,7 +63,11 @@ export function LessonBoard({
             {debugTargetText}
           </p>
         ) : null}
-        <p className={shouldShowDebugTarget ? 'mt-2 text-sm leading-6 text-white/70' : 'text-sm leading-6 text-white/70'}>
+        <p
+          aria-live="polite"
+          className={shouldShowDebugTarget ? 'mt-2 text-sm leading-6 text-white/70' : 'text-sm leading-6 text-white/70'}
+          data-testid="lesson-stage-prompt"
+        >
           {stagePrompt}
         </p>
       </div>
