@@ -1,6 +1,10 @@
 'use client';
 
-import type { Lesson, LessonItem } from '@/features/lesson-config/lesson-schema';
+import type {
+  Lesson,
+  LessonItem,
+  LessonStage,
+} from '@/features/lesson-config/lesson-schema';
 
 export type ClassroomOrchestratorPhase =
   | 'teacher_prompt'
@@ -35,12 +39,26 @@ export const CLASSROOM_TIMINGS: Record<
   move_next: 600,
 };
 
+export const GUIDED_STAGE_IDS = ['repeat-after-teacher', 'picture-talk'] as const;
+
+export type GuidedStageId = (typeof GUIDED_STAGE_IDS)[number];
+
+export type GuidedStageRun = {
+  itemIds: LessonStage['itemIds'];
+  stageId: GuidedStageId;
+};
+
 export type ClassroomOrchestratorState = {
   activeSeat: ClassroomActiveSeat;
   activeSpeaker: ClassroomSpeaker;
+  attemptIndex: number;
   currentItem: LessonItem;
   currentItemIndex: number;
+  currentStageId: GuidedStageId;
+  currentStageIndex: number;
+  currentStageItemIndex: number;
   debugTargetText: string;
+  guidedStageRuns: GuidedStageRun[];
   lesson: Lesson;
   phase: ClassroomOrchestratorPhase;
   participationState: ParticipationState;
@@ -50,21 +68,42 @@ export type ClassroomOrchestratorState = {
 export type ClassroomOrchestratorEvent =
   | { type: 'phase_timer_completed' }
   | { type: 'student_silent_timeout' }
-  | { type: 'student_spoke' }
+  | { type: 'student_participation_confirmed' }
   | { type: 'teacher_echo_complete' }
   | { type: 'reward_visibility_changed'; visible: boolean };
+
+export function buildGuidedStageRuns(lesson: Lesson): GuidedStageRun[] {
+  return lesson.stages
+    .filter(isGuidedLessonStage)
+    .map((stage) => ({
+      itemIds: [...stage.itemIds],
+      stageId: stage.id,
+    }));
+}
 
 export function createInitialClassroomState(
   lesson: Lesson,
 ): ClassroomOrchestratorState {
-  const currentItem = lesson.items[0];
+  const guidedStageRuns = buildGuidedStageRuns(lesson);
+  const firstStageRun = guidedStageRuns[0];
+
+  if (!firstStageRun) {
+    throw new Error('Lesson must include at least one guided speaking stage.');
+  }
+
+  const firstItemRef = resolveLessonItemReference(lesson, firstStageRun.itemIds[0]);
 
   return {
     activeSeat: null,
     activeSpeaker: 'teacher',
-    currentItem,
-    currentItemIndex: 0,
-    debugTargetText: currentItem.text.toUpperCase(),
+    attemptIndex: 0,
+    currentItem: firstItemRef.item,
+    currentItemIndex: firstItemRef.itemIndex,
+    currentStageId: firstStageRun.stageId,
+    currentStageIndex: 0,
+    currentStageItemIndex: 0,
+    debugTargetText: firstItemRef.item.text.toUpperCase(),
+    guidedStageRuns,
     lesson,
     phase: 'teacher_prompt',
     participationState: 'idle',
@@ -82,7 +121,7 @@ export function classroomOrchestratorReducer(
         ...state,
         rewardVisible: event.visible,
       };
-    case 'student_spoke':
+    case 'student_participation_confirmed':
       if (state.phase !== 'student_wait') {
         return state;
       }
@@ -91,6 +130,7 @@ export function classroomOrchestratorReducer(
         ...state,
         activeSeat: 'me',
         activeSpeaker: 'teacher',
+        attemptIndex: state.attemptIndex + 1,
         participationState: 'spoke',
         phase: 'teacher_feedback',
       };
@@ -130,6 +170,16 @@ function advanceTimedPhase(
 ): ClassroomOrchestratorState {
   switch (state.phase) {
     case 'teacher_prompt':
+      if (state.currentStageId === 'picture-talk') {
+        return {
+          ...state,
+          activeSeat: 'me',
+          activeSpeaker: 'student',
+          participationState: 'waiting',
+          phase: 'student_wait',
+        };
+      }
+
       return {
         ...state,
         activeSeat: 'ai',
@@ -175,27 +225,96 @@ function advanceTimedPhase(
 function moveToNextItem(
   state: ClassroomOrchestratorState,
 ): ClassroomOrchestratorState {
-  const nextItemIndex = state.currentItemIndex + 1;
-  const nextItem = state.lesson.items[nextItemIndex];
+  const currentStageRun = state.guidedStageRuns[state.currentStageIndex];
 
-  if (!nextItem) {
-    return {
-      ...state,
-      activeSeat: null,
-      activeSpeaker: 'teacher',
-      phase: 'wrap_up',
-    };
+  if (!currentStageRun) {
+    return toWrapUpState(state);
   }
 
+  const nextStageItemId = currentStageRun.itemIds[state.currentStageItemIndex + 1];
+
+  if (nextStageItemId) {
+    const nextItemRef = resolveLessonItemReference(state.lesson, nextStageItemId);
+
+    return resetForNextPrompt(state, {
+      item: nextItemRef.item,
+      itemIndex: nextItemRef.itemIndex,
+      stageId: currentStageRun.stageId,
+      stageIndex: state.currentStageIndex,
+      stageItemIndex: state.currentStageItemIndex + 1,
+    });
+  }
+
+  const nextStageRun = state.guidedStageRuns[state.currentStageIndex + 1];
+
+  if (!nextStageRun) {
+    return toWrapUpState(state);
+  }
+
+  const nextItemRef = resolveLessonItemReference(state.lesson, nextStageRun.itemIds[0]);
+
+  return resetForNextPrompt(state, {
+    item: nextItemRef.item,
+    itemIndex: nextItemRef.itemIndex,
+    stageId: nextStageRun.stageId,
+    stageIndex: state.currentStageIndex + 1,
+    stageItemIndex: 0,
+  });
+}
+
+function isGuidedLessonStage(
+  stage: LessonStage,
+): stage is LessonStage & { id: GuidedStageId } {
+  return GUIDED_STAGE_IDS.includes(stage.id as GuidedStageId);
+}
+
+function resolveLessonItemReference(lesson: Lesson, itemId: string) {
+  const itemIndex = lesson.items.findIndex((item) => item.id === itemId);
+
+  if (itemIndex === -1) {
+    throw new Error(`Missing lesson item "${itemId}" in guided stage run.`);
+  }
+
+  return {
+    item: lesson.items[itemIndex],
+    itemIndex,
+  };
+}
+
+function resetForNextPrompt(
+  state: ClassroomOrchestratorState,
+  nextStep: {
+    item: LessonItem;
+    itemIndex: number;
+    stageId: GuidedStageId;
+    stageIndex: number;
+    stageItemIndex: number;
+  },
+): ClassroomOrchestratorState {
   return {
     ...state,
     activeSeat: null,
     activeSpeaker: 'teacher',
-    currentItem: nextItem,
-    currentItemIndex: nextItemIndex,
-    debugTargetText: nextItem.text.toUpperCase(),
+    attemptIndex: 0,
+    currentItem: nextStep.item,
+    currentItemIndex: nextStep.itemIndex,
+    currentStageId: nextStep.stageId,
+    currentStageIndex: nextStep.stageIndex,
+    currentStageItemIndex: nextStep.stageItemIndex,
+    debugTargetText: nextStep.item.text.toUpperCase(),
     participationState: 'idle',
     phase: 'teacher_prompt',
     rewardVisible: false,
+  };
+}
+
+function toWrapUpState(
+  state: ClassroomOrchestratorState,
+): ClassroomOrchestratorState {
+  return {
+    ...state,
+    activeSeat: null,
+    activeSpeaker: 'teacher',
+    phase: 'wrap_up',
   };
 }
