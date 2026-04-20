@@ -50,13 +50,17 @@ export function useClassroomOrchestrator({
   }, [state.phase]);
 
   const teacherScriptLine = getTeacherScriptLine({
+    attemptIndex: state.attemptIndex,
     currentItemIndex: state.currentItemIndex,
     phase: state.phase,
+    participationState: state.participationState,
+    stageId: state.currentStageId,
     targetText: state.currentItem.text,
   });
   const bobbyScriptLine = getBobbyScriptLine({
     currentItemIndex: state.currentItemIndex,
     phase: state.phase,
+    stageId: state.currentStageId,
     targetText: state.currentItem.text,
   });
   const podiumViewModel = buildPodiumViewModel({
@@ -65,6 +69,7 @@ export function useClassroomOrchestrator({
     participationState: state.participationState,
     phase: state.phase,
     rewardVisible: state.rewardVisible,
+    stageId: state.currentStageId,
   });
 
   return {
@@ -77,13 +82,14 @@ export function useClassroomOrchestrator({
       progressCount: state.lesson.items.length,
       rewardVisible: state.rewardVisible,
       phase: state.phase,
+      stageId: state.currentStageId,
     }),
     stagePrompt: getStagePrompt({
       phase: state.phase,
       stageId: state.currentStageId,
     }),
     teacherHint: teacherScriptLine.hintLabel,
-    teacherMessage: teacherScriptLine.spokenLine,
+    teacherMessage: teacherScriptLine.visibleCaption,
     teacherScriptLine,
     showReward: () => {
       dispatch({ type: 'reward_visibility_changed', visible: true });
@@ -102,21 +108,25 @@ function getStageBadge({
   progressCount,
   rewardVisible,
   phase,
+  stageId,
 }: {
   currentItemIndex: number;
   progressCount: number;
   rewardVisible: boolean;
   phase: keyof typeof CLASSROOM_TIMINGS | 'wrap_up';
+  stageId: GuidedStageId;
 }) {
   if (rewardVisible) {
-    return '奖励时刻';
+    return 'Reward time';
   }
 
   if (phase === 'wrap_up') {
-    return '课堂收尾';
+    return 'Class closing';
   }
 
-  return `第 ${currentItemIndex + 1}/${progressCount} 轮`;
+  return `${
+    stageId === 'picture-talk' ? 'Picture talk' : 'Repeat'
+  } ${currentItemIndex + 1}/${progressCount}`;
 }
 
 function getStagePrompt({
@@ -129,24 +139,28 @@ function getStagePrompt({
   switch (phase) {
     case 'teacher_prompt':
       return stageId === 'picture-talk'
-        ? '老师正在看图提问，马上就轮到你自己回答。'
-        : '老师正在带你观察图片，马上会先听到 Bobby 的示范。';
+        ? 'Look at the picture. A question is coming.'
+        : 'Listen first. Bobby will model one.';
     case 'ai_model':
-      return '先听 Bobby 一次，再轮到你开口。';
+      return 'Listen to Bobby once, then you speak.';
     case 'student_wait':
       return stageId === 'picture-talk'
-        ? '看着图片自己回答，慢一点也没关系。'
-        : '听完示范后跟着说一次，慢一点也没关系。';
+        ? 'Look at the picture and answer.'
+        : 'Say it after the model.';
     case 'teacher_encourage':
-      return 'Cora 正在接住停顿，帮你把这一轮继续下去。';
+      return stageId === 'picture-talk'
+        ? 'Try one more answer.'
+        : 'Cora is helping you start again.';
     case 'teacher_echo':
-      return '跟着 Cora 再说一次，课堂节奏会继续往前走。';
+      return stageId === 'picture-talk'
+        ? 'Cora is keeping the class moving.'
+        : 'Say it once more with Cora.';
     case 'teacher_feedback':
-      return 'Cora 正在给一个短反馈，然后准备切到下一张图。';
+      return 'Cora gives a short feedback.';
     case 'move_next':
-      return '眼睛回到主屏幕，下一张图片要来了。';
+      return 'Eyes on the next picture.';
     case 'wrap_up':
-      return '这一节短课已经结束，准备挥手说再见。';
+      return 'Class is done. Time to wave goodbye.';
     default:
       return '';
   }

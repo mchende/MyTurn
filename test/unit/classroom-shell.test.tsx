@@ -180,12 +180,13 @@ describe('classroom shell layout', () => {
     );
 
     expect(screen.getAllByText('GREAT JOB!')).toHaveLength(1);
-    expect(screen.getAllByText('奖励时刻')).toHaveLength(2);
+    expect(screen.getAllByText('Reward time')).toHaveLength(2);
   });
 
   it('uses one classroom confirmation button to progress repeat-after-teacher and picture-talk turns', async () => {
     const user = userEvent.setup({
-      advanceTimers: vi.advanceTimersByTimeAsync,
+      advanceTimers: vi.advanceTimersByTime,
+      delay: null,
     });
 
     render(
@@ -202,7 +203,7 @@ describe('classroom shell layout', () => {
     const repeatButton = screen.getByRole('button', { name: 'I said it' });
     expect(screen.getAllByRole('button', { name: /i said it|i answered/i })).toHaveLength(1);
 
-    await user.click(repeatButton);
+    await clickWithUser(user, repeatButton);
 
     expect(screen.getByText(/Good job|Nice work|Yes\. I heard you trying carefully\./i)).toBeInTheDocument();
 
@@ -214,7 +215,7 @@ describe('classroom shell layout', () => {
     expect(screen.queryByText(/Bobby goes first|Listen to Bobby|Bobby shows one/i)).not.toBeInTheDocument();
     expect(screen.queryByText(/^apple$/i)).not.toBeInTheDocument();
 
-    await user.click(pictureTalkButton);
+    await clickWithUser(user, pictureTalkButton);
 
     expect(screen.getByText(/Good job|Nice work|Yes\. I heard you trying carefully\./i)).toBeInTheDocument();
   });
@@ -223,7 +224,8 @@ describe('classroom shell layout', () => {
 describe('classroom shell hook contract', () => {
   it('exposes stage-aware fields and confirmStudentParticipation to shell consumers', async () => {
     const user = userEvent.setup({
-      advanceTimers: vi.advanceTimersByTimeAsync,
+      advanceTimers: vi.advanceTimersByTime,
+      delay: null,
     });
 
     render(<ClassroomHookProbe />);
@@ -239,7 +241,10 @@ describe('classroom shell hook contract', () => {
 
     expect(screen.getByTestId('probe-phase')).toHaveTextContent('student_wait');
 
-    await user.click(screen.getByRole('button', { name: 'Confirm student participation' }));
+    await clickWithUser(
+      user,
+      screen.getByRole('button', { name: 'Confirm student participation' }),
+    );
 
     expect(screen.getByTestId('probe-phase')).toHaveTextContent('teacher_feedback');
     expect(screen.getByTestId('probe-attempt-index')).toHaveTextContent('1');
@@ -268,11 +273,21 @@ async function finishTurn() {
 async function completeRepeatAfterTeacherStage(user: ReturnType<typeof userEvent.setup>) {
   for (let index = 1; index < lesson.items.length; index += 1) {
     await moveToStudentTurn();
-    await user.click(screen.getByRole('button', { name: 'I said it' }));
+    await clickWithUser(user, screen.getByRole('button', { name: 'I said it' }));
     await finishTurn();
   }
 
   await advanceFlow(CLASSROOM_TIMINGS.teacher_prompt);
+}
+
+async function clickWithUser(
+  user: ReturnType<typeof userEvent.setup>,
+  element: Element,
+) {
+  await act(async () => {
+    void user.click(element);
+    await Promise.resolve();
+  });
 }
 
 function ClassroomHookProbe() {

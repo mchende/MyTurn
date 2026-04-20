@@ -1,6 +1,7 @@
 import type {
   ClassroomActiveSeat,
   ClassroomOrchestratorPhase,
+  GuidedStageId,
   ParticipationState,
 } from './classroom-orchestrator';
 import type { BobbyScriptLine } from './bobby-script';
@@ -16,12 +17,15 @@ export type StudentSeatViewModel = {
 };
 
 export type PodiumViewModel = {
+  confirmationButtonLabel: string | null;
   liveAvatarAlt: string;
   liveAvatarSrc: string;
   podiumCaption: string;
   podiumStatus: string;
   pulseDurationMs: number;
   seats: readonly StudentSeatViewModel[];
+  showConfirmationButton: boolean;
+  turnLabel: string;
 };
 
 type BuildPodiumViewModelOptions = {
@@ -30,6 +34,7 @@ type BuildPodiumViewModelOptions = {
   participationState: ParticipationState;
   phase: ClassroomOrchestratorPhase;
   rewardVisible: boolean;
+  stageId: GuidedStageId;
 };
 
 export function buildPodiumViewModel({
@@ -38,19 +43,26 @@ export function buildPodiumViewModel({
   participationState,
   phase,
   rewardVisible,
+  stageId,
 }: BuildPodiumViewModelOptions): PodiumViewModel {
+  const showConfirmationButton = activeSeat === 'me' && phase === 'student_wait';
+
   return {
+    confirmationButtonLabel: showConfirmationButton
+      ? getConfirmationButtonLabel(stageId)
+      : null,
     liveAvatarAlt: getLiveAvatarAlt(activeSeat),
     liveAvatarSrc:
       activeSeat === 'ai'
         ? '/avatars/student-bobby.svg'
         : '/avatars/reward-student.svg',
-    podiumCaption: getPodiumCaption(phase, rewardVisible),
+    podiumCaption: getPodiumCaption(phase, rewardVisible, stageId),
     podiumStatus: getPodiumStatus({
       bobbyScriptLine,
       participationState,
       phase,
       rewardVisible,
+      stageId,
     }),
     pulseDurationMs:
       phase === 'ai_model' && bobbyScriptLine
@@ -83,6 +95,8 @@ export function buildPodiumViewModel({
         testId: 'seat-empty',
       },
     ],
+    showConfirmationButton,
+    turnLabel: showConfirmationButton ? 'Your turn' : 'Podium',
   };
 }
 
@@ -101,30 +115,35 @@ function getLiveAvatarAlt(activeSeat: ClassroomActiveSeat) {
 function getPodiumCaption(
   phase: ClassroomOrchestratorPhase,
   rewardVisible: boolean,
+  stageId: GuidedStageId,
 ) {
   if (rewardVisible) {
-    return '奖励时刻';
+    return 'Reward time';
   }
 
   switch (phase) {
     case 'teacher_prompt':
-      return '先看图，马上轮到 Bobby';
+      return stageId === 'picture-talk'
+        ? 'Look first. Answer next.'
+        : 'Listen first. Bobby goes next.';
     case 'ai_model':
-      return 'Bobby 在讲台示范';
+      return 'Bobby is modeling';
     case 'student_wait':
-      return '轮到你上讲台';
+      return stageId === 'picture-talk' ? 'Look and answer' : 'Your turn to say it';
     case 'teacher_encourage':
-      return 'Cora 在台下接住你';
+      return stageId === 'picture-talk'
+        ? 'Try one more answer'
+        : 'Say it with Cora';
     case 'teacher_echo':
-      return 'Cora 带你一起说';
+      return 'Teacher is helping';
     case 'teacher_feedback':
-      return 'Cora 正在收束这一轮';
+      return 'Cora is wrapping this turn';
     case 'move_next':
-      return '准备切到下一题';
+      return 'Next picture';
     case 'wrap_up':
-      return '课堂收尾';
+      return 'Class closing';
     default:
-      return '课堂进行中';
+      return 'Class in progress';
   }
 }
 
@@ -133,6 +152,7 @@ function getPodiumStatus({
   participationState,
   phase,
   rewardVisible,
+  stageId,
 }: Omit<BuildPodiumViewModelOptions, 'activeSeat'>) {
   if (rewardVisible) {
     return 'Great job, brave voice.';
@@ -144,13 +164,21 @@ function getPodiumStatus({
 
   switch (phase) {
     case 'teacher_prompt':
-      return 'Watch first. Your turn is coming.';
+      return stageId === 'picture-talk'
+        ? 'Look carefully. A question is coming.'
+        : 'Listen first. Your turn is coming.';
     case 'student_wait':
-      return 'Take a breath. Your voice is ready.';
+      return stageId === 'picture-talk'
+        ? 'Look at the picture and answer.'
+        : 'Listen and say it back.';
     case 'teacher_encourage':
-      return 'Cora is helping you start.';
+      return stageId === 'picture-talk'
+        ? 'Take a breath. Answer one more time.'
+        : 'Cora is helping you start.';
     case 'teacher_echo':
-      return 'Say it together with Cora.';
+      return stageId === 'picture-talk'
+        ? 'Thanks for trying. Let us keep going.'
+        : 'Say it together with Cora.';
     case 'teacher_feedback':
       return participationState === 'spoke'
         ? 'Cora heard your brave try.'
@@ -162,4 +190,8 @@ function getPodiumStatus({
     default:
       return 'Stay with the class rhythm.';
   }
+}
+
+function getConfirmationButtonLabel(stageId: GuidedStageId) {
+  return stageId === 'picture-talk' ? 'I answered' : 'I said it';
 }

@@ -77,7 +77,10 @@ export function ClassroomShell({
               hint={classroom.teacherHint}
               message={classroom.teacherMessage}
             />
-            <PodiumColumn podiumViewModel={classroom.podiumViewModel} />
+            <PodiumColumn
+              onConfirmParticipation={classroom.confirmStudentParticipation}
+              podiumViewModel={classroom.podiumViewModel}
+            />
           </aside>
         </div>
       </div>
@@ -149,8 +152,10 @@ function TeacherColumn({
 }
 
 function PodiumColumn({
+  onConfirmParticipation,
   podiumViewModel,
 }: {
+  onConfirmParticipation: () => void;
   podiumViewModel: PodiumViewModel;
 }) {
   const bars = [0.42, 0.62, 1, 0.72, 0.5];
@@ -167,7 +172,7 @@ function PodiumColumn({
       }`}
     >
       <div className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full bg-[#10B981] px-4 py-1 text-[10px] font-black text-white shadow-lg">
-        你的发言时间
+        {podiumViewModel.turnLabel}
       </div>
 
       <div className="relative flex h-full flex-col overflow-hidden rounded-[32px] bg-slate-900">
@@ -201,9 +206,21 @@ function PodiumColumn({
         </div>
 
         <div className="absolute bottom-16 left-6 right-6 flex items-center justify-center">
-          <p className="rounded-full border border-white/10 bg-black/30 px-3 py-1.5 text-[11px] font-bold text-white/70">
-            {podiumViewModel.podiumStatus}
-          </p>
+          <div className="flex flex-col items-center gap-3">
+            <p className="rounded-full border border-white/10 bg-black/30 px-3 py-1.5 text-[11px] font-bold text-white/70">
+              {podiumViewModel.podiumStatus}
+            </p>
+            {podiumViewModel.showConfirmationButton &&
+            podiumViewModel.confirmationButtonLabel ? (
+              <button
+                className="inline-flex items-center justify-center rounded-full border border-emerald-300/40 bg-emerald-400/15 px-5 py-2 text-sm font-black tracking-[0.02em] text-emerald-50 shadow-[0_12px_24px_rgba(16,185,129,0.18)] transition hover:bg-emerald-400/25"
+                onClick={onConfirmParticipation}
+                type="button"
+              >
+                {podiumViewModel.confirmationButtonLabel}
+              </button>
+            ) : null}
+          </div>
         </div>
 
         <div className="absolute bottom-6 left-6 right-6 flex h-12 items-end justify-center gap-1.5">
