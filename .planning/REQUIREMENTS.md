@@ -16,13 +16,13 @@
 
 - [x] **CONT-01**: 运营或配置者可以为每节课配置 5 个目标词或短句
 - [x] **CONT-02**: 运营或配置者可以为每个目标项绑定 1 张图片，供示范与提问环节使用
-- [ ] **CONT-03**: 课堂流程以图片作为主要理解线索，而不是依赖中文解释
+- [x] **CONT-03**: 课堂流程以图片作为主要理解线索，而不是依赖中文解释
 - [x] **CONT-04**: 同一节课内容可以支撑多轮重复练习，并逐步提高输出要求
 
 ### Teacher Facilitation
 
 - [x] **TEAC-01**: 用户能听到具有老师风格的课堂引导，包括示范目标语言和清晰的过渡话术
-- [ ] **TEAC-02**: 用户能从老师那里获得温和的等待、鼓励和明确的点名作答提示
+- [x] **TEAC-02**: 用户能从老师那里获得温和的等待、鼓励和明确的点名作答提示
 - [ ] **TEAC-03**: 当孩子作答困难时，老师会先给出轻量提示，再让孩子重新尝试
 - [ ] **TEAC-04**: 当孩子连续几次仍无法作答时，老师可以退回到“示范 + 跟读”的兜底方式以恢复课堂节奏
 
@@ -85,9 +85,9 @@
 | TEAC-01 | Phase 2 | Complete |
 | AICL-01 | Phase 2 | Complete |
 | AICL-02 | Phase 2 | Complete |
-| CONT-03 | Phase 3 | Pending |
+| CONT-03 | Phase 3 | Complete |
 | CONT-04 | Phase 3 | Complete |
-| TEAC-02 | Phase 3 | Pending |
+| TEAC-02 | Phase 3 | Complete |
 | SPKG-01 | Phase 3 | Complete |
 | TEAC-03 | Phase 4 | Pending |
 | TEAC-04 | Phase 4 | Pending |
@@ -104,4 +104,4 @@
 
 ---
 *Requirements defined: 2026-04-15*
-*Last updated: 2026-04-20 after Phase 03 Plan 1 completion*
+*Last updated: 2026-04-20 after Phase 03 Plan 2 completion*

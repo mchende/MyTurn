@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: Completed 03-guided-speaking-flow-01-PLAN.md
-last_updated: "2026-04-20T02:59:41.582Z"
-last_activity: 2026-04-20 -- Completed 03-01 guided-speaking-flow
+stopped_at: Completed 03-02-PLAN.md
+last_updated: "2026-04-20T03:12:29.421Z"
+last_activity: 2026-04-20
 progress:
   total_phases: 5
   completed_phases: 2
   total_plans: 10
-  completed_plans: 8
-  percent: 80
+  completed_plans: 9
+  percent: 90
 ---
 
 # Project State
@@ -26,19 +26,19 @@ See: .planning/PROJECT.md (updated 2026-04-15)
 ## Current Position
 
 Phase: 03 (guided-speaking-flow) — EXECUTING
-Plan: 2 of 3
+Plan: 3 of 3
 Status: Ready to execute
-Last activity: 2026-04-20 -- Completed 03-01 guided-speaking-flow
+Last activity: 2026-04-20
 
-Progress: [████████░░] 80%
+Progress: [█████████░] 90%
 
 ## Performance Metrics
 
 **Velocity:**
 
-- Total plans completed: 8
-- Average duration: 6.4min
-- Total execution time: 0.9 hours
+- Total plans completed: 9
+- Average duration: 6.6min
+- Total execution time: 1.0 hours
 
 **By Phase:**
 
@@ -58,6 +58,7 @@ Progress: [████████░░] 80%
 | Phase 02-cast-and-orchestration P02 | 4min | 2 tasks | 5 files |
 | Phase 02-cast-and-orchestration P03 | 12min | 3 tasks | 9 files |
 | Phase 03-guided-speaking-flow P01 | 5min | 2 tasks | 4 files |
+| Phase 03 P02 | 8min | 2 tasks | 10 files |
 
 ## Accumulated Context
 
@@ -86,6 +87,9 @@ Progress: [████████░░] 80%
 - [Phase 03-guided-speaking-flow]: Derive guided speaking progress from lesson.stages so repeat-after-teacher fully completes before picture-talk begins.
 - [Phase 03-guided-speaking-flow]: Use student_participation_confirmed as the only speaking success signal instead of exposing auto-speech semantics in the hook API.
 - [Phase 03-guided-speaking-flow]: Keep useClassroomOrchestrator on one centralized CLASSROOM_TIMINGS scheduler while exposing stage metadata directly to shell consumers.
+- [Phase 03]: Render teacher visible copy from visibleCaption while preserving spokenModel for stage audio contracts.
+- [Phase 03]: Keep participation confirmation as a single podium CTA with stage-specific labels instead of adding extra shell chrome.
+- [Phase 03]: Restrict Bobby to repeat-after-teacher ai_model turns so picture-talk retries remain teacher-owned.
 
 ### Pending Todos
 
@@ -98,6 +102,6 @@ Progress: [████████░░] 80%
 
 ## Session Continuity
 
-Last session: 2026-04-20T02:59:41.578Z
-Stopped at: Completed 03-guided-speaking-flow-01-PLAN.md
+Last session: 2026-04-20T03:12:09.470Z
+Stopped at: Completed 03-02-PLAN.md
 Resume file: None
