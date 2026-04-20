@@ -139,6 +139,16 @@ export function classroomOrchestratorReducer(
         return state;
       }
 
+      if (state.currentStageId === 'picture-talk') {
+        return {
+          ...state,
+          activeSeat: null,
+          activeSpeaker: 'teacher',
+          participationState: 'silent',
+          phase: 'teacher_encourage',
+        };
+      }
+
       return {
         ...state,
         activeSeat: null,
@@ -197,6 +207,26 @@ function advanceTimedPhase(
     case 'student_wait':
       return classroomOrchestratorReducer(state, { type: 'student_silent_timeout' });
     case 'teacher_encourage':
+      if (state.currentStageId === 'picture-talk') {
+        if (state.attemptIndex === 0) {
+          return {
+            ...state,
+            activeSeat: 'me',
+            activeSpeaker: 'student',
+            attemptIndex: 1,
+            participationState: 'waiting',
+            phase: 'student_wait',
+          };
+        }
+
+        return {
+          ...state,
+          activeSeat: null,
+          activeSpeaker: 'teacher',
+          phase: 'move_next',
+        };
+      }
+
       return {
         ...state,
         activeSeat: null,

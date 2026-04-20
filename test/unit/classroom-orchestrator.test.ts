@@ -160,6 +160,89 @@ describe('classroomOrchestratorReducer', () => {
 
     expect(state.rewardVisible).toBe(true);
   });
+
+  it('gives picture-talk one retry before returning to a second student attempt', () => {
+    let state = moveToPictureTalkStudentWait();
+
+    expect(state.currentStageId).toBe('picture-talk');
+    expect(state.phase).toBe('student_wait');
+    expect(state.attemptIndex).toBe(0);
+
+    state = classroomOrchestratorReducer(state, { type: 'student_silent_timeout' });
+
+    expect(state.phase).toBe('teacher_encourage');
+    expect(state.participationState).toBe('silent');
+    expect(state.attemptIndex).toBe(0);
+    expect(state.activeSeat).toBe(null);
+    expect(state.activeSpeaker).toBe('teacher');
+
+    state = classroomOrchestratorReducer(state, { type: 'phase_timer_completed' });
+
+    expect(state.phase).toBe('student_wait');
+    expect(state.attemptIndex).toBe(1);
+    expect(state.participationState).toBe('waiting');
+    expect(state.activeSeat).toBe('me');
+    expect(state.activeSpeaker).toBe('student');
+  });
+
+  it('closes picture-talk after a second timeout instead of routing through teacher_echo', () => {
+    let state = moveToPictureTalkStudentWait();
+
+    state = classroomOrchestratorReducer(state, { type: 'student_silent_timeout' });
+    state = classroomOrchestratorReducer(state, { type: 'phase_timer_completed' });
+
+    expect(state.phase).toBe('student_wait');
+    expect(state.attemptIndex).toBe(1);
+
+    state = classroomOrchestratorReducer(state, { type: 'student_silent_timeout' });
+
+    expect(state.phase).toBe('teacher_encourage');
+    expect(state.participationState).toBe('silent');
+    expect(state.currentItem.id).toBe('apple');
+
+    state = classroomOrchestratorReducer(state, { type: 'phase_timer_completed' });
+
+    expect(state.phase).toBe('move_next');
+
+    state = classroomOrchestratorReducer(state, { type: 'phase_timer_completed' });
+
+    expect(state.phase).toBe('teacher_prompt');
+    expect(state.currentStageId).toBe('picture-talk');
+    expect(state.currentStageItemIndex).toBe(1);
+    expect(state.currentItem.id).toBe('banana');
+  });
+
+  it('lets picture-talk complete on either the first or second confirmed attempt', () => {
+    let firstAttemptState = moveToPictureTalkStudentWait();
+
+    firstAttemptState = classroomOrchestratorReducer(firstAttemptState, {
+      type: 'student_participation_confirmed',
+    });
+
+    expect(firstAttemptState.phase).toBe('teacher_feedback');
+    expect(firstAttemptState.participationState).toBe('spoke');
+    expect(firstAttemptState.attemptIndex).toBe(1);
+
+    let secondAttemptState = moveToPictureTalkStudentWait();
+
+    secondAttemptState = classroomOrchestratorReducer(secondAttemptState, {
+      type: 'student_silent_timeout',
+    });
+    secondAttemptState = classroomOrchestratorReducer(secondAttemptState, {
+      type: 'phase_timer_completed',
+    });
+
+    expect(secondAttemptState.phase).toBe('student_wait');
+    expect(secondAttemptState.attemptIndex).toBe(1);
+
+    secondAttemptState = classroomOrchestratorReducer(secondAttemptState, {
+      type: 'student_participation_confirmed',
+    });
+
+    expect(secondAttemptState.phase).toBe('teacher_feedback');
+    expect(secondAttemptState.participationState).toBe('spoke');
+    expect(secondAttemptState.attemptIndex).toBe(2);
+  });
 });
 
 describe('useClassroomOrchestrator', () => {
@@ -258,3 +341,22 @@ describe('useClassroomOrchestrator', () => {
     vi.useRealTimers();
   });
 });
+
+function moveToPictureTalkStudentWait() {
+  const lesson = lessonWeek01Lesson01;
+  let state = createInitialClassroomState(lesson);
+
+  for (let index = 0; index < lesson.items.length; index += 1) {
+    state = classroomOrchestratorReducer(state, { type: 'phase_timer_completed' });
+    state = classroomOrchestratorReducer(state, { type: 'phase_timer_completed' });
+    state = classroomOrchestratorReducer(state, {
+      type: 'student_participation_confirmed',
+    });
+    state = classroomOrchestratorReducer(state, { type: 'phase_timer_completed' });
+    state = classroomOrchestratorReducer(state, { type: 'phase_timer_completed' });
+  }
+
+  state = classroomOrchestratorReducer(state, { type: 'phase_timer_completed' });
+
+  return state;
+}

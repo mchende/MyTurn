@@ -228,22 +228,25 @@ function getPictureTalkSecondPrompt(
   currentItemIndex: number,
   participationState: ParticipationState,
 ): TeacherScriptVariant {
-  const visibleCaption =
-    attemptIndex > 0 || participationState === 'silent'
-      ? 'Take a breath. Answer one more time.'
-      : 'Answer one more time.';
+  if (attemptIndex > 0 && participationState === 'silent') {
+    return {
+      hintLabel: 'Keep going',
+      spokenModel: 'Thanks for trying. Let us keep going.',
+      visibleCaption: 'Thanks for trying. Let us keep going.',
+    };
+  }
 
   return pickVariant(
     [
       {
         hintLabel: 'Try again',
-        spokenModel: 'Take a look. What is it?',
-        visibleCaption,
+        spokenModel: 'Try once more. What is it?',
+        visibleCaption: 'Try once more.',
       },
       {
         hintLabel: 'One more answer',
-        spokenModel: 'Look carefully. What do you see?',
-        visibleCaption,
+        spokenModel: 'Try once more. What do you see?',
+        visibleCaption: 'Try once more.',
       },
     ],
     currentItemIndex,

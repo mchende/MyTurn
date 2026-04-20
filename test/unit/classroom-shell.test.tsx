@@ -219,6 +219,49 @@ describe('classroom shell layout', () => {
 
     expect(screen.getByText(/Good job|Nice work|Yes\. I heard you trying carefully\./i)).toBeInTheDocument();
   });
+
+  it('keeps picture-talk retries teacher-led with a light second prompt and no Bobby rescue', async () => {
+    const user = userEvent.setup({
+      advanceTimers: vi.advanceTimersByTime,
+      delay: null,
+    });
+
+    render(
+      <ClassroomShell
+        lesson={lesson}
+        sessionId="weekday-1700"
+        sessionStatus="检票入场中: 02:45"
+        sessionTitle="每日语感启蒙"
+      />,
+    );
+
+    await moveToPictureTalkStudentTurn(user);
+
+    expect(screen.getByRole('button', { name: 'I answered' })).toBeInTheDocument();
+    expect(screen.getByText('Picture talk · 1/5')).toBeInTheDocument();
+    expect(screen.queryByText(/Bobby goes first|Listen to Bobby|Bobby shows one/i)).not.toBeInTheDocument();
+
+    await advanceFlow(CLASSROOM_TIMINGS.student_wait);
+
+    expect(screen.getAllByText('Try once more.').length).toBeGreaterThan(0);
+    expect(screen.queryByText(/apple/i)).not.toBeInTheDocument();
+    expect(screen.queryByText(/Bobby goes first|Listen to Bobby|Bobby shows one/i)).not.toBeInTheDocument();
+
+    await advanceFlow(CLASSROOM_TIMINGS.teacher_encourage);
+
+    expect(screen.getByRole('button', { name: 'I answered' })).toBeInTheDocument();
+    expect(screen.getAllByText('Try once more.').length).toBeGreaterThan(0);
+
+    await advanceFlow(CLASSROOM_TIMINGS.student_wait);
+
+    expect(screen.getAllByText('Thanks for trying. Let us keep going.').length).toBeGreaterThan(0);
+    expect(screen.queryByText(/Bobby goes first|Listen to Bobby|Bobby shows one/i)).not.toBeInTheDocument();
+
+    await advanceFlow(CLASSROOM_TIMINGS.teacher_encourage);
+    await advanceFlow(CLASSROOM_TIMINGS.move_next);
+
+    expect(screen.getByText('Picture talk · 2/5')).toBeInTheDocument();
+  });
 });
 
 describe('classroom shell hook contract', () => {
@@ -270,8 +313,27 @@ async function finishTurn() {
   await advanceFlow(CLASSROOM_TIMINGS.move_next);
 }
 
-async function completeRepeatAfterTeacherStage(user: ReturnType<typeof userEvent.setup>) {
+async function completeRepeatAfterTeacherStage(user?: ReturnType<typeof userEvent.setup>) {
+  const actualUser =
+    user ??
+    userEvent.setup({
+      advanceTimers: vi.advanceTimersByTime,
+      delay: null,
+    });
+
   for (let index = 1; index < lesson.items.length; index += 1) {
+    await moveToStudentTurn();
+    await clickWithUser(actualUser, screen.getByRole('button', { name: 'I said it' }));
+    await finishTurn();
+  }
+
+  await advanceFlow(CLASSROOM_TIMINGS.teacher_prompt);
+}
+
+async function moveToPictureTalkStudentTurn(
+  user: ReturnType<typeof userEvent.setup>,
+) {
+  for (let index = 0; index < lesson.items.length; index += 1) {
     await moveToStudentTurn();
     await clickWithUser(user, screen.getByRole('button', { name: 'I said it' }));
     await finishTurn();

@@ -9,8 +9,9 @@ import {
   CLASSROOM_TIMINGS,
   classroomOrchestratorReducer,
   createInitialClassroomState,
-  type GuidedStageId,
   type ClassroomOrchestratorEvent,
+  type GuidedStageId,
+  type ParticipationState,
 } from './classroom-orchestrator';
 import { buildPodiumViewModel } from './podium-view-model';
 import { getTeacherScriptLine } from './teacher-script';
@@ -78,14 +79,18 @@ export function useClassroomOrchestrator({
     podiumViewModel,
     progressCount: state.lesson.items.length,
     stageBadge: getStageBadge({
-      currentItemIndex: state.currentItemIndex,
-      progressCount: state.lesson.items.length,
+      currentStageItemIndex: state.currentStageItemIndex,
+      progressCount:
+        state.guidedStageRuns[state.currentStageIndex]?.itemIds.length ??
+        state.lesson.items.length,
       rewardVisible: state.rewardVisible,
       phase: state.phase,
       stageId: state.currentStageId,
     }),
     stagePrompt: getStagePrompt({
+      attemptIndex: state.attemptIndex,
       phase: state.phase,
+      participationState: state.participationState,
       stageId: state.currentStageId,
     }),
     teacherHint: teacherScriptLine.hintLabel,
@@ -104,13 +109,13 @@ export function useClassroomOrchestrator({
 }
 
 function getStageBadge({
-  currentItemIndex,
+  currentStageItemIndex,
   progressCount,
   rewardVisible,
   phase,
   stageId,
 }: {
-  currentItemIndex: number;
+  currentStageItemIndex: number;
   progressCount: number;
   rewardVisible: boolean;
   phase: keyof typeof CLASSROOM_TIMINGS | 'wrap_up';
@@ -124,16 +129,21 @@ function getStageBadge({
     return 'Class closing';
   }
 
-  return `${
-    stageId === 'picture-talk' ? 'Picture talk' : 'Repeat'
-  } ${currentItemIndex + 1}/${progressCount}`;
+  const stageLabel =
+    stageId === 'picture-talk' ? 'Picture talk' : 'Repeat after Cora';
+
+  return `${stageLabel} · ${currentStageItemIndex + 1}/${progressCount}`;
 }
 
 function getStagePrompt({
+  attemptIndex,
   phase,
+  participationState,
   stageId,
 }: {
+  attemptIndex: number;
   phase: keyof typeof CLASSROOM_TIMINGS | 'wrap_up';
+  participationState: ParticipationState;
   stageId: GuidedStageId;
 }) {
   switch (phase) {
@@ -144,13 +154,19 @@ function getStagePrompt({
     case 'ai_model':
       return 'Listen to Bobby once, then you speak.';
     case 'student_wait':
-      return stageId === 'picture-talk'
-        ? 'Look at the picture and answer.'
-        : 'Say it after the model.';
+      if (stageId === 'picture-talk') {
+        return attemptIndex > 0 ? 'Try once more.' : 'Look at the picture and answer.';
+      }
+
+      return 'Say it after the model.';
     case 'teacher_encourage':
-      return stageId === 'picture-talk'
-        ? 'Try one more answer.'
-        : 'Cora is helping you start again.';
+      if (stageId === 'picture-talk') {
+        return attemptIndex > 0 && participationState === 'silent'
+          ? 'Thanks for trying. Let us keep going.'
+          : 'Try once more.';
+      }
+
+      return 'Cora is helping you start again.';
     case 'teacher_echo':
       return stageId === 'picture-talk'
         ? 'Cora is keeping the class moving.'
