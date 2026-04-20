@@ -40,10 +40,10 @@ created: 2026-04-20
 |---------|------|------|--------------|-----------|-------------------|-------------|--------|
 | 03-01-01 | 03-01 | 1 | CONT-04, SPKG-01 | unit | `npm run test:unit -- test/unit/classroom-orchestrator.test.ts` | ✅ partial | ⬜ pending |
 | 03-01-02 | 03-01 | 1 | CONT-04, SPKG-01 | unit | `npm run test:unit -- test/unit/classroom-orchestrator.test.ts test/unit/classroom-shell.test.tsx` | ✅ partial | ⬜ pending |
-| 03-02-01 | 03-02 | 2 | CONT-03, TEAC-02 | unit | `npm run test:unit -- test/unit/teacher-script.test.ts test/unit/lesson-board.test.tsx` | ✅ partial | ⬜ pending |
-| 03-02-02 | 03-02 | 2 | CONT-03, TEAC-02 | unit | `npm run test:unit -- test/unit/classroom-shell.test.tsx test/unit/teacher-script.test.ts` | ✅ partial | ⬜ pending |
-| 03-03-01 | 03-03 | 3 | CONT-04, TEAC-02, SPKG-01 | unit | `npm run test:unit -- test/unit/classroom-shell.test.tsx test/unit/classroom-orchestrator.test.ts test/unit/teacher-script.test.ts` | ✅ partial | ⬜ pending |
-| 03-03-02 | 03-03 | 3 | CONT-03, CONT-04, SPKG-01 | e2e smoke | `npm run test:unit -- test/unit/classroom-shell.test.tsx test/unit/classroom-orchestrator.test.ts && npm run test:e2e -- test/e2e/classroom-entry.spec.ts` | ✅ / ✅ | ⬜ pending |
+| 03-02-01 | 03-02 | 2 | CONT-03, TEAC-02, SPKG-01 | unit | `npm run test:unit -- test/unit/teacher-script.test.ts test/unit/bobby-script.test.ts` | ✅ partial | ⬜ pending |
+| 03-02-02 | 03-02 | 2 | CONT-03, TEAC-02, SPKG-01 | unit | `npm run test:unit -- test/unit/classroom-shell.test.tsx test/unit/teacher-script.test.ts test/unit/bobby-script.test.ts` | ✅ partial | ⬜ pending |
+| 03-03-01 | 03-03 | 3 | CONT-04, TEAC-02 | unit | `npm run test:unit -- test/unit/classroom-orchestrator.test.ts test/unit/classroom-shell.test.tsx` | ✅ partial | ⬜ pending |
+| 03-03-02 | 03-03 | 3 | CONT-03, CONT-04, TEAC-02 | unit + e2e smoke | `npm run test:unit -- test/unit/lesson-board.test.tsx test/unit/classroom-orchestrator.test.ts test/unit/classroom-shell.test.tsx && npm run test:e2e -- test/e2e/guided-speaking-flow.spec.ts` | ✅ partial / ⬜ planned | ⬜ pending |
 
 *Status: ⬜ pending · ✅ green · ❌ red · ⚠️ flaky*
 
@@ -53,9 +53,11 @@ created: 2026-04-20
 
 - [x] `test/unit/classroom-orchestrator.test.ts` — 已有 reducer / timing 基础测试，可扩展 stage-aware speaking flow
 - [x] `test/unit/teacher-script.test.ts` — 已有 teacher script 合同测试，可扩展 repeat-after-teacher / picture-talk 区分
+- [x] `test/unit/bobby-script.test.ts` — 已有 Bobby persona 合同测试，可扩展 stage-aware 出场限制
 - [x] `test/unit/lesson-board.test.tsx` — 已有 child-facing no-leak guard，可扩展 stage prompt 断言
 - [x] `test/unit/classroom-shell.test.tsx` — 已有 shell visible-behavior 覆盖，可扩展 guided speaking flow
-- [x] `test/e2e/classroom-entry.spec.ts` — 已有 homepage -> lesson smoke，可扩展 Phase 3 可见断言
+- [x] `test/e2e/classroom-entry.spec.ts` — 已有 homepage -> lesson smoke，可继续保留为入场回归
+- [ ] `test/e2e/guided-speaking-flow.spec.ts` — Phase 03 新增 focused guided flow 回归，用于覆盖 repeat-after-teacher -> picture-talk 升级路径
 
 ---
 
