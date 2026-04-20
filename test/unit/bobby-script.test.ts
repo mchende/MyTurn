@@ -6,10 +6,11 @@ import {
 } from '@/features/classroom-shell/bobby-script';
 
 describe('bobby-script', () => {
-  it('adds a mild hesitation envelope while keeping the demo line complete', () => {
+  it('adds a mild hesitation envelope only for repeat-after-teacher demo turns', () => {
     const line = getBobbyScriptLine({
       currentItemIndex: 0,
       phase: 'ai_model',
+      stageId: 'repeat-after-teacher',
       targetText: 'apple',
     });
 
@@ -26,11 +27,12 @@ describe('bobby-script', () => {
     expect(line?.hesitationBeatMs).toBeGreaterThan(0);
   });
 
-  it('does not let Bobby rescue student silence phases', () => {
+  it('keeps Bobby out of picture-talk and non-demo phases', () => {
     expect(
       getBobbyScriptLine({
         currentItemIndex: 0,
         phase: 'student_wait',
+        stageId: 'repeat-after-teacher',
         targetText: 'apple',
       }),
     ).toBeNull();
@@ -39,6 +41,16 @@ describe('bobby-script', () => {
       getBobbyScriptLine({
         currentItemIndex: 0,
         phase: 'teacher_encourage',
+        stageId: 'repeat-after-teacher',
+        targetText: 'apple',
+      }),
+    ).toBeNull();
+
+    expect(
+      getBobbyScriptLine({
+        currentItemIndex: 0,
+        phase: 'ai_model',
+        stageId: 'picture-talk',
         targetText: 'apple',
       }),
     ).toBeNull();
@@ -47,6 +59,7 @@ describe('bobby-script', () => {
       getBobbyScriptLine({
         currentItemIndex: 0,
         phase: 'teacher_echo',
+        stageId: 'picture-talk',
         targetText: 'apple',
       }),
     ).toBeNull();
