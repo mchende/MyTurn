@@ -15,6 +15,7 @@ export type ClassroomOrchestratorPhase =
   | 'ai_model'
   | 'student_wait'
   | 'teacher_encourage'
+  | 'teacher_fallback_model'
   | 'teacher_echo'
   | 'teacher_feedback'
   | 'move_next'
@@ -41,6 +42,7 @@ export const CLASSROOM_TIMINGS: Record<
   ai_model: 1800,
   student_wait: 2200,
   teacher_encourage: 1600,
+  teacher_fallback_model: 1800,
   teacher_echo: 1400,
   teacher_feedback: 1600,
   move_next: 600,
@@ -137,6 +139,16 @@ export function classroomOrchestratorReducer(
         rewardVisible: event.visible,
       };
     case 'student_attempt_submitted':
+      if (state.phase === 'teacher_echo') {
+        return {
+          ...state,
+          activeSeat: null,
+          activeSpeaker: 'teacher',
+          participationState: 'echoed',
+          phase: 'move_next',
+        };
+      }
+
       if (state.phase !== 'student_wait') {
         return state;
       }
@@ -163,12 +175,15 @@ export function classroomOrchestratorReducer(
 
       return {
         ...state,
-        activeSeat: 'me',
+        activeSeat: null,
         activeSpeaker: 'teacher',
         attemptIndex: state.attemptIndex + 1,
         hintLevel: judgment.outcome === 'fallback' ? 'fallback' : 'light',
         participationState: 'spoke',
-        phase: 'teacher_encourage',
+        phase:
+          judgment.outcome === 'fallback'
+            ? 'teacher_fallback_model'
+            : 'teacher_encourage',
         turnResolution: judgment.outcome,
       };
     case 'student_silent_timeout':
@@ -184,7 +199,10 @@ export function classroomOrchestratorReducer(
         activeSpeaker: 'teacher',
         hintLevel: silentOutcome === 'fallback' ? 'fallback' : 'light',
         participationState: 'silent',
-        phase: 'teacher_encourage',
+        phase:
+          silentOutcome === 'fallback'
+            ? 'teacher_fallback_model'
+            : 'teacher_encourage',
         turnResolution: silentOutcome,
       };
     case 'teacher_echo_complete':
@@ -256,22 +274,13 @@ function advanceTimedPhase(
           turnResolution: 'retry',
         };
       }
-
-      if (state.currentStageId === 'picture-talk') {
-        return {
-          ...state,
-          activeSeat: null,
-          activeSpeaker: 'teacher',
-          phase: 'move_next',
-        };
-      }
-
+      return state;
+    case 'teacher_fallback_model':
       return {
         ...state,
-        activeSeat: null,
-        activeSpeaker: 'teacher',
-        hintLevel: 'fallback',
-        participationState: 'encouraged',
+        activeSeat: 'me',
+        activeSpeaker: 'student',
+        participationState: 'waiting',
         phase: 'teacher_echo',
         turnResolution: state.turnResolution,
       };

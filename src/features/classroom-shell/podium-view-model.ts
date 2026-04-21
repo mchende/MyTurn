@@ -47,11 +47,12 @@ export function buildPodiumViewModel({
   rewardVisible,
   stageId,
 }: BuildPodiumViewModelOptions): PodiumViewModel {
-  const showConfirmationButton = activeSeat === 'me' && phase === 'student_wait';
+  const showConfirmationButton =
+    activeSeat === 'me' && (phase === 'student_wait' || phase === 'teacher_echo');
 
   return {
     confirmationButtonLabel: showConfirmationButton
-      ? getConfirmationButtonLabel(stageId)
+      ? getConfirmationButtonLabel(stageId, phase)
       : null,
     liveAvatarAlt: getLiveAvatarAlt(activeSeat),
     liveAvatarSrc:
@@ -139,13 +140,11 @@ function getPodiumCaption(
 
       return 'Your turn to say it';
     case 'teacher_encourage':
-      return stageId === 'picture-talk'
-        ? attemptIndex > 0
-          ? 'Teacher is closing this turn'
-          : 'Look closely'
-        : 'Say it with Cora';
+      return stageId === 'picture-talk' ? 'Look closely' : 'Say it with Cora';
+    case 'teacher_fallback_model':
+      return 'Listen once more';
     case 'teacher_echo':
-      return 'Teacher is helping';
+      return 'Say it with Cora';
     case 'teacher_feedback':
       return 'Cora is wrapping this turn';
     case 'move_next':
@@ -188,16 +187,14 @@ function getPodiumStatus({
       return 'Listen and say it back.';
     case 'teacher_encourage':
       if (stageId === 'picture-talk') {
-        return attemptIndex > 0
-          ? 'Thanks for trying. Let us keep going.'
-          : 'Look closely. What do you notice?';
+        return 'Look closely. What do you notice?';
       }
 
       return 'Cora is helping you start.';
+    case 'teacher_fallback_model':
+      return 'Listen once more. Then say it with Cora.';
     case 'teacher_echo':
-      return stageId === 'picture-talk'
-        ? 'Thanks for trying. Let us keep going.'
-        : 'Say it together with Cora.';
+      return 'Say it with Cora, then we go on.';
     case 'teacher_feedback':
       return participationState === 'spoke'
         ? 'Cora heard your brave try.'
@@ -211,6 +208,13 @@ function getPodiumStatus({
   }
 }
 
-function getConfirmationButtonLabel(stageId: GuidedStageId) {
+function getConfirmationButtonLabel(
+  stageId: GuidedStageId,
+  phase: ClassroomOrchestratorPhase,
+) {
+  if (phase === 'teacher_echo') {
+    return 'I said it with Cora';
+  }
+
   return stageId === 'picture-talk' ? 'I answered' : 'I said it';
 }

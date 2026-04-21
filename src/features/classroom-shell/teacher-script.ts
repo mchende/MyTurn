@@ -1,3 +1,4 @@
+import type { LessonItem } from '@/features/lesson-config/lesson-schema';
 import type {
   ClassroomOrchestratorPhase,
   GuidedStageId,
@@ -12,6 +13,7 @@ type TeacherScriptVariant = {
 
 export type TeacherScriptRequest = {
   attemptIndex: number;
+  currentItem?: LessonItem;
   currentItemIndex: number;
   phase: ClassroomOrchestratorPhase;
   participationState: ParticipationState;
@@ -26,7 +28,11 @@ export type TeacherScriptLine = TeacherScriptVariant & {
 const SHARED_VARIANTS: Record<
   Exclude<
     ClassroomOrchestratorPhase,
-    'teacher_prompt' | 'student_wait' | 'teacher_encourage' | 'teacher_echo'
+    | 'teacher_prompt'
+    | 'student_wait'
+    | 'teacher_encourage'
+    | 'teacher_fallback_model'
+    | 'teacher_echo'
   >,
   readonly TeacherScriptVariant[]
 > = {
@@ -90,6 +96,7 @@ const PHASE_HINTS: Record<ClassroomOrchestratorPhase, readonly string[]> = {
   ai_model: ['Listen before you speak.', 'Bobby shows one first.'],
   student_wait: ['Your turn to talk.', 'Speak when you feel ready.'],
   teacher_encourage: ['We can try together.', 'Take one brave try.'],
+  teacher_fallback_model: ['Listen once more.', 'Cora will model once more.'],
   teacher_echo: ['Listen and copy the sound.', 'Follow the teacher voice.'],
   teacher_feedback: ['The teacher is cheering for you.', 'Keep the class rhythm.'],
   move_next: ['The board is changing.', 'Get ready for the next picture.'],
@@ -98,6 +105,7 @@ const PHASE_HINTS: Record<ClassroomOrchestratorPhase, readonly string[]> = {
 
 export function getTeacherScriptLine({
   attemptIndex,
+  currentItem,
   currentItemIndex,
   phase,
   participationState,
@@ -106,6 +114,7 @@ export function getTeacherScriptLine({
 }: TeacherScriptRequest): TeacherScriptLine {
   const variant = resolveStageAwareVariant({
     attemptIndex,
+    currentItem,
     currentItemIndex,
     phase,
     participationState,
@@ -132,6 +141,7 @@ function pickVariant<T>(variants: readonly T[], currentItemIndex: number): T {
 
 function resolveStageAwareVariant({
   attemptIndex,
+  currentItem,
   currentItemIndex,
   phase,
   participationState,
@@ -160,14 +170,14 @@ function resolveStageAwareVariant({
         );
   }
 
-  if (phase === 'teacher_echo') {
+  if (phase === 'teacher_fallback_model') {
     return stageId === 'repeat-after-teacher'
-      ? getRepeatAfterTeacherEcho(targetText, currentItemIndex)
-      : {
-          hintLabel: 'Keep going',
-          spokenModel: 'Thanks for trying. Let us keep going.',
-          visibleCaption: 'Thanks for trying. Let us keep going.',
-        };
+      ? getRepeatFallbackModel(currentItem, targetText, currentItemIndex)
+      : getPictureFallbackModel(currentItem, currentItemIndex);
+  }
+
+  if (phase === 'teacher_echo') {
+    return getFinalFollowLine(currentItemIndex);
   }
 
   return pickVariant(SHARED_VARIANTS[phase], currentItemIndex);
@@ -334,6 +344,72 @@ function getRepeatAfterTeacherEcho(
         hintLabel: 'Copy the sound',
         spokenModel: `Match my voice: ${targetText.trim()}.`,
         visibleCaption: 'Copy the teacher voice.',
+      },
+    ],
+    currentItemIndex,
+  );
+}
+
+function getRepeatFallbackModel(
+  currentItem: LessonItem | undefined,
+  targetText: string,
+  currentItemIndex: number,
+): TeacherScriptVariant {
+  const model = currentItem?.repeatAccepts?.[0] ?? targetText.trim();
+
+  return pickVariant(
+    [
+      {
+        hintLabel: 'Listen once more',
+        spokenModel: `Listen once more: ${model}.`,
+        visibleCaption: 'Listen once more. Then say it with me.',
+      },
+      {
+        hintLabel: 'Hear it again',
+        spokenModel: `Hear it again: ${model}.`,
+        visibleCaption: 'Listen once more. Then say it with me.',
+      },
+    ],
+    currentItemIndex,
+  );
+}
+
+function getPictureFallbackModel(
+  currentItem: LessonItem | undefined,
+  currentItemIndex: number,
+): TeacherScriptVariant {
+  const fallbackModel =
+    currentItem?.pictureTalk?.fallbackModel ?? `It is ${currentItem?.text ?? 'it'}.`;
+
+  return pickVariant(
+    [
+      {
+        hintLabel: 'Listen once more',
+        spokenModel: fallbackModel,
+        visibleCaption: 'Listen once more. Then say it with me.',
+      },
+      {
+        hintLabel: 'Hear it again',
+        spokenModel: fallbackModel,
+        visibleCaption: 'Listen once more. Then say it with me.',
+      },
+    ],
+    currentItemIndex,
+  );
+}
+
+function getFinalFollowLine(currentItemIndex: number): TeacherScriptVariant {
+  return pickVariant(
+    [
+      {
+        hintLabel: 'Say it with Cora',
+        spokenModel: 'Say it with Cora, then we go on.',
+        visibleCaption: 'Say it with Cora, then we go on.',
+      },
+      {
+        hintLabel: 'One last say',
+        spokenModel: 'Say it with Cora, then we go on.',
+        visibleCaption: 'Say it with Cora, then we go on.',
       },
     ],
     currentItemIndex,

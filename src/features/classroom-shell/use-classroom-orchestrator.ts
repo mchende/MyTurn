@@ -59,6 +59,7 @@ export function useClassroomOrchestrator({
 
   const teacherScriptLine = getTeacherScriptLine({
     attemptIndex: state.attemptIndex,
+    currentItem: state.currentItem,
     currentItemIndex: state.currentItemIndex,
     phase: state.phase,
     participationState: state.participationState,
@@ -192,16 +193,14 @@ function getStagePrompt({
       return hintLevel === 'light' ? 'Say it once more with Cora.' : 'Say it after the model.';
     case 'teacher_encourage':
       if (stageId === 'picture-talk') {
-        return attemptIndex > 0 && participationState === 'silent'
-          ? 'Thanks for trying. Let us keep going.'
-          : 'Look again. I will make it smaller.';
+        return 'Look again. I will make it smaller.';
       }
 
       return 'Cora is helping you start again.';
+    case 'teacher_fallback_model':
+      return 'Listen once more. Then say it with Cora.';
     case 'teacher_echo':
-      return stageId === 'picture-talk'
-        ? 'Cora is keeping the class moving.'
-        : 'Say it once more with Cora.';
+      return 'Say it with Cora, then we go on.';
     case 'teacher_feedback':
       return turnResolution === 'pass'
         ? 'Cora gives a short feedback.'
