@@ -1,5 +1,12 @@
 import { z } from 'zod';
 
+const lessonItemPictureTalkSchema = z.object({
+  observeHint: z.string().min(1),
+  narrowedQuestion: z.string().min(1),
+  semanticAccepts: z.array(z.string().min(1)).min(1),
+  fallbackModel: z.string().min(1),
+});
+
 export const lessonItemSchema = z.object({
   id: z.string().min(1),
   text: z.string().min(1),
@@ -7,6 +14,8 @@ export const lessonItemSchema = z.object({
   imageAlt: z.string().min(1),
   imageWidth: z.number().int().positive(),
   imageHeight: z.number().int().positive(),
+  repeatAccepts: z.array(z.string().min(1)).min(1).optional(),
+  pictureTalk: lessonItemPictureTalkSchema.optional(),
 });
 
 export const lessonStageSchema = z.object({
