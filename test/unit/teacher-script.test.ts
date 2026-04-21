@@ -25,7 +25,24 @@ describe('teacher-script', () => {
     expect(line.debugTargetText).toBe('LION');
   });
 
-  it('uses direct picture-talk questions and a light second prompt without leaking the answer', () => {
+  it('uses a co-speak line for repeat teacher_encourage without leaking the target into child-facing copy', () => {
+    const line = getTeacherScriptLine({
+      currentItemIndex: 0,
+      attemptIndex: 0,
+      participationState: 'silent',
+      phase: 'teacher_encourage',
+      stageId: 'repeat-after-teacher',
+      targetText,
+    });
+
+    expect(line.visibleCaption).toBe('Say it with me. Nice and slow.');
+    expect(line.visibleCaption).not.toMatch(/lion/i);
+    expect(line.hintLabel).not.toMatch(/lion/i);
+    expect(line.spokenModel).toMatch(/say it with me/i);
+    expect(line.spokenModel).toMatch(/lion/i);
+  });
+
+  it('uses an observe hint first and then a narrowed re-ask for picture-talk without leaking the answer', () => {
     const firstAttempt = getTeacherScriptLine({
       currentItemIndex: 1,
       attemptIndex: 0,
@@ -34,11 +51,19 @@ describe('teacher-script', () => {
       stageId: 'picture-talk',
       targetText,
     });
-    const secondAttempt = getTeacherScriptLine({
+    const observeHint = getTeacherScriptLine({
       currentItemIndex: 1,
-      attemptIndex: 1,
+      attemptIndex: 0,
       participationState: 'silent',
       phase: 'teacher_encourage',
+      stageId: 'picture-talk',
+      targetText,
+    });
+    const narrowedRetry = getTeacherScriptLine({
+      currentItemIndex: 1,
+      attemptIndex: 1,
+      participationState: 'waiting',
+      phase: 'student_wait',
       stageId: 'picture-talk',
       targetText,
     });
@@ -48,10 +73,16 @@ describe('teacher-script', () => {
     expect(firstAttempt.spokenModel).not.toMatch(/first sound|starts with|in Chinese/i);
     expect(firstAttempt.visibleCaption).not.toMatch(/lion/i);
 
-    expect(secondAttempt.spokenModel).toMatch(/[A-Za-z]/);
-    expect(secondAttempt.spokenModel).not.toMatch(/lion/i);
-    expect(secondAttempt.spokenModel).not.toMatch(/first sound|starts with|in Chinese/i);
-    expect(secondAttempt.visibleCaption).not.toMatch(/lion/i);
+    expect(observeHint.visibleCaption).toBe('Look closely. What do you notice?');
+    expect(observeHint.spokenModel).toBe('Look closely. What do you notice?');
+    expect(observeHint.spokenModel).not.toMatch(/lion/i);
+    expect(observeHint.spokenModel).not.toMatch(/first sound|starts with|in Chinese|it is|say/i);
+
+    expect(narrowedRetry.visibleCaption).toBe('Look again and choose.');
+    expect(narrowedRetry.spokenModel).toBe('Look again and choose. What do you see now?');
+    expect(narrowedRetry.spokenModel).not.toMatch(/lion/i);
+    expect(narrowedRetry.spokenModel).not.toMatch(/first sound|starts with|in Chinese|it is|say/i);
+    expect(narrowedRetry.visibleCaption).not.toBe(firstAttempt.visibleCaption);
   });
 
   it('returns English hints for the stage-aware teacher flow', () => {

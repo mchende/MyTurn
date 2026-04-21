@@ -114,18 +114,18 @@ describe('classroom shell layout', () => {
 
   it('keeps the teacher in control during silence handling and does not auto-show reward', async () => {
     const encourageLine = getTeacherScriptLine({
-      attemptIndex: 1,
+      attemptIndex: 0,
       currentItemIndex: 0,
       phase: 'teacher_encourage',
       participationState: 'silent',
       stageId: 'repeat-after-teacher',
       targetText: 'apple',
     });
-    const echoLine = getTeacherScriptLine({
+    const retryLine = getTeacherScriptLine({
       attemptIndex: 1,
       currentItemIndex: 0,
-      phase: 'teacher_echo',
-      participationState: 'encouraged',
+      phase: 'student_wait',
+      participationState: 'waiting',
       stageId: 'repeat-after-teacher',
       targetText: 'apple',
     });
@@ -159,8 +159,11 @@ describe('classroom shell layout', () => {
 
     await advanceFlow(CLASSROOM_TIMINGS.teacher_encourage);
 
-    expect(screen.getByText(echoLine.visibleCaption)).toBeInTheDocument();
+    expect(screen.getByText(retryLine.visibleCaption)).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'I said it' })).toBeInTheDocument();
 
+    await advanceFlow(CLASSROOM_TIMINGS.student_wait);
+    await advanceFlow(CLASSROOM_TIMINGS.teacher_encourage);
     await advanceFlow(CLASSROOM_TIMINGS.teacher_echo);
     await advanceFlow(CLASSROOM_TIMINGS.move_next);
 
@@ -243,14 +246,16 @@ describe('classroom shell layout', () => {
 
     await advanceFlow(CLASSROOM_TIMINGS.student_wait);
 
-    expect(screen.getAllByText('Try once more.').length).toBeGreaterThan(0);
+    expect(screen.getAllByText('Look closely. What do you notice?').length).toBeGreaterThan(0);
     expect(screen.queryByText(/apple/i)).not.toBeInTheDocument();
     expect(screen.queryByText(/Bobby goes first|Listen to Bobby|Bobby shows one/i)).not.toBeInTheDocument();
+    expect(screen.queryByText(/correct|wrong|score|points/i)).not.toBeInTheDocument();
 
     await advanceFlow(CLASSROOM_TIMINGS.teacher_encourage);
 
     expect(screen.getByRole('button', { name: 'I answered' })).toBeInTheDocument();
-    expect(screen.getAllByText('Try once more.').length).toBeGreaterThan(0);
+    expect(screen.getAllByRole('button', { name: /i said it|i answered/i })).toHaveLength(1);
+    expect(screen.getAllByText('Look again and choose.').length).toBeGreaterThan(0);
 
     await advanceFlow(CLASSROOM_TIMINGS.student_wait);
 
