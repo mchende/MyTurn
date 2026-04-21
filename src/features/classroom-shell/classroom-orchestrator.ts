@@ -25,6 +25,8 @@ export type ParticipationState =
   | 'silent'
   | 'encouraged'
   | 'echoed';
+export type HintLevel = 'none' | 'light' | 'fallback';
+export type TurnResolution = 'idle' | 'retry' | 'pass' | 'fallback';
 
 export const CLASSROOM_TIMINGS: Record<
   Exclude<ClassroomOrchestratorPhase, 'wrap_up'>,
@@ -59,10 +61,12 @@ export type ClassroomOrchestratorState = {
   currentStageItemIndex: number;
   debugTargetText: string;
   guidedStageRuns: GuidedStageRun[];
+  hintLevel: HintLevel;
   lesson: Lesson;
   phase: ClassroomOrchestratorPhase;
   participationState: ParticipationState;
   rewardVisible: boolean;
+  turnResolution: TurnResolution;
 };
 
 export type ClassroomOrchestratorEvent =
@@ -104,10 +108,12 @@ export function createInitialClassroomState(
     currentStageItemIndex: 0,
     debugTargetText: firstItemRef.item.text.toUpperCase(),
     guidedStageRuns,
+    hintLevel: 'none',
     lesson,
     phase: 'teacher_prompt',
     participationState: 'idle',
     rewardVisible: false,
+    turnResolution: 'idle',
   };
 }
 
@@ -131,30 +137,24 @@ export function classroomOrchestratorReducer(
         activeSeat: 'me',
         activeSpeaker: 'teacher',
         attemptIndex: state.attemptIndex + 1,
+        hintLevel: state.hintLevel,
         participationState: 'spoke',
         phase: 'teacher_feedback',
+        turnResolution: 'pass',
       };
     case 'student_silent_timeout':
       if (state.phase !== 'student_wait') {
         return state;
       }
 
-      if (state.currentStageId === 'picture-talk') {
-        return {
-          ...state,
-          activeSeat: null,
-          activeSpeaker: 'teacher',
-          participationState: 'silent',
-          phase: 'teacher_encourage',
-        };
-      }
-
       return {
         ...state,
         activeSeat: null,
         activeSpeaker: 'teacher',
+        hintLevel: 'light',
         participationState: 'silent',
         phase: 'teacher_encourage',
+        turnResolution: 'retry',
       };
     case 'teacher_echo_complete':
       if (state.phase !== 'teacher_echo') {
@@ -185,8 +185,10 @@ function advanceTimedPhase(
           ...state,
           activeSeat: 'me',
           activeSpeaker: 'student',
+          hintLevel: state.hintLevel,
           participationState: 'waiting',
           phase: 'student_wait',
+          turnResolution: 'idle',
         };
       }
 
@@ -194,15 +196,19 @@ function advanceTimedPhase(
         ...state,
         activeSeat: 'ai',
         activeSpeaker: 'ai',
+        hintLevel: 'none',
         phase: 'ai_model',
+        turnResolution: 'idle',
       };
     case 'ai_model':
       return {
         ...state,
         activeSeat: 'me',
         activeSpeaker: 'student',
+        hintLevel: 'none',
         participationState: 'waiting',
         phase: 'student_wait',
+        turnResolution: 'idle',
       };
     case 'student_wait':
       return classroomOrchestratorReducer(state, { type: 'student_silent_timeout' });
@@ -214,8 +220,10 @@ function advanceTimedPhase(
             activeSeat: 'me',
             activeSpeaker: 'student',
             attemptIndex: 1,
+            hintLevel: 'light',
             participationState: 'waiting',
             phase: 'student_wait',
+            turnResolution: 'retry',
           };
         }
 
@@ -227,12 +235,27 @@ function advanceTimedPhase(
         };
       }
 
+      if (state.attemptIndex === 0) {
+        return {
+          ...state,
+          activeSeat: 'me',
+          activeSpeaker: 'student',
+          attemptIndex: 1,
+          hintLevel: 'light',
+          participationState: 'waiting',
+          phase: 'student_wait',
+          turnResolution: 'retry',
+        };
+      }
+
       return {
         ...state,
         activeSeat: null,
         activeSpeaker: 'teacher',
+        hintLevel: state.hintLevel,
         participationState: 'encouraged',
         phase: 'teacher_echo',
+        turnResolution: state.turnResolution,
       };
     case 'teacher_echo':
       return classroomOrchestratorReducer(state, { type: 'teacher_echo_complete' });
@@ -332,9 +355,11 @@ function resetForNextPrompt(
     currentStageIndex: nextStep.stageIndex,
     currentStageItemIndex: nextStep.stageItemIndex,
     debugTargetText: nextStep.item.text.toUpperCase(),
+    hintLevel: 'none',
     participationState: 'idle',
     phase: 'teacher_prompt',
     rewardVisible: false,
+    turnResolution: 'idle',
   };
 }
 

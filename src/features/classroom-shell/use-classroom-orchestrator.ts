@@ -89,9 +89,11 @@ export function useClassroomOrchestrator({
     }),
     stagePrompt: getStagePrompt({
       attemptIndex: state.attemptIndex,
+      hintLevel: state.hintLevel,
       phase: state.phase,
       participationState: state.participationState,
       stageId: state.currentStageId,
+      turnResolution: state.turnResolution,
     }),
     teacherHint: teacherScriptLine.hintLabel,
     teacherMessage: teacherScriptLine.visibleCaption,
@@ -137,14 +139,18 @@ function getStageBadge({
 
 function getStagePrompt({
   attemptIndex,
+  hintLevel,
   phase,
   participationState,
   stageId,
+  turnResolution,
 }: {
   attemptIndex: number;
+  hintLevel: 'none' | 'light' | 'fallback';
   phase: keyof typeof CLASSROOM_TIMINGS | 'wrap_up';
   participationState: ParticipationState;
   stageId: GuidedStageId;
+  turnResolution: 'idle' | 'retry' | 'pass' | 'fallback';
 }) {
   switch (phase) {
     case 'teacher_prompt':
@@ -155,15 +161,17 @@ function getStagePrompt({
       return 'Listen to Bobby once, then you speak.';
     case 'student_wait':
       if (stageId === 'picture-talk') {
-        return attemptIndex > 0 ? 'Try once more.' : 'Look at the picture and answer.';
+        return hintLevel === 'light'
+          ? 'Look again. Answer the smaller question.'
+          : 'Look at the picture and answer.';
       }
 
-      return 'Say it after the model.';
+      return hintLevel === 'light' ? 'Say it once more with Cora.' : 'Say it after the model.';
     case 'teacher_encourage':
       if (stageId === 'picture-talk') {
         return attemptIndex > 0 && participationState === 'silent'
           ? 'Thanks for trying. Let us keep going.'
-          : 'Try once more.';
+          : 'Look again. I will make it smaller.';
       }
 
       return 'Cora is helping you start again.';
@@ -172,7 +180,9 @@ function getStagePrompt({
         ? 'Cora is keeping the class moving.'
         : 'Say it once more with Cora.';
     case 'teacher_feedback':
-      return 'Cora gives a short feedback.';
+      return turnResolution === 'pass'
+        ? 'Cora gives a short feedback.'
+        : 'Cora keeps the class moving.';
     case 'move_next':
       return 'Eyes on the next picture.';
     case 'wrap_up':
