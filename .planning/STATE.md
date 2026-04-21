@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: Completed 04-01-PLAN.md
-last_updated: "2026-04-21T07:11:44.849Z"
+stopped_at: Completed 04-02-PLAN.md
+last_updated: "2026-04-21T07:25:23.851Z"
 last_activity: 2026-04-21
 progress:
   total_phases: 5
   completed_phases: 3
   total_plans: 13
-  completed_plans: 11
+  completed_plans: 12
   percent: 100
 ---
 
@@ -26,7 +26,7 @@ See: .planning/PROJECT.md (updated 2026-04-15)
 ## Current Position
 
 Phase: 04 (hints-and-judgment) — EXECUTING
-Plan: 2 of 3
+Plan: 3 of 3
 Status: Ready to execute
 Last activity: 2026-04-21
 
@@ -62,6 +62,7 @@ Progress: [██████████] 100%
 | Phase 03 P02 | 8min | 2 tasks | 10 files |
 | Phase 03-guided-speaking-flow P03 | 12min | 2 tasks | 8 files |
 | Phase 04 P01 | 6min | 2 tasks | 7 files |
+| Phase 04-hints-and-judgment P02 | 9min | 2 tasks | 10 files |
 
 ## Accumulated Context
 
@@ -98,6 +99,9 @@ Progress: [██████████] 100%
 - [Phase 04]: Keep attemptIndex as learner-turn index only, and split retry semantics into hintLevel plus turnResolution.
 - [Phase 04]: Drive repeat and picture first-failure handling through the existing reducer and single timeout effect instead of adding a parallel hint controller.
 - [Phase 04]: Pass retry context into the podium view-model so picture-talk can switch from observe hint to narrowed re-ask without adding a second CTA.
+- [Phase 04-hints-and-judgment]: Keep judged attempts behind a pure classroom-judgment adapter and let the reducer consume only pass/retry/fallback.
+- [Phase 04-hints-and-judgment]: Author repeatAccepts and pictureTalk.semanticAccepts in lesson content instead of hardcoding vocabulary in reducer branches.
+- [Phase 04-hints-and-judgment]: Preserve confirmStudentParticipation as a hook-level compatibility alias that dispatches submitStudentAttempt with a stage-safe canonical transcript.
 
 ### Pending Todos
 
@@ -110,6 +114,6 @@ Progress: [██████████] 100%
 
 ## Session Continuity
 
-Last session: 2026-04-21T07:11:44.845Z
-Stopped at: Completed 04-01-PLAN.md
+Last session: 2026-04-21T07:24:54.992Z
+Stopped at: Completed 04-02-PLAN.md
 Resume file: None

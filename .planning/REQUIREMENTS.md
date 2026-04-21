@@ -35,8 +35,8 @@
 
 - [x] **SPKG-01**: 用户可以在前期练习轮次中跟随老师复述目标语言
 - [ ] **SPKG-02**: 用户可以在后期练习轮次中根据图片回答老师提问，并允许表达与标准答案意义相近
-- [ ] **SPKG-03**: 系统在复述环节使用更贴近目标词句本身的近似匹配规则
-- [ ] **SPKG-04**: 系统在看图作答环节使用更宽松的基于语义的匹配规则
+- [x] **SPKG-03**: 系统在复述环节使用更贴近目标词句本身的近似匹配规则
+- [x] **SPKG-04**: 系统在看图作答环节使用更宽松的基于语义的匹配规则
 - [x] **SPKG-05**: 系统的判断与纠错方式应服务于信心建立和课堂推进，而不是严格打分
 
 ### Platform and Presentation
@@ -91,8 +91,8 @@
 | SPKG-01 | Phase 3 | Complete |
 | TEAC-03 | Phase 4 | Complete |
 | TEAC-04 | Phase 4 | Pending |
-| SPKG-03 | Phase 4 | Pending |
-| SPKG-04 | Phase 4 | Pending |
+| SPKG-03 | Phase 4 | Complete |
+| SPKG-04 | Phase 4 | Complete |
 | SPKG-05 | Phase 4 | Complete |
 | SPKG-02 | Phase 5 | Pending |
 | PLAT-02 | Phase 5 | Pending |

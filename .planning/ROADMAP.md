@@ -78,7 +78,7 @@ Verification:
 
 Plans:
 - [x] 04-01-PLAN.md — 实现 repeat/picture 轻提示梯度、显式 hint 状态图与单 CTA 护栏
-- [ ] 04-02-PLAN.md — 实现 judgment adapter、lesson metadata 与 Wave 0 judgment/schema 合同
+- [x] 04-02-PLAN.md — 实现 judgment adapter、lesson metadata 与 Wave 0 judgment/schema 合同
 - [ ] 04-03-PLAN.md — 实现 teacher fallback close-out，并补齐 focused unit/e2e 回归门
 
 ### Phase 5: Complete MVP Lesson
