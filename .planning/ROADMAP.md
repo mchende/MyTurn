@@ -77,7 +77,7 @@ Verification:
 **Plans**: 3 plans
 
 Plans:
-- [ ] 04-01-PLAN.md — 实现 repeat/picture 轻提示梯度、显式 hint 状态图与单 CTA 护栏
+- [x] 04-01-PLAN.md — 实现 repeat/picture 轻提示梯度、显式 hint 状态图与单 CTA 护栏
 - [ ] 04-02-PLAN.md — 实现 judgment adapter、lesson metadata 与 Wave 0 judgment/schema 合同
 - [ ] 04-03-PLAN.md — 实现 teacher fallback close-out，并补齐 focused unit/e2e 回归门
 
@@ -105,5 +105,5 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5
 | 1. Classroom Shell | 4/4 | Complete | 2026-04-15 |
 | 2. Cast and Orchestration | 3/3 | Complete | 2026-04-17 |
 | 3. Guided Speaking Flow | 3/3 | Complete (verified) | 2026-04-21 |
-| 4. Hints and Judgment | 0/3 | Not started | - |
+| 4. Hints and Judgment | 1/3 | In Progress|  |
 | 5. Complete MVP Lesson | 0/2 | Not started | - |
