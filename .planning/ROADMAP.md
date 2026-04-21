@@ -63,6 +63,8 @@ Plans:
 - [x] 03-01-PLAN.md — 建立 stage-aware guided queue、手动 participation confirmation 与 Phase 03 reducer/hook 基础合同
 - [x] 03-02-PLAN.md — 解决老师 visible/spoken script 冲突，并在保留现有课堂壳的前提下接入 confirmation UI
 - [x] 03-03-PLAN.md — 实现 picture-talk 二次机会、board copy 升级与 focused guided-flow 验证
+Verification:
+- [x] 03-VERIFICATION.md — focused unit + `guided-speaking-flow` / `classroom-entry` smoke 均已通过（2026-04-21）
 
 ### Phase 4: Hints and Judgment
 **Goal**: 用轻提示、兜底示范和分阶段判断策略维持课堂节奏与开口状态。
@@ -102,6 +104,6 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5
 |-------|----------------|--------|-----------|
 | 1. Classroom Shell | 4/4 | Complete | 2026-04-15 |
 | 2. Cast and Orchestration | 3/3 | Complete | 2026-04-17 |
-| 3. Guided Speaking Flow | 3/3 | Complete | 2026-04-20 |
+| 3. Guided Speaking Flow | 3/3 | Complete (verified) | 2026-04-21 |
 | 4. Hints and Judgment | 0/3 | Not started | - |
 | 5. Complete MVP Lesson | 0/2 | Not started | - |

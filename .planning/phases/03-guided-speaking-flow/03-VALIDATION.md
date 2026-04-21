@@ -1,10 +1,11 @@
 ---
 phase: 03
 slug: guided-speaking-flow
-status: draft
-nyquist_compliant: false
+status: complete
+nyquist_compliant: true
 wave_0_complete: true
 created: 2026-04-20
+validated_on: 2026-04-21
 ---
 
 # Phase 03 — Validation Strategy
@@ -38,12 +39,12 @@ created: 2026-04-20
 
 | Task ID | Plan | Wave | Requirements | Test Type | Automated Command | File Exists | Status |
 |---------|------|------|--------------|-----------|-------------------|-------------|--------|
-| 03-01-01 | 03-01 | 1 | CONT-04, SPKG-01 | unit | `npm run test:unit -- test/unit/classroom-orchestrator.test.ts` | ✅ partial | ⬜ pending |
-| 03-01-02 | 03-01 | 1 | CONT-04, SPKG-01 | unit | `npm run test:unit -- test/unit/classroom-orchestrator.test.ts test/unit/classroom-shell.test.tsx` | ✅ partial | ⬜ pending |
-| 03-02-01 | 03-02 | 2 | CONT-03, TEAC-02, SPKG-01 | unit | `npm run test:unit -- test/unit/teacher-script.test.ts test/unit/bobby-script.test.ts` | ✅ partial | ⬜ pending |
-| 03-02-02 | 03-02 | 2 | CONT-03, TEAC-02, SPKG-01 | unit | `npm run test:unit -- test/unit/classroom-shell.test.tsx test/unit/teacher-script.test.ts test/unit/bobby-script.test.ts` | ✅ partial | ⬜ pending |
-| 03-03-01 | 03-03 | 3 | CONT-04, TEAC-02 | unit | `npm run test:unit -- test/unit/classroom-orchestrator.test.ts test/unit/classroom-shell.test.tsx` | ✅ partial | ⬜ pending |
-| 03-03-02 | 03-03 | 3 | CONT-03, CONT-04, TEAC-02 | unit + e2e smoke | `npm run test:unit -- test/unit/lesson-board.test.tsx test/unit/classroom-orchestrator.test.ts test/unit/classroom-shell.test.tsx && npm run test:e2e -- test/e2e/guided-speaking-flow.spec.ts` | ✅ partial / ⬜ planned | ⬜ pending |
+| 03-01-01 | 03-01 | 1 | CONT-04, SPKG-01 | unit | `npm run test:unit -- test/unit/classroom-orchestrator.test.ts` | ✅ yes | ✅ green |
+| 03-01-02 | 03-01 | 1 | CONT-04, SPKG-01 | unit | `npm run test:unit -- test/unit/classroom-orchestrator.test.ts test/unit/classroom-shell.test.tsx` | ✅ yes | ✅ green |
+| 03-02-01 | 03-02 | 2 | CONT-03, TEAC-02, SPKG-01 | unit | `npm run test:unit -- test/unit/teacher-script.test.ts test/unit/bobby-script.test.ts` | ✅ yes | ✅ green |
+| 03-02-02 | 03-02 | 2 | CONT-03, TEAC-02, SPKG-01 | unit | `npm run test:unit -- test/unit/classroom-shell.test.tsx test/unit/teacher-script.test.ts test/unit/bobby-script.test.ts` | ✅ yes | ✅ green |
+| 03-03-01 | 03-03 | 3 | CONT-04, TEAC-02 | unit | `npm run test:unit -- test/unit/classroom-orchestrator.test.ts test/unit/classroom-shell.test.tsx` | ✅ yes | ✅ green |
+| 03-03-02 | 03-03 | 3 | CONT-03, CONT-04, TEAC-02 | unit + e2e smoke | `npm run test:unit -- test/unit/lesson-board.test.tsx test/unit/classroom-orchestrator.test.ts test/unit/classroom-shell.test.tsx && npm run test:e2e -- test/e2e/guided-speaking-flow.spec.ts` | ✅ yes | ✅ green |
 
 *Status: ⬜ pending · ✅ green · ❌ red · ⚠️ flaky*
 
@@ -57,7 +58,7 @@ created: 2026-04-20
 - [x] `test/unit/lesson-board.test.tsx` — 已有 child-facing no-leak guard，可扩展 stage prompt 断言
 - [x] `test/unit/classroom-shell.test.tsx` — 已有 shell visible-behavior 覆盖，可扩展 guided speaking flow
 - [x] `test/e2e/classroom-entry.spec.ts` — 已有 homepage -> lesson smoke，可继续保留为入场回归
-- [ ] `test/e2e/guided-speaking-flow.spec.ts` — Phase 03 新增 focused guided flow 回归，用于覆盖 repeat-after-teacher -> picture-talk 升级路径
+- [x] `test/e2e/guided-speaking-flow.spec.ts` — Phase 03 focused guided flow 回归已落盘，并在 verifier focused smoke 中通过
 
 ---
 
@@ -72,12 +73,12 @@ created: 2026-04-20
 
 ## Validation Sign-Off
 
-- [ ] All tasks have `<automated>` verify or Wave 0 dependencies
-- [ ] Sampling continuity: no 3 consecutive tasks without automated verify
+- [x] All tasks have `<automated>` verify or Wave 0 dependencies
+- [x] Sampling continuity: no 3 consecutive tasks without automated verify
 - [x] Wave 0 covers all required surfaces for this phase
 - [x] No watch-mode flags
-- [ ] Feedback latency remains within quick-iteration budget for targeted commands
-- [ ] Validation map matches real plan waves and per-task verify commands
-- [ ] `nyquist_compliant: true` set in frontmatter after execution confirms all planned test files exist
+- [x] Feedback latency remains within quick-iteration budget for targeted commands
+- [x] Validation map matches real plan waves and per-task verify commands
+- [x] `nyquist_compliant: true` set in frontmatter after execution confirms all planned test files exist
 
-**Approval:** pending
+**Approval:** Phase 03 validation signed off on 2026-04-21 after focused unit coverage plus `guided-speaking-flow` / `classroom-entry` Playwright smoke both passed.
