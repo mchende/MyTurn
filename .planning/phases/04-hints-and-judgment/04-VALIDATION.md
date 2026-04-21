@@ -1,10 +1,11 @@
 ---
 phase: 04
 slug: hints-and-judgment
-status: draft
+status: complete
 nyquist_compliant: true
 wave_0_complete: true
 created: 2026-04-21
+validated_on: 2026-04-21
 ---
 
 # Phase 04 — Validation Strategy
@@ -38,12 +39,12 @@ created: 2026-04-21
 
 | Task ID | Plan | Wave | Requirements | Test Type | Automated Command | File Exists | Status |
 |---------|------|------|--------------|-----------|-------------------|-------------|--------|
-| 04-01-01 | 04-01 | 1 | TEAC-03 | unit | `npm run test:unit -- test/unit/classroom-orchestrator.test.ts test/unit/teacher-script.test.ts` | ✅ partial | ⬜ pending |
-| 04-01-02 | 04-01 | 1 | TEAC-03, SPKG-05 | unit + integration | `npm run test:unit -- test/unit/classroom-orchestrator.test.ts test/unit/classroom-shell.test.tsx test/unit/teacher-script.test.ts` | ✅ partial | ⬜ pending |
-| 04-02-01 | 04-02 | 2 | SPKG-03, SPKG-04, SPKG-05 | unit | `npm run test:unit -- test/unit/classroom-judgment.test.ts test/unit/lesson-schema.test.ts` | ❌ planned in task | ⬜ pending |
-| 04-02-02 | 04-02 | 2 | SPKG-03, SPKG-04, SPKG-05 | unit + reducer | `npm run test:unit -- test/unit/classroom-judgment.test.ts test/unit/lesson-schema.test.ts test/unit/classroom-orchestrator.test.ts` | ❌ / ✅ partial | ⬜ pending |
-| 04-03-01 | 04-03 | 3 | TEAC-04, SPKG-05 | unit + integration | `npm run test:unit -- test/unit/classroom-orchestrator.test.ts test/unit/teacher-script.test.ts test/unit/classroom-shell.test.tsx` | ✅ partial | ⬜ pending |
-| 04-03-02 | 04-03 | 3 | TEAC-03, TEAC-04, SPKG-03, SPKG-04, SPKG-05 | unit + e2e smoke | `npm run test:unit -- test/unit/classroom-orchestrator.test.ts test/unit/classroom-judgment.test.ts test/unit/classroom-shell.test.tsx test/unit/teacher-script.test.ts test/unit/lesson-schema.test.ts && npm run test:e2e -- test/e2e/guided-speaking-flow.spec.ts` | ❌ / ✅ partial | ⬜ pending |
+| 04-01-01 | 04-01 | 1 | TEAC-03 | unit | `npm run test:unit -- test/unit/classroom-orchestrator.test.ts test/unit/teacher-script.test.ts` | ✅ yes | ✅ green |
+| 04-01-02 | 04-01 | 1 | TEAC-03, SPKG-05 | unit + integration | `npm run test:unit -- test/unit/classroom-orchestrator.test.ts test/unit/classroom-shell.test.tsx test/unit/teacher-script.test.ts` | ✅ yes | ✅ green |
+| 04-02-01 | 04-02 | 2 | SPKG-03, SPKG-04, SPKG-05 | unit | `npm run test:unit -- test/unit/classroom-judgment.test.ts test/unit/lesson-schema.test.ts` | ✅ yes | ✅ green |
+| 04-02-02 | 04-02 | 2 | SPKG-03, SPKG-04, SPKG-05 | unit + reducer | `npm run test:unit -- test/unit/classroom-judgment.test.ts test/unit/lesson-schema.test.ts test/unit/classroom-orchestrator.test.ts` | ✅ yes | ✅ green |
+| 04-03-01 | 04-03 | 3 | TEAC-04, SPKG-05 | unit + integration | `npm run test:unit -- test/unit/classroom-orchestrator.test.ts test/unit/teacher-script.test.ts test/unit/classroom-shell.test.tsx` | ✅ yes | ✅ green |
+| 04-03-02 | 04-03 | 3 | TEAC-03, TEAC-04, SPKG-03, SPKG-04, SPKG-05 | unit + e2e smoke | `npm run test:unit -- test/unit/classroom-orchestrator.test.ts test/unit/classroom-judgment.test.ts test/unit/classroom-shell.test.tsx test/unit/teacher-script.test.ts test/unit/lesson-schema.test.ts && npm run test:e2e -- test/e2e/guided-speaking-flow.spec.ts` | ✅ yes | ✅ green |
 
 *Status: ⬜ pending · ✅ green · ❌ red · ⚠️ flaky*
 
@@ -79,4 +80,4 @@ created: 2026-04-21
 - [x] Validation map matches real plan waves and per-task verify commands
 - [x] `nyquist_compliant: true` set in frontmatter
 
-**Approval:** ready for re-check
+**Approval:** Phase 04 validation signed off on 2026-04-21 after focused unit coverage plus `guided-speaking-flow` / `classroom-entry` Playwright smoke both passed.
