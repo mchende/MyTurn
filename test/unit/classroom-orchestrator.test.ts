@@ -141,7 +141,7 @@ describe('classroomOrchestratorReducer', () => {
       source: 'mock_transcript',
     });
 
-    expect(state.phase).toBe('teacher_encourage');
+    expect(state.phase).toBe('teacher_fallback_model');
     expect(state.turnResolution).toBe('fallback');
   });
 
@@ -229,7 +229,7 @@ describe('classroomOrchestratorReducer', () => {
     expect(state.activeSpeaker).toBe('student');
   });
 
-  it('closes picture-talk after a second timeout instead of routing through teacher_echo', () => {
+  it('routes second picture-talk failure into fallback model and one final follow CTA before moving on', () => {
     let state = moveToPictureTalkStudentWait();
 
     state = classroomOrchestratorReducer(state, { type: 'student_silent_timeout' });
@@ -240,11 +240,19 @@ describe('classroomOrchestratorReducer', () => {
 
     state = classroomOrchestratorReducer(state, { type: 'student_silent_timeout' });
 
-    expect(state.phase).toBe('teacher_encourage');
+    expect(state.phase).toBe('teacher_fallback_model');
     expect(state.participationState).toBe('silent');
     expect(state.currentItem.id).toBe('apple');
+    expect(state.activeSeat).toBe(null);
+    expect(state.activeSpeaker).toBe('teacher');
 
     state = classroomOrchestratorReducer(state, { type: 'phase_timer_completed' });
+
+    expect(state.phase).toBe('teacher_echo');
+    expect(state.activeSeat).toBe('me');
+    expect(state.activeSpeaker).toBe('student');
+
+    state = submitCanonicalAttempt(state);
 
     expect(state.phase).toBe('move_next');
 
@@ -254,6 +262,44 @@ describe('classroomOrchestratorReducer', () => {
     expect(state.currentStageId).toBe('picture-talk');
     expect(state.currentStageItemIndex).toBe(1);
     expect(state.currentItem.id).toBe('banana');
+  });
+
+  it('routes second repeat failure into teacher_fallback_model and then final follow before moving next', () => {
+    let state = createInitialClassroomState(lessonWeek01Lesson01);
+
+    state = classroomOrchestratorReducer(state, { type: 'phase_timer_completed' });
+    state = classroomOrchestratorReducer(state, { type: 'phase_timer_completed' });
+
+    state = classroomOrchestratorReducer(state, {
+      type: 'student_attempt_submitted',
+      transcript: 'banana',
+      source: 'mock_transcript',
+    });
+    expect(state.phase).toBe('teacher_encourage');
+
+    state = classroomOrchestratorReducer(state, { type: 'phase_timer_completed' });
+    expect(state.phase).toBe('student_wait');
+
+    state = classroomOrchestratorReducer(state, {
+      type: 'student_attempt_submitted',
+      transcript: 'banana',
+      source: 'mock_transcript',
+    });
+
+    expect(state.phase).toBe('teacher_fallback_model');
+    expect(state.activeSeat).toBe(null);
+    expect(state.activeSpeaker).toBe('teacher');
+    expect(state.turnResolution).toBe('fallback');
+
+    state = classroomOrchestratorReducer(state, { type: 'phase_timer_completed' });
+
+    expect(state.phase).toBe('teacher_echo');
+    expect(state.activeSeat).toBe('me');
+    expect(state.activeSpeaker).toBe('student');
+
+    state = classroomOrchestratorReducer(state, { type: 'phase_timer_completed' });
+
+    expect(state.phase).toBe('move_next');
   });
 
   it('lets picture-talk complete on either the first or second confirmed attempt', () => {
@@ -371,6 +417,55 @@ describe('useClassroomOrchestrator', () => {
     expect(result.current.phase).toBe('teacher_feedback');
     expect(result.current.attemptIndex).toBe(2);
     expect(result.current.turnResolution).toBe('pass');
+
+    vi.useRealTimers();
+  });
+
+  it('exposes the final follow CTA label after fallback and keeps the timer chain centralized', async () => {
+    vi.useFakeTimers();
+
+    const { result } = renderHook(() =>
+      useClassroomOrchestrator({
+        lesson: lessonWeek01Lesson01,
+      }),
+    );
+
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(CLASSROOM_TIMINGS.teacher_prompt);
+    });
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(CLASSROOM_TIMINGS.ai_model);
+    });
+
+    act(() => {
+      result.current.submitStudentAttempt({
+        transcript: 'banana',
+        source: 'mock_transcript',
+      });
+    });
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(CLASSROOM_TIMINGS.teacher_encourage);
+    });
+
+    act(() => {
+      result.current.submitStudentAttempt({
+        transcript: 'banana',
+        source: 'mock_transcript',
+      });
+    });
+
+    expect(result.current.phase).toBe('teacher_fallback_model');
+    expect(result.current.podiumViewModel.showConfirmationButton).toBe(false);
+
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(CLASSROOM_TIMINGS.teacher_fallback_model);
+    });
+
+    expect(result.current.phase).toBe('teacher_echo');
+    expect(result.current.podiumViewModel.showConfirmationButton).toBe(true);
+    expect(result.current.podiumViewModel.confirmationButtonLabel).toBe(
+      'I said it with Cora',
+    );
 
     vi.useRealTimers();
   });

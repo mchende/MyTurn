@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
+import { lessonWeek01Lesson01 } from '../../content/lessons/week-01/lesson-01';
 import {
   getTeacherHint,
   getTeacherScriptLine,
@@ -107,5 +108,58 @@ describe('teacher-script', () => {
       expect(line.hintLabel).toMatch(/[A-Za-z]/);
       expect(getTeacherHint(phase)).toMatch(/[A-Za-z]/);
     });
+  });
+
+  it('keeps repeat fallback targets in spokenModel only and never in visibleCaption', () => {
+    const appleItem = lessonWeek01Lesson01.items[0];
+    const line = getTeacherScriptLine({
+      currentItemIndex: 0,
+      attemptIndex: 2,
+      participationState: 'spoke',
+      phase: 'teacher_fallback_model',
+      stageId: 'repeat-after-teacher',
+      targetText: appleItem.text,
+      currentItem: appleItem,
+    });
+
+    expect(line.spokenModel).toMatch(/apple/i);
+    expect(line.visibleCaption).toBe('Listen once more. Then say it with me.');
+    expect(line.visibleCaption).not.toMatch(/apple/i);
+    expect(line.hintLabel).not.toMatch(/apple/i);
+  });
+
+  it('keeps picture fallback answers in spokenModel only and child-facing copy answer-free', () => {
+    const appleItem = lessonWeek01Lesson01.items[0];
+    const line = getTeacherScriptLine({
+      currentItemIndex: 0,
+      attemptIndex: 2,
+      participationState: 'silent',
+      phase: 'teacher_fallback_model',
+      stageId: 'picture-talk',
+      targetText: appleItem.text,
+      currentItem: appleItem,
+    });
+
+    expect(line.spokenModel).toBe('It is an apple.');
+    expect(line.visibleCaption).toBe('Listen once more. Then say it with me.');
+    expect(line.visibleCaption).not.toMatch(/apple/i);
+    expect(line.hintLabel).not.toMatch(/apple/i);
+  });
+
+  it('uses a child-safe final follow line after fallback without exposing the answer', () => {
+    const appleItem = lessonWeek01Lesson01.items[0];
+    const line = getTeacherScriptLine({
+      currentItemIndex: 0,
+      attemptIndex: 2,
+      participationState: 'waiting',
+      phase: 'teacher_echo',
+      stageId: 'picture-talk',
+      targetText: appleItem.text,
+      currentItem: appleItem,
+    });
+
+    expect(line.visibleCaption).toBe('Say it with Cora, then we go on.');
+    expect(line.visibleCaption).not.toMatch(/apple/i);
+    expect(line.spokenModel).not.toMatch(/apple/i);
   });
 });
