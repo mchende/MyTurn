@@ -77,9 +77,9 @@ Verification:
 **Plans**: 3 plans
 
 Plans:
-- [ ] 04-01: 实现尝试次数跟踪与轻提示行为
-- [ ] 04-02: 实现复述模式和看图模式下的不同判断规则
-- [ ] 04-03: 增加不破坏课堂感的老师兜底行为
+- [ ] 04-01-PLAN.md — 实现 repeat/picture 轻提示梯度、显式 hint 状态图与单 CTA 护栏
+- [ ] 04-02-PLAN.md — 实现 judgment adapter、lesson metadata 与 Wave 0 judgment/schema 合同
+- [ ] 04-03-PLAN.md — 实现 teacher fallback close-out，并补齐 focused unit/e2e 回归门
 
 ### Phase 5: Complete MVP Lesson
 **Goal**: 交付一节经过打磨的 15 分钟课堂，在浏览器中端到端运行，并清晰验证“课堂感”假设。
