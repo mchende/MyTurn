@@ -142,6 +142,6 @@ describe('classroom judgment', () => {
         currentItem: appleItem,
         stageId: 'picture-talk',
       }),
-    ).toBe('It is an apple.');
+    ).toBe('apple');
   });
 });

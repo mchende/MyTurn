@@ -12,13 +12,20 @@ import {
   type ClassroomOrchestratorEvent,
   type GuidedStageId,
   type ParticipationState,
+  type StudentAttemptSource,
 } from './classroom-orchestrator';
+import { buildCanonicalManualTranscript } from './classroom-judgment';
 import { buildPodiumViewModel } from './podium-view-model';
 import { getTeacherScriptLine } from './teacher-script';
 
 type UseClassroomOrchestratorOptions = {
   lesson: Lesson;
   showReward?: boolean;
+};
+
+type SubmitStudentAttemptInput = {
+  transcript?: string | null;
+  source?: StudentAttemptSource;
 };
 
 export function useClassroomOrchestrator({
@@ -74,6 +81,14 @@ export function useClassroomOrchestrator({
     stageId: state.currentStageId,
   });
 
+  const submitStudentAttempt = (input: SubmitStudentAttemptInput = {}) => {
+    dispatch({
+      type: 'student_attempt_submitted',
+      transcript: input.transcript ?? null,
+      source: input.source ?? 'manual',
+    });
+  };
+
   return {
     ...state,
     bobbyScriptLine,
@@ -105,8 +120,15 @@ export function useClassroomOrchestrator({
     hideReward: () => {
       dispatch({ type: 'reward_visibility_changed', visible: false });
     },
+    submitStudentAttempt,
     confirmStudentParticipation: () => {
-      dispatch({ type: 'student_participation_confirmed' });
+      submitStudentAttempt({
+        source: 'manual',
+        transcript: buildCanonicalManualTranscript({
+          currentItem: state.currentItem,
+          stageId: state.currentStageId,
+        }),
+      });
     },
   };
 }

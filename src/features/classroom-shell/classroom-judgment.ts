@@ -29,7 +29,9 @@ export function buildCanonicalManualTranscript(input: {
   stageId: JudgmentStageId;
 }) {
   if (input.stageId === 'picture-talk') {
-    return input.currentItem.pictureTalk?.fallbackModel ?? input.currentItem.text;
+    return (
+      input.currentItem.pictureTalk?.semanticAccepts[0] ?? input.currentItem.text
+    );
   }
 
   return input.currentItem.repeatAccepts?.[0] ?? input.currentItem.text;

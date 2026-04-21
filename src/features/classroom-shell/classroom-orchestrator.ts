@@ -5,6 +5,10 @@ import type {
   LessonItem,
   LessonStage,
 } from '@/features/lesson-config/lesson-schema';
+import {
+  judgeStudentAttempt,
+  type JudgmentStageId,
+} from '@/features/classroom-shell/classroom-judgment';
 
 export type ClassroomOrchestratorPhase =
   | 'teacher_prompt'
@@ -27,6 +31,7 @@ export type ParticipationState =
   | 'echoed';
 export type HintLevel = 'none' | 'light' | 'fallback';
 export type TurnResolution = 'idle' | 'retry' | 'pass' | 'fallback';
+export type StudentAttemptSource = 'manual' | 'mock_transcript' | 'future_asr';
 
 export const CLASSROOM_TIMINGS: Record<
   Exclude<ClassroomOrchestratorPhase, 'wrap_up'>,
@@ -72,7 +77,11 @@ export type ClassroomOrchestratorState = {
 export type ClassroomOrchestratorEvent =
   | { type: 'phase_timer_completed' }
   | { type: 'student_silent_timeout' }
-  | { type: 'student_participation_confirmed' }
+  | {
+      type: 'student_attempt_submitted';
+      transcript: string | null;
+      source: StudentAttemptSource;
+    }
   | { type: 'teacher_echo_complete' }
   | { type: 'reward_visibility_changed'; visible: boolean };
 
@@ -127,9 +136,29 @@ export function classroomOrchestratorReducer(
         ...state,
         rewardVisible: event.visible,
       };
-    case 'student_participation_confirmed':
+    case 'student_attempt_submitted':
       if (state.phase !== 'student_wait') {
         return state;
+      }
+
+      const judgment = judgeStudentAttempt({
+        lessonItem: state.currentItem,
+        stageId: state.currentStageId as JudgmentStageId,
+        transcript: event.transcript,
+        attemptIndex: state.attemptIndex,
+      });
+
+      if (judgment.outcome === 'pass') {
+        return {
+          ...state,
+          activeSeat: 'me',
+          activeSpeaker: 'teacher',
+          attemptIndex: state.attemptIndex + 1,
+          hintLevel: state.hintLevel,
+          participationState: 'spoke',
+          phase: 'teacher_feedback',
+          turnResolution: 'pass',
+        };
       }
 
       return {
@@ -137,24 +166,26 @@ export function classroomOrchestratorReducer(
         activeSeat: 'me',
         activeSpeaker: 'teacher',
         attemptIndex: state.attemptIndex + 1,
-        hintLevel: state.hintLevel,
+        hintLevel: judgment.outcome === 'fallback' ? 'fallback' : 'light',
         participationState: 'spoke',
-        phase: 'teacher_feedback',
-        turnResolution: 'pass',
+        phase: 'teacher_encourage',
+        turnResolution: judgment.outcome,
       };
     case 'student_silent_timeout':
       if (state.phase !== 'student_wait') {
         return state;
       }
 
+      const silentOutcome = state.attemptIndex >= 1 ? 'fallback' : 'retry';
+
       return {
         ...state,
         activeSeat: null,
         activeSpeaker: 'teacher',
-        hintLevel: 'light',
+        hintLevel: silentOutcome === 'fallback' ? 'fallback' : 'light',
         participationState: 'silent',
         phase: 'teacher_encourage',
-        turnResolution: 'retry',
+        turnResolution: silentOutcome,
       };
     case 'teacher_echo_complete':
       if (state.phase !== 'teacher_echo') {
@@ -213,20 +244,20 @@ function advanceTimedPhase(
     case 'student_wait':
       return classroomOrchestratorReducer(state, { type: 'student_silent_timeout' });
     case 'teacher_encourage':
-      if (state.currentStageId === 'picture-talk') {
-        if (state.attemptIndex === 0) {
-          return {
-            ...state,
-            activeSeat: 'me',
-            activeSpeaker: 'student',
-            attemptIndex: 1,
-            hintLevel: 'light',
-            participationState: 'waiting',
-            phase: 'student_wait',
-            turnResolution: 'retry',
-          };
-        }
+      if (state.turnResolution === 'retry') {
+        return {
+          ...state,
+          activeSeat: 'me',
+          activeSpeaker: 'student',
+          attemptIndex: Math.max(state.attemptIndex, 1),
+          hintLevel: state.hintLevel,
+          participationState: 'waiting',
+          phase: 'student_wait',
+          turnResolution: 'retry',
+        };
+      }
 
+      if (state.currentStageId === 'picture-talk') {
         return {
           ...state,
           activeSeat: null,
@@ -235,24 +266,11 @@ function advanceTimedPhase(
         };
       }
 
-      if (state.attemptIndex === 0) {
-        return {
-          ...state,
-          activeSeat: 'me',
-          activeSpeaker: 'student',
-          attemptIndex: 1,
-          hintLevel: 'light',
-          participationState: 'waiting',
-          phase: 'student_wait',
-          turnResolution: 'retry',
-        };
-      }
-
       return {
         ...state,
         activeSeat: null,
         activeSpeaker: 'teacher',
-        hintLevel: state.hintLevel,
+        hintLevel: 'fallback',
         participationState: 'encouraged',
         phase: 'teacher_echo',
         turnResolution: state.turnResolution,
