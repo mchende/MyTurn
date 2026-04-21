@@ -136,6 +136,84 @@ describe('lesson schema contracts', () => {
     ).toThrow();
   });
 
+  it('accepts optional repeatAccepts and pictureTalk metadata without requiring all legacy lessons to provide them', () => {
+    const lesson = lessonSchema.parse({
+      weekKey: 'week-01',
+      lessonId: 'week-01-lesson-judgment',
+      title: 'Week 1 · Judgment Metadata',
+      items: [
+        {
+          id: 'apple',
+          text: 'apple',
+          imageSrc: '/lessons/week-01/apple.svg',
+          imageAlt: 'A red apple.',
+          imageWidth: 512,
+          imageHeight: 512,
+          repeatAccepts: ['apple', 'an apple'],
+          pictureTalk: {
+            observeHint: 'Look at the fruit.',
+            narrowedQuestion: 'Is it an apple or a banana?',
+            semanticAccepts: ['apple', 'an apple', 'red apple'],
+            fallbackModel: 'It is an apple.',
+          },
+        },
+        {
+          id: 'banana',
+          text: 'banana',
+          imageSrc: '/lessons/week-01/banana.svg',
+          imageAlt: 'A yellow banana.',
+          imageWidth: 512,
+          imageHeight: 512,
+        },
+        {
+          id: 'cat',
+          text: 'cat',
+          imageSrc: '/lessons/week-01/cat.svg',
+          imageAlt: 'A smiling cat.',
+          imageWidth: 512,
+          imageHeight: 512,
+        },
+        {
+          id: 'dog',
+          text: 'dog',
+          imageSrc: '/lessons/week-01/dog.svg',
+          imageAlt: 'A playful dog.',
+          imageWidth: 512,
+          imageHeight: 512,
+        },
+        {
+          id: 'sun',
+          text: 'sun',
+          imageSrc: '/lessons/week-01/sun.svg',
+          imageAlt: 'A bright sun.',
+          imageWidth: 512,
+          imageHeight: 512,
+        },
+      ],
+      stages: [
+        { id: 'warmup', itemIds: ['apple', 'banana', 'cat', 'dog', 'sun'] },
+        {
+          id: 'repeat-after-teacher',
+          itemIds: ['apple', 'banana', 'cat', 'dog', 'sun'],
+        },
+        { id: 'picture-talk', itemIds: ['apple', 'banana', 'cat', 'dog', 'sun'] },
+        { id: 'wrap-up', itemIds: ['apple', 'banana', 'cat', 'dog', 'sun'] },
+      ],
+    });
+
+    expect(lesson.items[0]).toMatchObject({
+      repeatAccepts: ['apple', 'an apple'],
+      pictureTalk: {
+        observeHint: 'Look at the fruit.',
+        narrowedQuestion: 'Is it an apple or a banana?',
+        semanticAccepts: ['apple', 'an apple', 'red apple'],
+        fallbackModel: 'It is an apple.',
+      },
+    });
+    expect(lesson.items[1]).not.toHaveProperty('repeatAccepts');
+    expect(lesson.items[1]).not.toHaveProperty('pictureTalk');
+  });
+
   it('builds session view models from a parsed schedule template', () => {
     const template = scheduleTemplateSchema.parse({
       templateId: 'default-weekday',
@@ -235,6 +313,57 @@ describe('lesson schema contracts', () => {
         );
       }),
     ).toBe(true);
+    expect(
+      lesson.items.map((item) => ({
+        id: item.id,
+        repeatAccepts: item.repeatAccepts,
+        observeHint: item.pictureTalk?.observeHint,
+        narrowedQuestion: item.pictureTalk?.narrowedQuestion,
+        semanticAccepts: item.pictureTalk?.semanticAccepts,
+        fallbackModel: item.pictureTalk?.fallbackModel,
+      })),
+    ).toEqual([
+      {
+        id: 'apple',
+        repeatAccepts: expect.arrayContaining(['apple']),
+        observeHint: expect.any(String),
+        narrowedQuestion: expect.any(String),
+        semanticAccepts: expect.arrayContaining(['apple', 'an apple', 'red apple']),
+        fallbackModel: expect.any(String),
+      },
+      {
+        id: 'banana',
+        repeatAccepts: expect.arrayContaining(['banana']),
+        observeHint: expect.any(String),
+        narrowedQuestion: expect.any(String),
+        semanticAccepts: expect.arrayContaining(['banana']),
+        fallbackModel: expect.any(String),
+      },
+      {
+        id: 'cat',
+        repeatAccepts: expect.arrayContaining(['cat']),
+        observeHint: expect.any(String),
+        narrowedQuestion: expect.any(String),
+        semanticAccepts: expect.arrayContaining(['cat']),
+        fallbackModel: expect.any(String),
+      },
+      {
+        id: 'dog',
+        repeatAccepts: expect.arrayContaining(['dog']),
+        observeHint: expect.any(String),
+        narrowedQuestion: expect.any(String),
+        semanticAccepts: expect.arrayContaining(['dog']),
+        fallbackModel: expect.any(String),
+      },
+      {
+        id: 'sun',
+        repeatAccepts: expect.arrayContaining(['sun']),
+        observeHint: expect.any(String),
+        narrowedQuestion: expect.any(String),
+        semanticAccepts: expect.arrayContaining(['sun']),
+        fallbackModel: expect.any(String),
+      },
+    ]);
   });
 
   it('parses the default weekday schedule seed for 15-minute sessions', () => {
