@@ -167,12 +167,16 @@ describe('classroomOrchestratorReducer', () => {
     expect(state.currentStageId).toBe('picture-talk');
     expect(state.phase).toBe('student_wait');
     expect(state.attemptIndex).toBe(0);
+    expect(state.hintLevel).toBe('none');
+    expect(state.turnResolution).toBe('idle');
 
     state = classroomOrchestratorReducer(state, { type: 'student_silent_timeout' });
 
     expect(state.phase).toBe('teacher_encourage');
     expect(state.participationState).toBe('silent');
     expect(state.attemptIndex).toBe(0);
+    expect(state.hintLevel).toBe('light');
+    expect(state.turnResolution).toBe('retry');
     expect(state.activeSeat).toBe(null);
     expect(state.activeSpeaker).toBe('teacher');
 
@@ -180,7 +184,41 @@ describe('classroomOrchestratorReducer', () => {
 
     expect(state.phase).toBe('student_wait');
     expect(state.attemptIndex).toBe(1);
+    expect(state.hintLevel).toBe('light');
+    expect(state.turnResolution).toBe('retry');
     expect(state.participationState).toBe('waiting');
+    expect(state.activeSeat).toBe('me');
+    expect(state.activeSpeaker).toBe('student');
+  });
+
+  it('routes the first repeat timeout into a light co-speak hint before giving a second student attempt', () => {
+    const lesson = lessonWeek01Lesson01;
+    let state = createInitialClassroomState(lesson);
+
+    state = classroomOrchestratorReducer(state, { type: 'phase_timer_completed' });
+    state = classroomOrchestratorReducer(state, { type: 'phase_timer_completed' });
+
+    expect(state.currentStageId).toBe('repeat-after-teacher');
+    expect(state.phase).toBe('student_wait');
+    expect(state.attemptIndex).toBe(0);
+    expect(state.hintLevel).toBe('none');
+    expect(state.turnResolution).toBe('idle');
+
+    state = classroomOrchestratorReducer(state, { type: 'student_silent_timeout' });
+
+    expect(state.phase).toBe('teacher_encourage');
+    expect(state.participationState).toBe('silent');
+    expect(state.attemptIndex).toBe(0);
+    expect(state.hintLevel).toBe('light');
+    expect(state.turnResolution).toBe('retry');
+
+    state = classroomOrchestratorReducer(state, { type: 'phase_timer_completed' });
+
+    expect(state.phase).toBe('student_wait');
+    expect(state.participationState).toBe('waiting');
+    expect(state.attemptIndex).toBe(1);
+    expect(state.hintLevel).toBe('light');
+    expect(state.turnResolution).toBe('retry');
     expect(state.activeSeat).toBe('me');
     expect(state.activeSpeaker).toBe('student');
   });
@@ -222,6 +260,8 @@ describe('classroomOrchestratorReducer', () => {
     expect(firstAttemptState.phase).toBe('teacher_feedback');
     expect(firstAttemptState.participationState).toBe('spoke');
     expect(firstAttemptState.attemptIndex).toBe(1);
+    expect(firstAttemptState.hintLevel).toBe('none');
+    expect(firstAttemptState.turnResolution).toBe('pass');
 
     let secondAttemptState = moveToPictureTalkStudentWait();
 
@@ -242,6 +282,8 @@ describe('classroomOrchestratorReducer', () => {
     expect(secondAttemptState.phase).toBe('teacher_feedback');
     expect(secondAttemptState.participationState).toBe('spoke');
     expect(secondAttemptState.attemptIndex).toBe(2);
+    expect(secondAttemptState.hintLevel).toBe('light');
+    expect(secondAttemptState.turnResolution).toBe('pass');
   });
 });
 
@@ -260,6 +302,8 @@ describe('useClassroomOrchestrator', () => {
     expect(result.current.currentStageIndex).toBe(0);
     expect(result.current.currentStageItemIndex).toBe(0);
     expect(result.current.attemptIndex).toBe(0);
+    expect(result.current.hintLevel).toBe('none');
+    expect(result.current.turnResolution).toBe('idle');
     expect(result.current.activeSeat).toBe(null);
     expect(result.current.activeSpeaker).toBe('teacher');
     expect(result.current.rewardVisible).toBe(false);
@@ -299,6 +343,7 @@ describe('useClassroomOrchestrator', () => {
 
     expect(result.current.phase).toBe('teacher_feedback');
     expect(result.current.attemptIndex).toBe(1);
+    expect(result.current.turnResolution).toBe('pass');
 
     vi.useRealTimers();
   });
@@ -324,18 +369,25 @@ describe('useClassroomOrchestrator', () => {
       await vi.advanceTimersByTimeAsync(CLASSROOM_TIMINGS.ai_model);
     });
     expect(result.current.phase).toBe('student_wait');
-    expect(vi.getTimerCount()).toBe(1);
-
-    act(() => {
-      result.current.confirmStudentParticipation();
-    });
-    expect(result.current.phase).toBe('teacher_feedback');
+    expect(result.current.hintLevel).toBe('none');
+    expect(result.current.turnResolution).toBe('idle');
     expect(vi.getTimerCount()).toBe(1);
 
     await act(async () => {
-      await vi.advanceTimersByTimeAsync(CLASSROOM_TIMINGS.teacher_feedback);
+      await vi.advanceTimersByTimeAsync(CLASSROOM_TIMINGS.student_wait);
     });
-    expect(result.current.phase).toBe('move_next');
+    expect(result.current.phase).toBe('teacher_encourage');
+    expect(result.current.hintLevel).toBe('light');
+    expect(result.current.turnResolution).toBe('retry');
+    expect(vi.getTimerCount()).toBe(1);
+
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(CLASSROOM_TIMINGS.teacher_encourage);
+    });
+    expect(result.current.phase).toBe('student_wait');
+    expect(result.current.attemptIndex).toBe(1);
+    expect(result.current.hintLevel).toBe('light');
+    expect(result.current.turnResolution).toBe('retry');
     expect(vi.getTimerCount()).toBe(1);
 
     vi.useRealTimers();
