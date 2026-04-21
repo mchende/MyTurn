@@ -24,7 +24,10 @@ export type TeacherScriptLine = TeacherScriptVariant & {
 };
 
 const SHARED_VARIANTS: Record<
-  Exclude<ClassroomOrchestratorPhase, 'teacher_prompt' | 'teacher_encourage' | 'teacher_echo'>,
+  Exclude<
+    ClassroomOrchestratorPhase,
+    'teacher_prompt' | 'student_wait' | 'teacher_encourage' | 'teacher_echo'
+  >,
   readonly TeacherScriptVariant[]
 > = {
   ai_model: [
@@ -37,18 +40,6 @@ const SHARED_VARIANTS: Record<
       hintLabel: 'Hear the model',
       spokenModel: 'Bobby goes first. Use your listening ears.',
       visibleCaption: 'Bobby goes first. Use your listening ears.',
-    },
-  ],
-  student_wait: [
-    {
-      hintLabel: 'Your voice now',
-      spokenModel: 'Your voice is ready. I am listening.',
-      visibleCaption: 'Your voice is ready. I am listening.',
-    },
-    {
-      hintLabel: 'Say it now',
-      spokenModel: 'Say it when you are ready.',
-      visibleCaption: 'Say it when you are ready.',
     },
   ],
   teacher_feedback: [
@@ -153,10 +144,16 @@ function resolveStageAwareVariant({
       : getPictureTalkPrompt(currentItemIndex);
   }
 
+  if (phase === 'student_wait') {
+    return stageId === 'repeat-after-teacher'
+      ? getRepeatAfterTeacherStudentWait(currentItemIndex)
+      : getPictureTalkStudentWait(attemptIndex, currentItemIndex);
+  }
+
   if (phase === 'teacher_encourage') {
     return stageId === 'repeat-after-teacher'
       ? getRepeatAfterTeacherEncourage(targetText, currentItemIndex)
-      : getPictureTalkSecondPrompt(
+      : getPictureTalkObserveOrCloseout(
           attemptIndex,
           currentItemIndex,
           participationState,
@@ -223,7 +220,27 @@ function getRepeatAfterTeacherEncourage(
   );
 }
 
-function getPictureTalkSecondPrompt(
+function getRepeatAfterTeacherStudentWait(
+  currentItemIndex: number,
+): TeacherScriptVariant {
+  return pickVariant(
+    [
+      {
+        hintLabel: 'Your voice now',
+        spokenModel: 'Your voice is ready. I am listening.',
+        visibleCaption: 'Your voice is ready. I am listening.',
+      },
+      {
+        hintLabel: 'Say it now',
+        spokenModel: 'Say it when you are ready.',
+        visibleCaption: 'Say it when you are ready.',
+      },
+    ],
+    currentItemIndex,
+  );
+}
+
+function getPictureTalkObserveOrCloseout(
   attemptIndex: number,
   currentItemIndex: number,
   participationState: ParticipationState,
@@ -236,17 +253,66 @@ function getPictureTalkSecondPrompt(
     };
   }
 
+  return getPictureTalkObserveHint(currentItemIndex);
+}
+
+function getPictureTalkObserveHint(currentItemIndex: number): TeacherScriptVariant {
   return pickVariant(
     [
       {
-        hintLabel: 'Try again',
-        spokenModel: 'Try once more. What is it?',
-        visibleCaption: 'Try once more.',
+        hintLabel: 'Look closely',
+        spokenModel: 'Look closely. What do you notice?',
+        visibleCaption: 'Look closely. What do you notice?',
       },
       {
-        hintLabel: 'One more answer',
-        spokenModel: 'Try once more. What do you see?',
-        visibleCaption: 'Try once more.',
+        hintLabel: 'Look closely',
+        spokenModel: 'Look closely. What do you notice?',
+        visibleCaption: 'Look closely. What do you notice?',
+      },
+    ],
+    currentItemIndex,
+  );
+}
+
+function getPictureTalkStudentWait(
+  attemptIndex: number,
+  currentItemIndex: number,
+): TeacherScriptVariant {
+  if (attemptIndex > 0) {
+    return getPictureTalkNarrowedPrompt(currentItemIndex);
+  }
+
+  return pickVariant(
+    [
+      {
+        hintLabel: 'Your voice now',
+        spokenModel: 'Your voice is ready. I am listening.',
+        visibleCaption: 'Your voice is ready. I am listening.',
+      },
+      {
+        hintLabel: 'Say it now',
+        spokenModel: 'Say it when you are ready.',
+        visibleCaption: 'Say it when you are ready.',
+      },
+    ],
+    currentItemIndex,
+  );
+}
+
+function getPictureTalkNarrowedPrompt(
+  currentItemIndex: number,
+): TeacherScriptVariant {
+  return pickVariant(
+    [
+      {
+        hintLabel: 'Smaller question',
+        spokenModel: 'Look again and choose. What do you see now?',
+        visibleCaption: 'Look again and choose.',
+      },
+      {
+        hintLabel: 'Smaller question',
+        spokenModel: 'Look again and choose. What do you see now?',
+        visibleCaption: 'Look again and choose.',
       },
     ],
     currentItemIndex,

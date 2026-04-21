@@ -30,6 +30,7 @@ export type PodiumViewModel = {
 
 type BuildPodiumViewModelOptions = {
   activeSeat: ClassroomActiveSeat;
+  attemptIndex: number;
   bobbyScriptLine: BobbyScriptLine | null;
   participationState: ParticipationState;
   phase: ClassroomOrchestratorPhase;
@@ -39,6 +40,7 @@ type BuildPodiumViewModelOptions = {
 
 export function buildPodiumViewModel({
   activeSeat,
+  attemptIndex,
   bobbyScriptLine,
   participationState,
   phase,
@@ -56,8 +58,9 @@ export function buildPodiumViewModel({
       activeSeat === 'ai'
         ? '/avatars/student-bobby.svg'
         : '/avatars/reward-student.svg',
-    podiumCaption: getPodiumCaption(phase, rewardVisible, stageId),
+    podiumCaption: getPodiumCaption(phase, rewardVisible, stageId, attemptIndex),
     podiumStatus: getPodiumStatus({
+      attemptIndex,
       bobbyScriptLine,
       participationState,
       phase,
@@ -116,6 +119,7 @@ function getPodiumCaption(
   phase: ClassroomOrchestratorPhase,
   rewardVisible: boolean,
   stageId: GuidedStageId,
+  attemptIndex: number,
 ) {
   if (rewardVisible) {
     return 'Reward time';
@@ -129,10 +133,16 @@ function getPodiumCaption(
     case 'ai_model':
       return 'Bobby is modeling';
     case 'student_wait':
-      return stageId === 'picture-talk' ? 'Look and answer' : 'Your turn to say it';
+      if (stageId === 'picture-talk') {
+        return attemptIndex > 0 ? 'Look again and choose' : 'Look and answer';
+      }
+
+      return 'Your turn to say it';
     case 'teacher_encourage':
       return stageId === 'picture-talk'
-        ? 'Try one more answer'
+        ? attemptIndex > 0
+          ? 'Teacher is closing this turn'
+          : 'Look closely'
         : 'Say it with Cora';
     case 'teacher_echo':
       return 'Teacher is helping';
@@ -148,6 +158,7 @@ function getPodiumCaption(
 }
 
 function getPodiumStatus({
+  attemptIndex,
   bobbyScriptLine,
   participationState,
   phase,
@@ -168,13 +179,21 @@ function getPodiumStatus({
         ? 'Look carefully. A question is coming.'
         : 'Listen first. Your turn is coming.';
     case 'student_wait':
-      return stageId === 'picture-talk'
-        ? 'Look at the picture and answer.'
-        : 'Listen and say it back.';
+      if (stageId === 'picture-talk') {
+        return attemptIndex > 0
+          ? 'Look again and choose.'
+          : 'Look at the picture and answer.';
+      }
+
+      return 'Listen and say it back.';
     case 'teacher_encourage':
-      return stageId === 'picture-talk'
-        ? 'Take a breath. Answer one more time.'
-        : 'Cora is helping you start.';
+      if (stageId === 'picture-talk') {
+        return attemptIndex > 0
+          ? 'Thanks for trying. Let us keep going.'
+          : 'Look closely. What do you notice?';
+      }
+
+      return 'Cora is helping you start.';
     case 'teacher_echo':
       return stageId === 'picture-talk'
         ? 'Thanks for trying. Let us keep going.'

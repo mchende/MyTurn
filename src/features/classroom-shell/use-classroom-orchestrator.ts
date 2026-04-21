@@ -66,6 +66,7 @@ export function useClassroomOrchestrator({
   });
   const podiumViewModel = buildPodiumViewModel({
     activeSeat: state.activeSeat,
+    attemptIndex: state.attemptIndex,
     bobbyScriptLine,
     participationState: state.participationState,
     phase: state.phase,
