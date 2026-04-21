@@ -163,7 +163,7 @@ describe('classroom shell layout', () => {
     expect(screen.getByRole('button', { name: 'I said it' })).toBeInTheDocument();
 
     await advanceFlow(CLASSROOM_TIMINGS.student_wait);
-    await advanceFlow(CLASSROOM_TIMINGS.teacher_encourage);
+    await advanceFlow(CLASSROOM_TIMINGS.teacher_fallback_model);
     await advanceFlow(CLASSROOM_TIMINGS.teacher_echo);
     await advanceFlow(CLASSROOM_TIMINGS.move_next);
 
@@ -259,10 +259,112 @@ describe('classroom shell layout', () => {
 
     await advanceFlow(CLASSROOM_TIMINGS.student_wait);
 
-    expect(screen.getAllByText('Thanks for trying. Let us keep going.').length).toBeGreaterThan(0);
+    expect(
+      screen.getAllByText('Listen once more. Then say it with Cora.').length,
+    ).toBeGreaterThan(0);
     expect(screen.queryByText(/Bobby goes first|Listen to Bobby|Bobby shows one/i)).not.toBeInTheDocument();
 
+    await advanceFlow(CLASSROOM_TIMINGS.teacher_fallback_model);
+    expect(screen.getByRole('button', { name: 'I said it with Cora' })).toBeInTheDocument();
+    expect(screen.getAllByRole('button', { name: /i said it|i answered/i })).toHaveLength(1);
+
+    await advanceFlow(CLASSROOM_TIMINGS.teacher_echo);
+    await advanceFlow(CLASSROOM_TIMINGS.move_next);
+
+    expect(screen.getByText('Picture talk · 2/5')).toBeInTheDocument();
+  });
+
+  it('keeps one CTA through repeat fallback and switches to I said it with Cora for the final follow', async () => {
+    const user = userEvent.setup({
+      advanceTimers: vi.advanceTimersByTime,
+      delay: null,
+    });
+
+    render(
+      <ClassroomShell
+        lesson={lesson}
+        sessionId="weekday-1700"
+        sessionStatus="检票入场中: 02:45"
+        sessionTitle="每日语感启蒙"
+      />,
+    );
+
+    await moveToStudentTurn();
+    expect(screen.getAllByRole('button', { name: /i said it|i answered/i })).toHaveLength(1);
+
+    await advanceFlow(CLASSROOM_TIMINGS.student_wait);
+
+    expect(screen.getByText('Say it with me. Nice and slow.')).toBeInTheDocument();
+    expect(screen.queryByText(/^apple$/i)).not.toBeInTheDocument();
+
     await advanceFlow(CLASSROOM_TIMINGS.teacher_encourage);
+
+    expect(screen.getByRole('button', { name: 'I said it' })).toBeInTheDocument();
+    expect(screen.getAllByRole('button', { name: /i said it|i answered/i })).toHaveLength(1);
+
+    await advanceFlow(CLASSROOM_TIMINGS.student_wait);
+
+    expect(
+      screen.getAllByText('Listen once more. Then say it with Cora.').length,
+    ).toBeGreaterThan(0);
+    expect(screen.queryByText(/score|correct|incorrect/i)).not.toBeInTheDocument();
+    expect(screen.queryByText(/^apple$/i)).not.toBeInTheDocument();
+
+    await advanceFlow(CLASSROOM_TIMINGS.teacher_fallback_model);
+
+    const finalFollowButton = screen.getByRole('button', {
+      name: 'I said it with Cora',
+    });
+    expect(finalFollowButton).toBeInTheDocument();
+    expect(screen.getAllByRole('button', { name: /i said it|i answered/i })).toHaveLength(1);
+
+    await clickWithUser(user, finalFollowButton);
+
+    await advanceFlow(CLASSROOM_TIMINGS.move_next);
+
+    expect(screen.getByText('Repeat after Cora · 2/5')).toBeInTheDocument();
+  });
+
+  it('keeps picture fallback teacher-led with one final CTA and no Bobby or answer leakage', async () => {
+    const user = userEvent.setup({
+      advanceTimers: vi.advanceTimersByTime,
+      delay: null,
+    });
+
+    render(
+      <ClassroomShell
+        lesson={lesson}
+        sessionId="weekday-1700"
+        sessionStatus="检票入场中: 02:45"
+        sessionTitle="每日语感启蒙"
+      />,
+    );
+
+    await moveToPictureTalkStudentTurn(user);
+
+    expect(screen.getByRole('button', { name: 'I answered' })).toBeInTheDocument();
+    expect(screen.queryByText(/Bobby goes first|Listen to Bobby|Bobby shows one/i)).not.toBeInTheDocument();
+
+    await advanceFlow(CLASSROOM_TIMINGS.student_wait);
+    await advanceFlow(CLASSROOM_TIMINGS.teacher_encourage);
+    await advanceFlow(CLASSROOM_TIMINGS.student_wait);
+
+    expect(
+      screen.getAllByText('Listen once more. Then say it with Cora.').length,
+    ).toBeGreaterThan(0);
+    expect(screen.queryByText(/apple|banana/i)).not.toBeInTheDocument();
+    expect(screen.queryByText(/score|correct|incorrect/i)).not.toBeInTheDocument();
+
+    await advanceFlow(CLASSROOM_TIMINGS.teacher_fallback_model);
+
+    const finalFollowButton = screen.getByRole('button', {
+      name: 'I said it with Cora',
+    });
+    expect(finalFollowButton).toBeInTheDocument();
+    expect(screen.getAllByRole('button', { name: /i said it|i answered/i })).toHaveLength(1);
+    expect(screen.queryByText(/Bobby goes first|Listen to Bobby|Bobby shows one/i)).not.toBeInTheDocument();
+
+    await clickWithUser(user, finalFollowButton);
     await advanceFlow(CLASSROOM_TIMINGS.move_next);
 
     expect(screen.getByText('Picture talk · 2/5')).toBeInTheDocument();
