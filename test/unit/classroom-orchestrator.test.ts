@@ -2,6 +2,7 @@ import { act, renderHook } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 
 import { lessonWeek01Lesson01 } from '../../content/lessons/week-01/lesson-01';
+import { buildCanonicalManualTranscript } from '@/features/classroom-shell/classroom-judgment';
 import {
   CLASSROOM_TIMINGS,
   GUIDED_STAGE_IDS,
@@ -54,9 +55,7 @@ describe('classroomOrchestratorReducer', () => {
     expect(state.activeSpeaker).toBe('student');
     expect(state.activeSeat).toBe('me');
 
-    state = classroomOrchestratorReducer(state, {
-      type: 'student_participation_confirmed',
-    });
+    state = submitCanonicalAttempt(state);
 
     expect(state.phase).toBe('teacher_feedback');
     expect(state.participationState).toBe('spoke');
@@ -78,9 +77,7 @@ describe('classroomOrchestratorReducer', () => {
       state = classroomOrchestratorReducer(state, { type: 'phase_timer_completed' });
       expect(state.phase).toBe('student_wait');
 
-      state = classroomOrchestratorReducer(state, {
-        type: 'student_participation_confirmed',
-      });
+      state = submitCanonicalAttempt(state);
       expect(state.phase).toBe('teacher_feedback');
     }
 
@@ -104,7 +101,7 @@ describe('classroomOrchestratorReducer', () => {
     expect(state.activeSeat).toBe('me');
   });
 
-  it('requires an explicit participation confirmation instead of auto-passing the student turn', () => {
+  it('requires a judged student attempt instead of auto-passing the student turn', () => {
     const lesson = lessonWeek01Lesson01;
     let state = createInitialClassroomState(lesson);
 
@@ -125,16 +122,27 @@ describe('classroomOrchestratorReducer', () => {
     expect(state.phase).toBe('student_wait');
 
     state = classroomOrchestratorReducer(state, {
-      type: 'student_participation_confirmed',
+      type: 'student_attempt_submitted',
+      transcript: 'banana',
+      source: 'mock_transcript',
     });
 
-    expect(state.phase).toBe('teacher_feedback');
+    expect(state.phase).toBe('teacher_encourage');
     expect(state.participationState).toBe('spoke');
+    expect(state.turnResolution).toBe('retry');
 
     state = classroomOrchestratorReducer(state, { type: 'phase_timer_completed' });
-    expect(state.phase).toBe('move_next');
-    expect(state.activeSpeaker).toBe('teacher');
-    expect(state.activeSeat).toBe(null);
+    expect(state.phase).toBe('student_wait');
+    expect(state.attemptIndex).toBe(1);
+
+    state = classroomOrchestratorReducer(state, {
+      type: 'student_attempt_submitted',
+      transcript: 'banana',
+      source: 'mock_transcript',
+    });
+
+    expect(state.phase).toBe('teacher_encourage');
+    expect(state.turnResolution).toBe('fallback');
   });
 
   it('keeps reward gating explicit instead of making celebration mandatory', () => {
@@ -143,9 +151,7 @@ describe('classroomOrchestratorReducer', () => {
 
     state = classroomOrchestratorReducer(state, { type: 'phase_timer_completed' });
     state = classroomOrchestratorReducer(state, { type: 'phase_timer_completed' });
-    state = classroomOrchestratorReducer(state, {
-      type: 'student_participation_confirmed',
-    });
+    state = submitCanonicalAttempt(state);
 
     expect(state.phase).toBe('teacher_feedback');
     expect(state.rewardVisible).toBe(false);
@@ -253,9 +259,7 @@ describe('classroomOrchestratorReducer', () => {
   it('lets picture-talk complete on either the first or second confirmed attempt', () => {
     let firstAttemptState = moveToPictureTalkStudentWait();
 
-    firstAttemptState = classroomOrchestratorReducer(firstAttemptState, {
-      type: 'student_participation_confirmed',
-    });
+    firstAttemptState = submitCanonicalAttempt(firstAttemptState);
 
     expect(firstAttemptState.phase).toBe('teacher_feedback');
     expect(firstAttemptState.participationState).toBe('spoke');
@@ -275,9 +279,7 @@ describe('classroomOrchestratorReducer', () => {
     expect(secondAttemptState.phase).toBe('student_wait');
     expect(secondAttemptState.attemptIndex).toBe(1);
 
-    secondAttemptState = classroomOrchestratorReducer(secondAttemptState, {
-      type: 'student_participation_confirmed',
-    });
+    secondAttemptState = submitCanonicalAttempt(secondAttemptState);
 
     expect(secondAttemptState.phase).toBe('teacher_feedback');
     expect(secondAttemptState.participationState).toBe('spoke');
@@ -311,7 +313,7 @@ describe('useClassroomOrchestrator', () => {
     expect(result.current.debugTargetText).toBe('APPLE');
   });
 
-  it('only advances to teacher_feedback when confirmStudentParticipation is called during student_wait', async () => {
+  it('only advances to teacher_feedback when submitStudentAttempt or the compatibility alias is called during student_wait', async () => {
     vi.useFakeTimers();
 
     const { result } = renderHook(() =>
@@ -319,6 +321,15 @@ describe('useClassroomOrchestrator', () => {
         lesson: lessonWeek01Lesson01,
       }),
     );
+
+    act(() => {
+      result.current.submitStudentAttempt({
+        transcript: 'apple',
+        source: 'mock_transcript',
+      });
+    });
+    expect(result.current.phase).toBe('teacher_prompt');
+    expect(result.current.attemptIndex).toBe(0);
 
     act(() => {
       result.current.confirmStudentParticipation();
@@ -338,11 +349,27 @@ describe('useClassroomOrchestrator', () => {
     expect(result.current.currentStageItemIndex).toBe(0);
 
     act(() => {
+      result.current.submitStudentAttempt({
+        transcript: 'banana',
+        source: 'mock_transcript',
+      });
+    });
+
+    expect(result.current.phase).toBe('teacher_encourage');
+    expect(result.current.turnResolution).toBe('retry');
+
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(CLASSROOM_TIMINGS.teacher_encourage);
+    });
+    expect(result.current.phase).toBe('student_wait');
+    expect(result.current.attemptIndex).toBe(1);
+
+    act(() => {
       result.current.confirmStudentParticipation();
     });
 
     expect(result.current.phase).toBe('teacher_feedback');
-    expect(result.current.attemptIndex).toBe(1);
+    expect(result.current.attemptIndex).toBe(2);
     expect(result.current.turnResolution).toBe('pass');
 
     vi.useRealTimers();
@@ -401,9 +428,7 @@ function moveToPictureTalkStudentWait() {
   for (let index = 0; index < lesson.items.length; index += 1) {
     state = classroomOrchestratorReducer(state, { type: 'phase_timer_completed' });
     state = classroomOrchestratorReducer(state, { type: 'phase_timer_completed' });
-    state = classroomOrchestratorReducer(state, {
-      type: 'student_participation_confirmed',
-    });
+    state = submitCanonicalAttempt(state);
     state = classroomOrchestratorReducer(state, { type: 'phase_timer_completed' });
     state = classroomOrchestratorReducer(state, { type: 'phase_timer_completed' });
   }
@@ -411,4 +436,17 @@ function moveToPictureTalkStudentWait() {
   state = classroomOrchestratorReducer(state, { type: 'phase_timer_completed' });
 
   return state;
+}
+
+function submitCanonicalAttempt(
+  state: ReturnType<typeof createInitialClassroomState>,
+) {
+  return classroomOrchestratorReducer(state, {
+    type: 'student_attempt_submitted',
+    transcript: buildCanonicalManualTranscript({
+      currentItem: state.currentItem,
+      stageId: state.currentStageId,
+    }),
+    source: 'manual',
+  });
 }
