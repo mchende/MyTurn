@@ -24,7 +24,7 @@
 - [x] **TEAC-01**: 用户能听到具有老师风格的课堂引导，包括示范目标语言和清晰的过渡话术
 - [x] **TEAC-02**: 用户能从老师那里获得温和的等待、鼓励和明确的点名作答提示
 - [x] **TEAC-03**: 当孩子作答困难时，老师会先给出轻量提示，再让孩子重新尝试
-- [ ] **TEAC-04**: 当孩子连续几次仍无法作答时，老师可以退回到“示范 + 跟读”的兜底方式以恢复课堂节奏
+- [x] **TEAC-04**: 当孩子连续几次仍无法作答时，老师可以退回到“示范 + 跟读”的兜底方式以恢复课堂节奏
 
 ### AI Classmate
 
@@ -90,7 +90,7 @@
 | TEAC-02 | Phase 3 | Complete |
 | SPKG-01 | Phase 3 | Complete |
 | TEAC-03 | Phase 4 | Complete |
-| TEAC-04 | Phase 4 | Pending |
+| TEAC-04 | Phase 4 | Complete |
 | SPKG-03 | Phase 4 | Complete |
 | SPKG-04 | Phase 4 | Complete |
 | SPKG-05 | Phase 4 | Complete |
