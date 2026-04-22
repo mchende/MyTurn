@@ -12,7 +12,10 @@ import {
   classroomOrchestratorReducer,
   createInitialClassroomState,
 } from '@/features/classroom-shell/classroom-orchestrator';
-import { useClassroomOrchestrator } from '@/features/classroom-shell/use-classroom-orchestrator';
+import {
+  LESSON_COMPLETE_HOLD_MS as HOOK_LESSON_COMPLETE_HOLD_MS,
+  useClassroomOrchestrator,
+} from '@/features/classroom-shell/use-classroom-orchestrator';
 
 describe('classroomOrchestratorReducer', () => {
   it('builds the guided speaking queue from repeat-after-teacher and picture-talk only', () => {
@@ -431,6 +434,22 @@ describe('useClassroomOrchestrator', () => {
     expect(result.current.debugTargetText).toBe('APPLE');
   });
 
+  it('exposes warmup and lesson completion contracts directly from the hook surface', () => {
+    const { result } = renderHook(() =>
+      useClassroomOrchestrator({
+        lesson: lessonWeek01Lesson01,
+      }),
+    );
+
+    expect(HOOK_LESSON_COMPLETE_HOLD_MS).toBe(LESSON_COMPLETE_HOLD_MS);
+    expect(result.current.completionHoldMs).toBe(LESSON_COMPLETE_HOLD_MS);
+    expect(result.current.isLessonComplete).toBe(false);
+    expect(result.current.stageBadge).toBe('Class warmup');
+    expect(result.current.stagePrompt).toBe(
+      'Class warmup. Cora is getting everyone ready.',
+    );
+  });
+
   it('only advances to teacher_feedback when submitStudentAttempt or the compatibility alias is called during student_wait', async () => {
     vi.useFakeTimers();
 
@@ -592,6 +611,82 @@ describe('useClassroomOrchestrator', () => {
     expect(result.current.hintLevel).toBe('light');
     expect(result.current.turnResolution).toBe('retry');
     expect(vi.getTimerCount()).toBe(1);
+
+    vi.useRealTimers();
+  });
+
+  it('stops scheduling timers after lesson_complete and keeps closing badges/prompts stable for shell consumers', async () => {
+    vi.useFakeTimers();
+
+    const { result } = renderHook(() =>
+      useClassroomOrchestrator({
+        lesson: lessonWeek01Lesson01,
+      }),
+    );
+
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(CLASSROOM_TIMINGS.warmup);
+    });
+
+    for (let index = 0; index < lessonWeek01Lesson01.items.length; index += 1) {
+      await act(async () => {
+        await vi.advanceTimersByTimeAsync(CLASSROOM_TIMINGS.teacher_prompt);
+      });
+      await act(async () => {
+        await vi.advanceTimersByTimeAsync(CLASSROOM_TIMINGS.ai_model);
+      });
+      act(() => {
+        result.current.confirmStudentParticipation();
+      });
+      await act(async () => {
+        await vi.advanceTimersByTimeAsync(CLASSROOM_TIMINGS.teacher_feedback);
+      });
+      await act(async () => {
+        await vi.advanceTimersByTimeAsync(CLASSROOM_TIMINGS.move_next);
+      });
+    }
+
+    for (let index = 0; index < lessonWeek01Lesson01.items.length; index += 1) {
+      await act(async () => {
+        await vi.advanceTimersByTimeAsync(CLASSROOM_TIMINGS.teacher_prompt);
+      });
+      act(() => {
+        result.current.confirmStudentParticipation();
+      });
+      await act(async () => {
+        await vi.advanceTimersByTimeAsync(CLASSROOM_TIMINGS.teacher_feedback);
+      });
+      await act(async () => {
+        await vi.advanceTimersByTimeAsync(CLASSROOM_TIMINGS.move_next);
+      });
+    }
+
+    expect(result.current.phase).toBe('wrap_up');
+    expect(result.current.stageBadge).toBe('Class closing');
+    expect(result.current.stagePrompt).toBe('Class is done. Time to wave goodbye.');
+    expect(vi.getTimerCount()).toBe(1);
+
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(CLASSROOM_TIMINGS.wrap_up);
+    });
+
+    expect(result.current.phase).toBe('completion_reward');
+    expect(result.current.stageBadge).toBe('Reward time');
+    expect(result.current.stagePrompt).toBe('Great job. Class is wrapping up.');
+    expect(result.current.rewardVisible).toBe(true);
+    expect(vi.getTimerCount()).toBe(1);
+
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(CLASSROOM_TIMINGS.completion_reward);
+    });
+
+    expect(result.current.phase).toBe('lesson_complete');
+    expect(result.current.isLessonComplete).toBe(true);
+    expect(result.current.stageBadge).toBe('Class complete');
+    expect(result.current.stagePrompt).toBe('Class complete. See you next time.');
+    expect(result.current.rewardVisible).toBe(false);
+    expect(result.current.completionHoldMs).toBe(LESSON_COMPLETE_HOLD_MS);
+    expect(vi.getTimerCount()).toBe(0);
 
     vi.useRealTimers();
   });
