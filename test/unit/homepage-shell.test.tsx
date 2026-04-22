@@ -21,6 +21,7 @@ const homepageViewModel: TodayScheduleViewModel = {
     learnerLabel: '同学 Bobby',
     campLabel: '第 4 周：动物园大冒险',
     attendanceLabel: '正在检票',
+    isRecentlyCompleted: false,
   },
   sessions: [
     {
@@ -38,6 +39,7 @@ const homepageViewModel: TodayScheduleViewModel = {
       learnerLabel: 'Cora 老师',
       campLabel: '第 4 周：动物园大冒险',
       attendanceLabel: '已结束',
+      isRecentlyCompleted: false,
     },
     {
       sessionId: 'weekday-1700',
@@ -54,6 +56,7 @@ const homepageViewModel: TodayScheduleViewModel = {
       learnerLabel: '同学 Bobby',
       campLabel: '第 4 周：动物园大冒险',
       attendanceLabel: '正在检票',
+      isRecentlyCompleted: false,
     },
     {
       sessionId: 'weekday-1800',
@@ -70,6 +73,7 @@ const homepageViewModel: TodayScheduleViewModel = {
       learnerLabel: '同学 Bobby',
       campLabel: '第 4 周：动物园大冒险',
       attendanceLabel: '尚未开放',
+      isRecentlyCompleted: false,
     },
   ],
 };
@@ -111,5 +115,56 @@ describe('homepage shell contract', () => {
     expect(within(timeline).getByText('正在入场')).toBeInTheDocument();
     expect(within(timeline).getByText('18:00')).toBeInTheDocument();
     expect(within(timeline).getByText('尚未开放')).toBeInTheDocument();
+  });
+
+  it('prioritizes a recently-completed session with warm homecoming copy and timeline label', () => {
+    const recentlyCompletedViewModel: TodayScheduleViewModel = {
+      ...homepageViewModel,
+      nextSession: homepageViewModel.sessions[1]
+        ? {
+            ...homepageViewModel.sessions[1],
+            accessState: 'open_for_entry',
+            isRecentlyCompleted: false,
+          }
+        : null,
+      sessions: homepageViewModel.sessions.map((session) =>
+        session.sessionId === 'weekday-1600'
+          ? {
+              ...session,
+              isRecentlyCompleted: true,
+            }
+          : session,
+      ),
+    };
+
+    render(<HomepageShell viewModel={recentlyCompletedViewModel} />);
+
+    expect(screen.getByText('刚完成这节课')).toBeInTheDocument();
+    expect(screen.getByText('今天这节课已经上完啦')).toBeInTheDocument();
+
+    const timeline = screen.getByTestId('session-timeline');
+    const completedRow = within(timeline).getByTestId('timeline-session-weekday-1600');
+    expect(within(completedRow).getByText('刚完成')).toBeInTheDocument();
+
+    const cta = screen.getByRole('link', { name: '进入教室' });
+    expect(cta).toHaveAttribute('href', '/lesson/weekday-1600');
+  });
+
+  it('uses the responsive reflow contract instead of fixed overflow-hidden columns on narrow layouts', () => {
+    const { container } = render(<HomepageShell viewModel={homepageViewModel} />);
+    const main = container.querySelector('main');
+    const wrapper = main?.firstElementChild;
+    const content = screen.getByTestId('homepage-content');
+
+    expect(main).toHaveClass('min-h-screen');
+    expect(main).toHaveClass('xl:h-screen');
+    expect(main).toHaveClass('xl:overflow-hidden');
+    expect(wrapper).toHaveClass('flex');
+    expect(wrapper).toHaveClass('min-h-screen');
+    expect(wrapper).toHaveClass('flex-col');
+    expect(wrapper).toHaveClass('xl:flex-row');
+    expect(content).toHaveClass('overflow-y-auto');
+    expect(content).toHaveClass('xl:overflow-hidden');
+    expect(content).toHaveClass('xl:flex-row');
   });
 });

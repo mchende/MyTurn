@@ -4,8 +4,19 @@ import { getTodayScheduleViewModel } from '@/features/schedule/get-today-schedul
 export { HomepageShell } from '@/features/homepage/homepage-shell';
 export { type TodayScheduleViewModel } from '@/features/schedule/get-today-schedule-view-model';
 
-export default async function HomePage() {
-  const viewModel = getTodayScheduleViewModel();
+type HomePageSearchParams = Promise<{
+  completedSession?: string;
+}>;
+
+export default async function HomePage({
+  searchParams,
+}: {
+  searchParams?: HomePageSearchParams;
+}) {
+  const resolvedSearchParams = searchParams ? await searchParams : undefined;
+  const viewModel = getTodayScheduleViewModel(undefined, {
+    completedSessionId: resolvedSearchParams?.completedSession ?? null,
+  });
 
   return <HomepageShell viewModel={viewModel} />;
 }

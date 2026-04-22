@@ -18,6 +18,7 @@ export type TodayScheduleSessionViewModel = {
   learnerLabel: string;
   campLabel: string;
   attendanceLabel: string;
+  isRecentlyCompleted: boolean;
 };
 
 export type TodayScheduleViewModel = {
@@ -25,6 +26,10 @@ export type TodayScheduleViewModel = {
   currentTimeLabel: string;
   sessions: TodayScheduleSessionViewModel[];
   nextSession: TodayScheduleSessionViewModel | null;
+};
+
+type TodayScheduleViewModelOptions = {
+  completedSessionId?: string | null;
 };
 
 const HOMEPAGE_TITLE = '每日语感启蒙';
@@ -49,7 +54,11 @@ const SESSION_META = [
   },
 ] as const;
 
-export function getTodayScheduleViewModel(now: Date = getReferenceNow()): TodayScheduleViewModel {
+export function getTodayScheduleViewModel(
+  now: Date = getReferenceNow(),
+  options: TodayScheduleViewModelOptions = {},
+): TodayScheduleViewModel {
+  const completedSessionId = options.completedSessionId ?? null;
   const sessions = buildDaySessions({
     template: defaultWeekdayScheduleTemplate,
     date: now,
@@ -80,13 +89,19 @@ export function getTodayScheduleViewModel(now: Date = getReferenceNow()): TodayS
       learnerLabel: meta.learnerLabel,
       campLabel: meta.campLabel,
       attendanceLabel: meta.attendanceLabel,
+      isRecentlyCompleted: session.sessionId === completedSessionId,
     };
   });
+
+  const nextSession =
+    sessions.find((session) => session.isRecentlyCompleted) ??
+    sessions.find((session) => session.accessState !== 'completed') ??
+    null;
 
   return {
     todayLabel: formatTodayLabel(now),
     currentTimeLabel: `当前时间 ${formatTimeLabel(now)}`,
-    nextSession: sessions.find((session) => session.accessState !== 'completed') ?? null,
+    nextSession,
     sessions,
   };
 }

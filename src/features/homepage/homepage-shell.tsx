@@ -26,7 +26,10 @@ const navItems = [
 ] as const;
 
 export function HomepageShell({ viewModel }: { viewModel: TodayScheduleViewModel }) {
-  const focusSession = viewModel.nextSession ?? viewModel.sessions[0];
+  const focusSession =
+    viewModel.sessions.find((session) => session.isRecentlyCompleted) ??
+    viewModel.nextSession ??
+    viewModel.sessions[0];
 
   if (!focusSession) {
     return (
@@ -37,48 +40,45 @@ export function HomepageShell({ viewModel }: { viewModel: TodayScheduleViewModel
   }
 
   return (
-    <main className="h-screen overflow-hidden bg-[#F9FAFB] text-[#1F2937]">
-      <div className="flex h-screen overflow-hidden">
-        <aside className="flex w-28 shrink-0 flex-col items-center justify-between border-r border-[#E5E7EB] bg-white py-8">
+    <main className="min-h-screen bg-[#F9FAFB] text-[#1F2937] xl:h-screen xl:overflow-hidden">
+      <div className="flex min-h-screen flex-col xl:h-screen xl:flex-row">
+        <aside className="flex shrink-0 flex-row items-center justify-between border-b border-[#E5E7EB] bg-white px-6 py-5 xl:w-28 xl:flex-col xl:border-b-0 xl:border-r xl:px-0 xl:py-8">
           <div className="flex w-full flex-col items-center gap-10">
-            <div className="flex h-16 w-16 items-center justify-center rounded-[24px] bg-[#10B981] text-white shadow-[0_20px_45px_rgba(16,185,129,0.22)]">
+            <div className="flex h-14 w-14 items-center justify-center rounded-[20px] bg-[#10B981] text-white shadow-[0_20px_45px_rgba(16,185,129,0.22)] xl:h-16 xl:w-16 xl:rounded-[24px]">
               <Sparkles className="h-8 w-8 fill-current" />
             </div>
 
-            <nav className="flex w-full flex-col items-center gap-8">
+            <nav className="flex w-full flex-row items-center justify-end gap-3 xl:flex-col xl:gap-8">
               {navItems.map((item) => (
                 <button
                   className={cn(
-                    'flex w-full flex-col items-center gap-2 px-2 text-center transition-colors',
+                    'flex min-w-0 flex-1 items-center justify-center gap-2 px-2 text-center transition-colors xl:w-full xl:flex-col',
                     item.active ? 'text-[#10B981]' : 'text-[#C7CDD4] hover:text-[#6B7280]',
                   )}
                   key={item.label}
                   type="button"
                 >
                   <div
-                    className={cn(
-                      'rounded-[24px] p-4',
-                      item.active ? 'bg-[#10B981]/10' : 'bg-transparent',
-                    )}
+                    className={cn('rounded-[24px] p-3 xl:p-4', item.active ? 'bg-[#10B981]/10' : 'bg-transparent')}
                   >
-                    <item.icon className="h-8 w-8" />
+                    <item.icon className="h-6 w-6 xl:h-8 xl:w-8" />
                   </div>
-                  <span className="text-[15px] font-black leading-tight">{item.label}</span>
+                  <span className="text-xs font-black leading-tight xl:text-[15px]">{item.label}</span>
                 </button>
               ))}
             </nav>
           </div>
         </aside>
 
-        <section className="flex min-w-0 flex-1 flex-col overflow-hidden">
-          <header className="flex h-24 shrink-0 items-center justify-between border-b border-[#E5E7EB] bg-white/70 px-8 backdrop-blur-md xl:px-10">
-            <div className="flex items-center gap-4">
+        <section className="flex min-w-0 flex-1 flex-col">
+          <header className="flex shrink-0 flex-col gap-5 border-b border-[#E5E7EB] bg-white/70 px-6 py-5 backdrop-blur-md md:flex-row md:items-center md:justify-between xl:h-24 xl:px-10 xl:py-0">
+            <div className="flex flex-wrap items-center gap-4">
               <h1 className="text-3xl font-black tracking-[-0.05em]">MyTurn</h1>
               <span className="text-[#D1D5DB]">|</span>
               <p className="text-sm font-black text-[#9CA3AF]">{viewModel.todayLabel}</p>
             </div>
 
-            <div className="flex items-center gap-5">
+            <div className="flex flex-col gap-3 md:flex-row md:items-center md:gap-5">
               <div className="flex items-center gap-3 rounded-[24px] border border-[#FED7AA] bg-[#FFF7ED] px-4 py-3 text-[#EA580C]">
                 <Flame className="h-5 w-5 fill-current" />
                 <span className="text-lg font-black">12 天连胜</span>
@@ -100,17 +100,20 @@ export function HomepageShell({ viewModel }: { viewModel: TodayScheduleViewModel
             </div>
           </header>
 
-          <div className="flex flex-1 gap-8 overflow-hidden p-6 xl:p-8">
+          <div
+            className="flex flex-1 flex-col gap-6 overflow-y-auto p-6 xl:flex-row xl:gap-8 xl:overflow-hidden xl:p-8"
+            data-testid="homepage-content"
+          >
             <motion.section
               animate={{ opacity: 1, y: 0 }}
-              className="flex min-w-0 flex-[2] flex-col overflow-hidden"
+              className="flex min-w-0 flex-1 flex-col overflow-hidden xl:flex-[2]"
               initial={{ opacity: 0, y: 24 }}
               transition={{ duration: 0.35, ease: 'easeOut' }}
               data-testid="hero-card"
             >
               <div className="flex h-full flex-col justify-between rounded-[48px] border border-[#E5E7EB] bg-white p-8 shadow-[0_24px_60px_rgba(15,23,42,0.05)] xl:p-10">
                 <div className="space-y-6">
-                  <div className="flex items-start justify-between gap-6">
+                  <div className="flex flex-col gap-5 md:flex-row md:items-start md:justify-between md:gap-6">
                     <motion.div
                       animate={{
                         boxShadow: [
@@ -127,7 +130,9 @@ export function HomepageShell({ viewModel }: { viewModel: TodayScheduleViewModel
                         className="h-2.5 w-2.5 rounded-full bg-white"
                         transition={{ duration: 1.2, repeat: Number.POSITIVE_INFINITY, ease: 'easeInOut' }}
                       />
-                      <span className="text-sm font-black tracking-tight">正在检票入场</span>
+                      <span className="text-sm font-black tracking-tight">
+                        {focusSession.isRecentlyCompleted ? '刚完成这节课' : '正在检票入场'}
+                      </span>
                     </motion.div>
 
                     <motion.div
@@ -137,11 +142,17 @@ export function HomepageShell({ viewModel }: { viewModel: TodayScheduleViewModel
                       transition={{ delay: 0.08, duration: 0.3, ease: 'easeOut' }}
                     >
                       <p className="text-[10px] font-black uppercase tracking-[0.28em] text-[#9CA3AF]">
-                        距离开课
+                        {focusSession.isRecentlyCompleted ? '本节状态' : '距离开课'}
                       </p>
-                      <p className="mt-2 font-mono text-5xl font-black tracking-[-0.08em] text-[#10B981]">
-                        {extractCountdown(focusSession.countdownLabel)}
-                      </p>
+                      {focusSession.isRecentlyCompleted ? (
+                        <p className="mt-2 text-3xl font-black tracking-[-0.06em] text-[#10B981]">
+                          今天这节课已经上完啦
+                        </p>
+                      ) : (
+                        <p className="mt-2 font-mono text-5xl font-black tracking-[-0.08em] text-[#10B981]">
+                          {extractCountdown(focusSession.countdownLabel)}
+                        </p>
+                      )}
                     </motion.div>
                   </div>
 
@@ -185,7 +196,7 @@ export function HomepageShell({ viewModel }: { viewModel: TodayScheduleViewModel
 
             <motion.aside
               animate={{ opacity: 1, y: 0 }}
-              className="flex min-w-[320px] flex-1 flex-col overflow-hidden"
+              className="flex min-w-0 flex-1 flex-col overflow-hidden xl:min-w-[320px]"
               initial={{ opacity: 0, y: 24 }}
               transition={{ delay: 0.06, duration: 0.35, ease: 'easeOut' }}
               data-testid="session-timeline"
@@ -198,7 +209,7 @@ export function HomepageShell({ viewModel }: { viewModel: TodayScheduleViewModel
                   </span>
                 </div>
 
-                <div className="flex-1 space-y-4 overflow-hidden">
+                <div className="flex-1 space-y-4 overflow-visible xl:overflow-hidden">
                   {viewModel.sessions.map((session) => (
                     <TimelineSessionRow key={session.sessionId} session={session} />
                   ))}
@@ -261,6 +272,7 @@ function TimelineSessionRow({ session }: { session: TodayScheduleSessionViewMode
         animate={{ scale: [1, 1.015, 1] }}
         className="flex items-center gap-4 rounded-[32px] bg-[#10B981] px-6 py-6 text-white shadow-[0_20px_40px_rgba(16,185,129,0.22)]"
         transition={{ duration: 1.8, repeat: Number.POSITIVE_INFINITY, ease: 'easeInOut' }}
+        data-testid={`timeline-session-${session.sessionId}`}
       >
         <span className="w-16 text-2xl font-black tracking-[-0.06em]">{session.startTimeLabel}</span>
         <span className="h-3 w-3 rounded-full bg-white shadow-[0_0_14px_rgba(255,255,255,0.95)]" />
@@ -275,12 +287,19 @@ function TimelineSessionRow({ session }: { session: TodayScheduleSessionViewMode
         'flex items-center gap-4 rounded-[32px] px-6 py-5',
         state.tone === 'completed' && 'bg-[#F3F4F6] opacity-50',
         state.tone === 'upcoming' && 'border-2 border-dashed border-[#E5E7EB] bg-white',
+        state.tone === 'recently-completed' &&
+          'border border-[#A7F3D0] bg-[#ECFDF5] opacity-100 shadow-[0_16px_32px_rgba(16,185,129,0.12)]',
       )}
+      data-testid={`timeline-session-${session.sessionId}`}
     >
       <span
         className={cn(
           'w-16 text-2xl font-black tracking-[-0.06em]',
-          state.tone === 'completed' ? 'text-[#9CA3AF]' : 'text-[#D1D5DB]',
+          state.tone === 'completed'
+            ? 'text-[#9CA3AF]'
+            : state.tone === 'recently-completed'
+              ? 'text-[#047857]'
+              : 'text-[#D1D5DB]',
         )}
       >
         {session.startTimeLabel}
@@ -288,13 +307,21 @@ function TimelineSessionRow({ session }: { session: TodayScheduleSessionViewMode
       <span
         className={cn(
           'h-2.5 w-2.5 rounded-full',
-          state.tone === 'completed' ? 'bg-[#9CA3AF]' : 'bg-[#E5E7EB]',
+          state.tone === 'completed'
+            ? 'bg-[#9CA3AF]'
+            : state.tone === 'recently-completed'
+              ? 'bg-[#10B981]'
+              : 'bg-[#E5E7EB]',
         )}
       />
       <span
         className={cn(
           'font-black',
-          state.tone === 'completed' ? 'text-[#9CA3AF]' : 'text-[#D1D5DB]',
+          state.tone === 'completed'
+            ? 'text-[#9CA3AF]'
+            : state.tone === 'recently-completed'
+              ? 'text-[#047857]'
+              : 'text-[#D1D5DB]',
         )}
       >
         {state.label}
@@ -308,6 +335,10 @@ function extractCountdown(label: string) {
 }
 
 function getTimelineState(session: TodayScheduleSessionViewModel) {
+  if (session.isRecentlyCompleted) {
+    return { label: '刚完成', tone: 'recently-completed' as const };
+  }
+
   if (session.accessState === 'open_for_entry') {
     return { label: '正在入场', tone: 'active' as const };
   }
