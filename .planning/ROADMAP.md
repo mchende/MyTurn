@@ -91,11 +91,12 @@ Verification:
   1. 孩子可以在网页中从头到尾完成一整节课程，无需跳出当前体验。
   2. 后期轮次会要求孩子基于图片作答，而不只是重复老师示范。
   3. 整体体验应更像一节短课，而不是几段分离的练习拼接。
-**Plans**: 2 plans
+**Plans**: 3 plans
 
 Plans:
-- [ ] 05-01-PLAN.md — 建立四段式完整 lesson、老师结课收束与稳定完成态合同
-- [ ] 05-02-PLAN.md — 接通 lesson 自动回首页、首页已完成余温与 full-loop 网页验证
+- [ ] 05-01-PLAN.md — 建立四段式完整 lesson、judged path、中心 pacing 与稳定完成态合同
+- [ ] 05-02-PLAN.md — 建立首页 recently-completed overlay 合同并完成响应式重排
+- [ ] 05-03-PLAN.md — 接通 classroom closeout、lesson 自动回首页与 full-loop 网页验证
 
 ## Progress
 

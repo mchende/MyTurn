@@ -3,7 +3,7 @@ phase: 05
 slug: complete-mvp-lesson
 status: draft
 nyquist_compliant: true
-wave_0_complete: false
+wave_0_complete: true
 created: 2026-04-22
 ---
 
@@ -19,7 +19,7 @@ created: 2026-04-22
 |----------|-------|
 | **Framework** | Vitest + Testing Library + Playwright |
 | **Config file** | `vitest.config.ts` / `playwright.config.ts` |
-| **Quick run command** | `npm run test:unit -- test/unit/classroom-orchestrator.test.ts test/unit/classroom-shell.test.tsx test/unit/classroom-judgment.test.ts test/unit/lesson-schema.test.ts` |
+| **Quick run command** | `npm run test:unit -- test/unit/classroom-orchestrator.test.ts test/unit/classroom-judgment.test.ts test/unit/lesson-schema.test.ts test/unit/get-today-schedule-view-model.test.ts test/unit/homepage-shell.test.tsx` |
 | **Full suite command** | `npm run test:unit && npm run test:e2e` |
 | **Estimated runtime** | ~90-140 seconds |
 
@@ -27,8 +27,8 @@ created: 2026-04-22
 
 ## Sampling Rate
 
-- **After every task commit:** Run `npm run test:unit -- test/unit/classroom-orchestrator.test.ts test/unit/classroom-shell.test.tsx test/unit/classroom-judgment.test.ts test/unit/lesson-schema.test.ts`
-- **After every plan wave:** Run `npm run test:e2e -- test/e2e/guided-speaking-flow.spec.ts test/e2e/classroom-entry.spec.ts` plus the new `test/e2e/complete-mvp-lesson.spec.ts`
+- **After every task commit:** Run the task's focused verify command first; default unit fallback is `npm run test:unit -- test/unit/classroom-orchestrator.test.ts test/unit/classroom-judgment.test.ts test/unit/lesson-schema.test.ts test/unit/get-today-schedule-view-model.test.ts test/unit/homepage-shell.test.tsx`
+- **After every plan wave:** Run that wave's merge gate, with browser-heavy `complete-mvp-lesson.spec.ts` reserved for the final wave
 - **Before `$gsd-verify-work`:** Full suite must be green
 - **Max feedback latency:** 140 seconds
 
@@ -38,10 +38,12 @@ created: 2026-04-22
 
 | Task ID | Plan | Wave | Requirement | Test Type | Automated Command | File Exists | Status |
 |---------|------|------|-------------|-----------|-------------------|-------------|--------|
-| 05-01-01 | 05-01 | 1 | PLAT-02 | unit | `npm run test:unit -- test/unit/classroom-orchestrator.test.ts test/unit/classroom-shell.test.tsx` | ✅ partial | ⬜ pending |
-| 05-01-02 | 05-01 | 1 | SPKG-02 | unit | `npm run test:unit -- test/unit/classroom-orchestrator.test.ts test/unit/classroom-judgment.test.ts test/unit/lesson-schema.test.ts` | ✅ partial | ⬜ pending |
-| 05-02-01 | 05-02 | 2 | PLAT-02 | unit + homepage integration | `npm run test:unit -- test/unit/classroom-shell.test.tsx test/unit/classroom-orchestrator.test.ts test/unit/homepage-shell.test.tsx` | ❌ / ✅ partial | ⬜ pending |
-| 05-02-02 | 05-02 | 2 | SPKG-02, PLAT-02 | e2e smoke | `npm run test:e2e -- test/e2e/classroom-entry.spec.ts test/e2e/guided-speaking-flow.spec.ts test/e2e/complete-mvp-lesson.spec.ts` | ❌ planned in task | ⬜ pending |
+| 05-01-01 | 05-01 | 1 | SPKG-02 | unit | `npm run test:unit -- test/unit/classroom-orchestrator.test.ts test/unit/classroom-judgment.test.ts test/unit/lesson-schema.test.ts` | ✅ partial | ⬜ pending |
+| 05-01-02 | 05-01 | 1 | PLAT-02 | unit | `npm run test:unit -- test/unit/classroom-orchestrator.test.ts` | ✅ partial | ⬜ pending |
+| 05-02-01 | 05-02 | 2 | PLAT-02 | unit | `npm run test:unit -- test/unit/get-today-schedule-view-model.test.ts` | ❌ planned in task | ⬜ pending |
+| 05-02-02 | 05-02 | 2 | PLAT-02 | unit + homepage integration | `npm run test:unit -- test/unit/homepage-shell.test.tsx` | ❌ planned in task | ⬜ pending |
+| 05-03-01 | 05-03 | 3 | PLAT-02 | unit | `npm run test:unit -- test/unit/classroom-orchestrator.test.ts test/unit/teacher-script.test.ts test/unit/classroom-shell.test.tsx` | ✅ / ❌ planned in task | ⬜ pending |
+| 05-03-02 | 05-03 | 3 | SPKG-02, PLAT-02 | focused smoke + e2e | `npm run test:e2e -- test/e2e/guided-speaking-flow.spec.ts && npm run test:e2e -- test/e2e/classroom-entry.spec.ts test/e2e/complete-mvp-lesson.spec.ts` | ✅ / ❌ planned in task | ⬜ pending |
 
 *Status: ⬜ pending · ✅ green · ❌ red · ⚠️ flaky*
 
@@ -49,10 +51,9 @@ created: 2026-04-22
 
 ## Wave 0 Requirements
 
-- [ ] `test/e2e/complete-mvp-lesson.spec.ts` — 覆盖 full lesson loop、reward 停留、3 秒 auto-return 和 homepage completed state
-- [ ] `test/unit/homepage-shell.test.tsx` — 覆盖 completion override 不污染真实 schedule state，且首页中窄视口仍能看到主内容
 - [x] `test/unit/classroom-orchestrator.test.ts` — 已有 guided flow / hint / fallback 基础，可扩展 warmup / closing / completion path
 - [x] `test/unit/classroom-shell.test.tsx` — 已有单 CTA 和 child-safe shell 覆盖，可扩展 lesson completion / homepage handoff contract
+- [x] 现有 Vitest / Playwright 基础设施足以承载新增测试文件；`complete-mvp-lesson.spec.ts` 与 homepage overlay 单测会在 05-02 / 05-03 任务里创建，不需要单独 Wave 0 预埋
 
 ---
 
