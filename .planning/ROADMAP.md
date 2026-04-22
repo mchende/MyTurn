@@ -94,8 +94,8 @@ Verification:
 **Plans**: 2 plans
 
 Plans:
-- [ ] 05-01: 将所有课堂状态整合成连续的 15 分钟课程流程
-- [ ] 05-02: 打磨节奏、过渡和最终 MVP 验证流程
+- [ ] 05-01-PLAN.md — 建立四段式完整 lesson、老师结课收束与稳定完成态合同
+- [ ] 05-02-PLAN.md — 接通 lesson 自动回首页、首页已完成余温与 full-loop 网页验证
 
 ## Progress
 
