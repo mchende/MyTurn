@@ -1,72 +1,46 @@
 ---
 gsd_state_version: 1.0
-milestone: v1.0
-milestone_name: milestone
-status: verified
-stopped_at: Completed 05-VERIFICATION.md
-last_updated: "2026-04-22T08:05:00.000Z"
+milestone: v1.1
+milestone_name: voice-enabled-usable-mvp
+status: planning
+stopped_at: Opened v1.1 Voice-Enabled Usable MVP after v1.0 verification
+last_updated: "2026-04-22T16:40:00.000Z"
 last_activity: 2026-04-22
 progress:
-  total_phases: 5
-  completed_phases: 5
-  total_plans: 16
-  completed_plans: 16
-  percent: 100
+  total_phases: 3
+  completed_phases: 0
+  total_plans: 9
+  completed_plans: 0
+  percent: 0
 ---
 
 # Project State
 
 ## Project Reference
 
-See: .planning/PROJECT.md (updated 2026-04-15)
+See: .planning/PROJECT.md (updated 2026-04-22)
 
 **Core value:** 孩子在整节课里都应真实地感受到自己“正在上一节英语小班课”，并且持续愿意开口说。
-**Current focus:** Milestone verified
+**Current focus:** Start v1.1 voice-enabled usable MVP planning
 
 ## Current Position
 
-Phase: 05 (complete-mvp-lesson) — VERIFIED
-Plan: 3 of 3
-Status: Verification passed
+Phase: 06 (voice-capture-classroom-loop) — NOT STARTED
+Plan: 0 of 3
+Status: Milestone opened, ready for discuss/planning
 Last activity: 2026-04-22
 
-Progress: [██████████] 100%
+Progress: [----------] 0%
 
 ## Performance Metrics
 
-**Velocity:**
+**Carryover milestone:** v1.0 classroom prototype verified on 2026-04-22
 
-- Total plans completed: 10
-- Average duration: 6.6min
-- Total execution time: 1.0 hours
+**Next execution target:**
 
-**By Phase:**
-
-| Phase | Plans | Total | Avg/Plan |
-|-------|-------|-------|----------|
-| 01-classroom-shell | 4 | 20min | 5min |
-| 02-cast-and-orchestration | 3 | 26min | 8.7min |
-| 03-guided-speaking-flow | 3 | 25min | 8.3min |
-
-**Recent Trend:**
-
-- Last 5 plans: 02-02, 02-03, 03-01, 03-02, 03-03
-- Trend: Stable
-
-| Phase 01-classroom-shell P03 | 6min | 1 tasks | 10 files |
-| Phase 01-classroom-shell P04 | 6min | 1 tasks | 10 files |
-| Phase 02-cast-and-orchestration P01 | 10min | 2 tasks | 4 files |
-| Phase 02-cast-and-orchestration P02 | 4min | 2 tasks | 5 files |
-| Phase 02-cast-and-orchestration P03 | 12min | 3 tasks | 9 files |
-| Phase 03-guided-speaking-flow P01 | 5min | 2 tasks | 4 files |
-| Phase 03 P02 | 8min | 2 tasks | 10 files |
-| Phase 03-guided-speaking-flow P03 | 12min | 2 tasks | 8 files |
-| Phase 04 P01 | 6min | 2 tasks | 7 files |
-| Phase 04-hints-and-judgment P02 | 9min | 2 tasks | 10 files |
-| Phase 04-hints-and-judgment P03 | 12min | 2 tasks | 8 files |
-| Phase 05 P01 | 6m | 2 tasks | 7 files |
-| Phase 05 P02 | 8m | 2 tasks | 6 files |
-| Phase 05 P03 | 19m | 2 tasks | 10 files |
+- Start Phase 06 discussion/planning
+- Confirm browser speech capture and transcription strategy
+- Preserve existing classroom contracts while adding real voice input
 
 ## Accumulated Context
 
@@ -75,56 +49,27 @@ Progress: [██████████] 100%
 决策完整记录在 PROJECT.md 的 Key Decisions 表格中。
 当前影响后续工作的近期决策：
 
-- Phase 1: 采用网页优先的 MVP 形态，优先验证课堂感而不是平台封装
-- Phase 1: 固定角色为 1 位老师、1 个真实孩子、1 个 AI 同学
-- Phase 1: 课程推进需从复述逐步过渡到看图作答
-- [Phase 01-classroom-shell]: Use Plus Jakarta Sans and Manrope token fallbacks to match the approved UI contract while keeping classroom-focused body and display font variables.
-- [Phase 01-classroom-shell]: Scope Vitest to test/unit so placeholder Playwright specs do not break the unit runner.
-- [Phase 01-classroom-shell]: Keep Wave 0 tests intentionally skipped with explicit handoff comments instead of fake passing assertions.
-- [Phase 01-classroom-shell]: Keep lesson stages fixed in schema and let pages consume exported contracts instead of redefining stage IDs.
-- [Phase 01-classroom-shell]: Model entry timing as a pure selector plus a day-session builder so homepage and lesson routes share one access-state rule.
-- [Phase 01-classroom-shell]: Seed week-01 lesson content locally with parsed TS modules and stable SVG assets to support image-first classroom screens.
-- [Phase 01-classroom-shell]: Move the homepage shell into src/app/(marketing)/page.tsx so the real root route follows the Stitch schedule contract.
-- [Phase 01-classroom-shell]: Homepage data is mapped into a server-safe schedule view-model before rendering cards and CTA state.
-- [Phase 01-classroom-shell]: Keep mobile top bar and desktop left rail in parallel so 主页 and 设置 remain reachable across breakpoints.
-- [Phase 01-classroom-shell]: Resolve `/lesson/[sessionId]` from the seeded weekday schedule and keep unknown sessions on `notFound()` rather than rendering a broken classroom shell.
-- [Phase 01-classroom-shell]: Run Playwright against an isolated dedicated dev-server port because Next.js blocks concurrent repo-local `next dev` instances during smoke validation.
-- [Phase 02-cast-and-orchestration]: Use a reducer-driven classroom orchestrator so teacher-led turn order and silence handling live in one deterministic state graph.
-- [Phase 02-cast-and-orchestration]: Keep target words out of the child-facing classroom surface by default and expose them only behind debug metadata.
-- [Phase 02-cast-and-orchestration]: Let Bobby demo only in the `ai_model` phase with mild hesitation, while silence recovery remains teacher-owned.
-- [Phase 03-guided-speaking-flow]: Derive guided speaking progress from lesson.stages so repeat-after-teacher fully completes before picture-talk begins.
-- [Phase 03-guided-speaking-flow]: Use student_participation_confirmed as the only speaking success signal instead of exposing auto-speech semantics in the hook API.
-- [Phase 03-guided-speaking-flow]: Keep useClassroomOrchestrator on one centralized CLASSROOM_TIMINGS scheduler while exposing stage metadata directly to shell consumers.
-- [Phase 03]: Render teacher visible copy from visibleCaption while preserving spokenModel for stage audio contracts.
-- [Phase 03]: Keep participation confirmation as a single podium CTA with stage-specific labels instead of adding extra shell chrome.
-- [Phase 03]: Restrict Bobby to repeat-after-teacher ai_model turns so picture-talk retries remain teacher-owned.
-- [Phase 03-guided-speaking-flow]: Keep picture-talk retry handling inside teacher_encourage, branching by attemptIndex between second chance and close-out.
-- [Phase 03-guided-speaking-flow]: Expose board badge and prompt as stable DOM nodes so stage upgrades can be asserted in unit and browser tests.
-- [Phase 04]: Keep attemptIndex as learner-turn index only, and split retry semantics into hintLevel plus turnResolution.
-- [Phase 04]: Drive repeat and picture first-failure handling through the existing reducer and single timeout effect instead of adding a parallel hint controller.
-- [Phase 04]: Pass retry context into the podium view-model so picture-talk can switch from observe hint to narrowed re-ask without adding a second CTA.
-- [Phase 04-hints-and-judgment]: Keep judged attempts behind a pure classroom-judgment adapter and let the reducer consume only pass/retry/fallback.
-- [Phase 04-hints-and-judgment]: Author repeatAccepts and pictureTalk.semanticAccepts in lesson content instead of hardcoding vocabulary in reducer branches.
-- [Phase 04-hints-and-judgment]: Preserve confirmStudentParticipation as a hook-level compatibility alias that dispatches submitStudentAttempt with a stage-safe canonical transcript.
-- [Phase 04-hints-and-judgment]: Reuse teacher_echo as the final follow phase and keep the only child-facing button label as I said it with Cora.
-- [Phase 05]: Keep warmup and wrap-up outside GUIDED_STAGE_IDS so judged speaking stays limited to repeat-after-teacher and picture-talk.
-- [Phase 05]: Derive demo and test pacing from CLASSROOM_TIMING_PROFILES and export LESSON_COMPLETE_HOLD_MS = 3000 as the shared closeout contract.
-- [Phase 05]: Expose lesson_complete state and hold timing from useClassroomOrchestrator so downstream closeout UI can consume one stable contract.
-- [Phase 05]: Keep recently-completed as a homepage overlay instead of extending the real schedule access-state enum.
-- [Phase 05]: Let ClassroomShell own the only lesson-complete redirect timer and return straight to `/?completedSession=...`.
-- [Phase 05]: Keep picture-talk success feedback to one short `Nice answer.` so the class keeps moving.
+- `v1.0` 的 1-5 阶段保留为“课堂原型已验证”，不回滚既有完成状态
+- `v1.1` 只补语音可用化，不重做 lesson state machine、homepage overlay 或 closeout flow
+- Bobby 仍只在 `repeat-after-teacher` 的 `ai_model` 出现
+- reward 仍只在结尾出现一次
+- 课堂完成态仍停留约 3 秒后自动回首页
+- 首页与课堂页继续优先保证完整可见或可滚动，不再依赖固定三栏加裁切布局
 
 ### Pending Todos
 
-暂无。
+- 确定浏览器语音采集与转写技术路线
+- 规划语音失败、无权限、静音和延迟过高时的课堂兜底策略
+- 定义最小 focused unit / e2e 验证集合，覆盖真实语音闭环
 
 ### Blockers/Concerns
 
-- 语音采集、转写和响应延迟方案仍需在技术规划阶段明确
-- 网页语音采集、转写和实时响应延迟方案仍需在 Phase 3/4 技术规划中继续明确
+- 浏览器端麦克风权限、录音 API 与平板横屏设备兼容性仍需确认
+- 语音转写与课堂反馈的延迟上限需要在 Phase 6/7 中尽快量化
+- 若浏览器原生语音能力不稳定，需尽早决定服务端或第三方转写方案
 
 ## Session Continuity
 
-Last session: 2026-04-22T08:05:00.000Z
-Stopped at: Completed 05-VERIFICATION.md
-Resume file: .planning/phases/05-complete-mvp-lesson/05-VERIFICATION.md
+Last session: 2026-04-22
+Stopped at: Opened v1.1 Voice-Enabled Usable MVP
+Resume file: .planning/ROADMAP.md
