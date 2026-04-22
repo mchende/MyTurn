@@ -75,7 +75,7 @@ describe('classroom judgment', () => {
     });
   });
 
-  it('matches picture talk against semantic accept sets and escalates to fallback on the second miss', () => {
+  it('matches picture-talk only through lesson metadata semanticAccepts and escalates to fallback on the second miss', () => {
     expect(
       judgeStudentAttempt({
         lessonItem: appleItem,
@@ -127,6 +127,13 @@ describe('classroom judgment', () => {
       normalizedTranscript: 'banana',
       matchedAgainst: null,
     });
+
+    expect(
+      buildCanonicalManualTranscript({
+        currentItem: appleItem,
+        stageId: 'picture-talk',
+      }),
+    ).toBe(appleItem.pictureTalk?.semanticAccepts[0]);
   });
 
   it('builds a canonical manual transcript from lesson content for compatibility submits', () => {

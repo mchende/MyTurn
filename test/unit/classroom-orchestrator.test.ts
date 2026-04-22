@@ -5,7 +5,9 @@ import { lessonWeek01Lesson01 } from '../../content/lessons/week-01/lesson-01';
 import { buildCanonicalManualTranscript } from '@/features/classroom-shell/classroom-judgment';
 import {
   CLASSROOM_TIMINGS,
+  CLASSROOM_TIMING_PROFILES,
   GUIDED_STAGE_IDS,
+  LESSON_COMPLETE_HOLD_MS,
   buildGuidedStageRuns,
   classroomOrchestratorReducer,
   createInitialClassroomState,
@@ -35,8 +37,15 @@ describe('classroomOrchestratorReducer', () => {
     expect(state.currentStageId).toBe('repeat-after-teacher');
     expect(state.currentStageIndex).toBe(0);
     expect(state.currentStageItemIndex).toBe(0);
-    expect(state.phase).toBe('teacher_prompt');
+    expect(state.phase).toBe('warmup');
     expect(state.currentItemIndex).toBe(0);
+    expect(state.activeSpeaker).toBe('teacher');
+    expect(state.activeSeat).toBe(null);
+
+    state = classroomOrchestratorReducer(state, { type: 'phase_timer_completed' });
+
+    expect(state.phase).toBe('teacher_prompt');
+    expect(state.currentItem.id).toBe('apple');
     expect(state.activeSpeaker).toBe('teacher');
     expect(state.activeSeat).toBe(null);
 
@@ -165,6 +174,58 @@ describe('classroomOrchestratorReducer', () => {
     state = classroomOrchestratorReducer(state, { type: 'reward_visibility_changed', visible: true });
 
     expect(state.rewardVisible).toBe(true);
+  });
+
+  it('runs warmup, both guided stages, and the closing chain without adding warmup or wrap-up into the judged queue', () => {
+    let state = createInitialClassroomState(lessonWeek01Lesson01);
+
+    expect(state.phase).toBe('warmup');
+    expect(state.guidedStageRuns).toHaveLength(2);
+    expect(state.guidedStageRuns.map((stageRun) => stageRun.stageId)).toEqual([
+      'repeat-after-teacher',
+      'picture-talk',
+    ]);
+
+    state = classroomOrchestratorReducer(state, { type: 'phase_timer_completed' });
+    expect(state.phase).toBe('teacher_prompt');
+
+    state = completeLessonThroughFinalPictureItem(state);
+
+    expect(state.currentStageId).toBe('picture-talk');
+    expect(state.phase).toBe('wrap_up');
+    expect(state.rewardVisible).toBe(false);
+
+    state = classroomOrchestratorReducer(state, { type: 'phase_timer_completed' });
+
+    expect(state.phase).toBe('completion_reward');
+    expect(state.rewardVisible).toBe(true);
+
+    state = classroomOrchestratorReducer(state, { type: 'phase_timer_completed' });
+
+    expect(state.phase).toBe('lesson_complete');
+    expect(state.rewardVisible).toBe(false);
+    expect(LESSON_COMPLETE_HOLD_MS).toBe(3000);
+
+    const settledState = classroomOrchestratorReducer(state, {
+      type: 'phase_timer_completed',
+    });
+
+    expect(settledState).toEqual(state);
+  });
+
+  it('derives demo and test pacing from one central timing profile source', () => {
+    expect(CLASSROOM_TIMINGS).toEqual(CLASSROOM_TIMING_PROFILES.demo);
+    expect(CLASSROOM_TIMING_PROFILES.demo).toMatchObject({
+      warmup: 2400,
+      wrap_up: 2200,
+      completion_reward: 1400,
+    });
+    expect(CLASSROOM_TIMING_PROFILES.test.warmup).toBeLessThan(
+      CLASSROOM_TIMING_PROFILES.demo.warmup,
+    );
+    expect(CLASSROOM_TIMING_PROFILES.test.completion_reward).toBeLessThan(
+      CLASSROOM_TIMING_PROFILES.demo.completion_reward,
+    );
   });
 
   it('gives picture-talk one retry before returning to a second student attempt', () => {
@@ -343,7 +404,7 @@ describe('useClassroomOrchestrator', () => {
       }),
     );
 
-    expect(result.current.phase).toBe('teacher_prompt');
+    expect(result.current.phase).toBe('warmup');
     expect(result.current.currentItemIndex).toBe(0);
     expect(result.current.currentItem.id).toBe('apple');
     expect(result.current.currentStageId).toBe('repeat-after-teacher');
@@ -520,6 +581,8 @@ function moveToPictureTalkStudentWait() {
   const lesson = lessonWeek01Lesson01;
   let state = createInitialClassroomState(lesson);
 
+  state = classroomOrchestratorReducer(state, { type: 'phase_timer_completed' });
+
   for (let index = 0; index < lesson.items.length; index += 1) {
     state = classroomOrchestratorReducer(state, { type: 'phase_timer_completed' });
     state = classroomOrchestratorReducer(state, { type: 'phase_timer_completed' });
@@ -531,6 +594,35 @@ function moveToPictureTalkStudentWait() {
   state = classroomOrchestratorReducer(state, { type: 'phase_timer_completed' });
 
   return state;
+}
+
+function completeLessonThroughFinalPictureItem(
+  state: ReturnType<typeof createInitialClassroomState>,
+) {
+  let currentState = state;
+  const totalTurns = lessonWeek01Lesson01.items.length * 2;
+
+  for (let index = 0; index < totalTurns; index += 1) {
+    currentState = classroomOrchestratorReducer(currentState, {
+      type: 'phase_timer_completed',
+    });
+
+    if (currentState.phase === 'ai_model') {
+      currentState = classroomOrchestratorReducer(currentState, {
+        type: 'phase_timer_completed',
+      });
+    }
+
+    currentState = submitCanonicalAttempt(currentState);
+    currentState = classroomOrchestratorReducer(currentState, {
+      type: 'phase_timer_completed',
+    });
+    currentState = classroomOrchestratorReducer(currentState, {
+      type: 'phase_timer_completed',
+    });
+  }
+
+  return currentState;
 }
 
 function submitCanonicalAttempt(

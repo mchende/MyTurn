@@ -366,6 +366,38 @@ describe('lesson schema contracts', () => {
     ]);
   });
 
+  it('keeps picture-talk semanticAccepts in lesson metadata so judged speaking can consume them directly', () => {
+    const lesson = loadLesson('week-01-lesson-01');
+
+    expect(
+      lesson.items.map((item) => ({
+        id: item.id,
+        semanticAccepts: item.pictureTalk?.semanticAccepts,
+      })),
+    ).toEqual([
+      {
+        id: 'apple',
+        semanticAccepts: ['apple', 'an apple', 'red apple'],
+      },
+      {
+        id: 'banana',
+        semanticAccepts: ['banana', 'a banana', 'yellow banana'],
+      },
+      {
+        id: 'cat',
+        semanticAccepts: ['cat', 'a cat', 'orange cat'],
+      },
+      {
+        id: 'dog',
+        semanticAccepts: ['dog', 'a dog', 'brown dog'],
+      },
+      {
+        id: 'sun',
+        semanticAccepts: ['sun', 'the sun', 'yellow sun'],
+      },
+    ]);
+  });
+
   it('parses the default weekday schedule seed for 15-minute sessions', () => {
     expect(defaultWeekdayScheduleTemplate.slots).toHaveLength(3);
     expect(
