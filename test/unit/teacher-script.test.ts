@@ -110,6 +110,55 @@ describe('teacher-script', () => {
     });
   });
 
+  it('locks warmup, wrap-up, and lesson-complete copy to the closeout contract', () => {
+    const warmupLine = getTeacherScriptLine({
+      currentItemIndex: 0,
+      attemptIndex: 0,
+      participationState: 'idle',
+      phase: 'warmup',
+      stageId: 'repeat-after-teacher',
+      targetText,
+    });
+    const wrapUpLine = getTeacherScriptLine({
+      currentItemIndex: 0,
+      attemptIndex: 0,
+      participationState: 'idle',
+      phase: 'wrap_up',
+      stageId: 'picture-talk',
+      targetText,
+    });
+    const completeLine = getTeacherScriptLine({
+      currentItemIndex: 0,
+      attemptIndex: 0,
+      participationState: 'idle',
+      phase: 'lesson_complete',
+      stageId: 'picture-talk',
+      targetText,
+    });
+
+    expect(warmupLine.hintLabel).toBe('Class hello');
+    expect(warmupLine.visibleCaption).toBe('Hello, class. Cora is here.');
+    expect(wrapUpLine.hintLabel).toBe('Class closing');
+    expect(wrapUpLine.visibleCaption).toBe('Great work today. Class is all done.');
+    expect(completeLine.hintLabel).toBe('Class complete');
+    expect(completeLine.visibleCaption).toBe('You finished class. See you next time.');
+  });
+
+  it('uses one short Nice answer line for picture-talk success feedback', () => {
+    const line = getTeacherScriptLine({
+      currentItemIndex: 0,
+      attemptIndex: 1,
+      participationState: 'spoke',
+      phase: 'teacher_feedback',
+      stageId: 'picture-talk',
+      targetText,
+    });
+
+    expect(line.visibleCaption).toBe('Nice answer.');
+    expect(line.spokenModel).toBe('Nice answer.');
+    expect(line.hintLabel).toBe('Short praise');
+  });
+
   it('keeps repeat fallback targets in spokenModel only and never in visibleCaption', () => {
     const appleItem = lessonWeek01Lesson01.items[0];
     const line = getTeacherScriptLine({

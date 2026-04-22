@@ -38,14 +38,9 @@ const SHARED_VARIANTS: Record<
 > = {
   warmup: [
     {
-      hintLabel: 'Class warmup',
-      spokenModel: 'Hello class. Eyes here and voices ready.',
-      visibleCaption: 'Hello class. Eyes here and voices ready.',
-    },
-    {
-      hintLabel: 'Ready together',
-      spokenModel: 'Welcome back. We will start together.',
-      visibleCaption: 'Welcome back. We will start together.',
+      hintLabel: 'Class hello',
+      spokenModel: 'Hello, class. Cora is here.',
+      visibleCaption: 'Hello, class. Cora is here.',
     },
   ],
   ai_model: [
@@ -91,14 +86,9 @@ const SHARED_VARIANTS: Record<
   ],
   wrap_up: [
     {
-      hintLabel: 'Class done',
-      spokenModel: 'Class is all done. See you next time.',
-      visibleCaption: 'Class is all done. See you next time.',
-    },
-    {
-      hintLabel: 'Wave goodbye',
-      spokenModel: 'You worked hard today. Wave goodbye.',
-      visibleCaption: 'You worked hard today. Wave goodbye.',
+      hintLabel: 'Class closing',
+      spokenModel: 'Great work today. Class is all done.',
+      visibleCaption: 'Great work today. Class is all done.',
     },
   ],
   completion_reward: [
@@ -110,9 +100,9 @@ const SHARED_VARIANTS: Record<
   ],
   lesson_complete: [
     {
-      hintLabel: 'See you next time',
-      spokenModel: 'See you next time.',
-      visibleCaption: 'See you next time.',
+      hintLabel: 'Class complete',
+      spokenModel: 'You finished class. See you next time.',
+      visibleCaption: 'You finished class. See you next time.',
     },
   ],
 };
@@ -207,6 +197,14 @@ function resolveStageAwareVariant({
 
   if (phase === 'teacher_echo') {
     return getFinalFollowLine(currentItemIndex);
+  }
+
+  if (phase === 'teacher_feedback' && stageId === 'picture-talk') {
+    return {
+      hintLabel: 'Short praise',
+      spokenModel: 'Nice answer.',
+      visibleCaption: 'Nice answer.',
+    };
   }
 
   return pickVariant(SHARED_VARIANTS[phase], currentItemIndex);

@@ -154,7 +154,7 @@ function getStageBadge({
   }
 
   if (phase === 'completion_reward') {
-    return rewardVisible ? 'Reward time' : 'Class complete';
+    return 'Reward time';
   }
 
   if (phase === 'warmup') {
@@ -188,7 +188,7 @@ function getStagePrompt({
 }) {
   switch (phase) {
     case 'warmup':
-      return 'Class warmup. Cora is getting everyone ready.';
+      return 'Say hello. Class is starting.';
     case 'teacher_prompt':
       return stageId === 'picture-talk'
         ? 'Look at the picture. A question is coming.'
@@ -220,11 +220,11 @@ function getStagePrompt({
     case 'move_next':
       return 'Eyes on the next picture.';
     case 'wrap_up':
-      return 'Class is done. Time to wave goodbye.';
+      return 'Cora is saying goodbye.';
     case 'completion_reward':
-      return 'Great job. Class is wrapping up.';
+      return 'Celebrate this brave lesson.';
     case 'lesson_complete':
-      return 'Class complete. See you next time.';
+      return 'See you next time.';
     default:
       return '';
   }

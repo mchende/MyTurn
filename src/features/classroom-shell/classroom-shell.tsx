@@ -1,5 +1,7 @@
 'use client';
 
+import { useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import { Settings2, Sparkles, Volume2, X } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -8,7 +10,10 @@ import type { Lesson } from '@/features/lesson-config/lesson-schema';
 import { LessonBoard } from './lesson-board';
 import type { PodiumViewModel } from './podium-view-model';
 import { StudentSeatStrip } from './student-seat-strip';
-import { useClassroomOrchestrator } from './use-classroom-orchestrator';
+import {
+  LESSON_COMPLETE_HOLD_MS,
+  useClassroomOrchestrator,
+} from './use-classroom-orchestrator';
 
 type ClassroomShellProps = {
   lesson: Lesson;
@@ -25,10 +30,23 @@ export function ClassroomShell({
   sessionStatus,
   showReward = false,
 }: ClassroomShellProps) {
+  const router = useRouter();
   const classroom = useClassroomOrchestrator({
     lesson,
     showReward,
   });
+
+  useEffect(() => {
+    if (classroom.phase !== 'lesson_complete') {
+      return;
+    }
+
+    const timer = window.setTimeout(() => {
+      router.replace(`/?completedSession=${sessionId}`, { scroll: false });
+    }, LESSON_COMPLETE_HOLD_MS);
+
+    return () => window.clearTimeout(timer);
+  }, [classroom.phase, router, sessionId]);
 
   return (
     <main className="relative h-screen overflow-hidden bg-[#0F172A] px-4 py-4 text-white lg:px-6 lg:py-6">
@@ -85,7 +103,7 @@ export function ClassroomShell({
         </div>
       </div>
 
-      <CelebrateOverlay show={classroom.rewardVisible} />
+      <CelebrateOverlay show={showReward || classroom.rewardVisible} />
     </main>
   );
 }

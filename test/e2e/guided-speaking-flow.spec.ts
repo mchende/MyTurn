@@ -31,6 +31,13 @@ test('guided speaking upgrades from repeat-after-teacher into picture-talk on th
     timeout: 8_000,
   });
   await expect(page.getByTestId('classroom-stage')).not.toContainText(/^apple$/i);
+
+  await page.getByRole('button', { name: 'I answered' }).click();
+
+  await expect(page.getByText('Nice answer.')).toBeVisible();
+  await expect(page.getByTestId('lesson-stage-badge')).toHaveText('Picture talk · 2/5', {
+    timeout: 8_000,
+  });
 });
 
 test('guided speaking fallback path keeps one CTA and no answer leakage', async ({

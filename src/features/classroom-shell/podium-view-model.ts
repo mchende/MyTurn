@@ -128,7 +128,7 @@ function getPodiumCaption(
 
   switch (phase) {
     case 'warmup':
-      return 'Class warmup';
+      return 'Class hello';
     case 'teacher_prompt':
       return stageId === 'picture-talk'
         ? 'Look first. Answer next.'
@@ -180,7 +180,7 @@ function getPodiumStatus({
 
   switch (phase) {
     case 'warmup':
-      return 'Cora is bringing the class in.';
+      return 'Class hello';
     case 'teacher_prompt':
       return stageId === 'picture-talk'
         ? 'Look carefully. A question is coming.'
@@ -210,11 +210,11 @@ function getPodiumStatus({
     case 'move_next':
       return 'Next picture is loading.';
     case 'wrap_up':
-      return 'Class is all done.';
+      return 'Class closing';
     case 'completion_reward':
       return 'Great job, brave voice.';
     case 'lesson_complete':
-      return 'Class complete. See you next time.';
+      return 'Class complete';
     default:
       return 'Stay with the class rhythm.';
   }

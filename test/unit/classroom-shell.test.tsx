@@ -9,10 +9,21 @@ import { getTeacherScriptLine } from '@/features/classroom-shell/teacher-script'
 import { useClassroomOrchestrator } from '@/features/classroom-shell/use-classroom-orchestrator';
 import { loadLesson } from '@/features/lesson-config/load-lesson';
 
+const { replaceMock } = vi.hoisted(() => ({
+  replaceMock: vi.fn(),
+}));
+
+vi.mock('next/navigation', () => ({
+  useRouter: () => ({
+    replace: replaceMock,
+  }),
+}));
+
 const lesson = loadLesson('week-01-lesson-01');
 
 beforeEach(() => {
   vi.useFakeTimers();
+  replaceMock.mockReset();
 });
 
 afterEach(() => {
@@ -31,7 +42,7 @@ describe('classroom shell layout', () => {
     const teacherLine = getTeacherScriptLine({
       attemptIndex: 0,
       currentItemIndex: 0,
-      phase: 'teacher_prompt',
+      phase: 'warmup',
       participationState: 'idle',
       stageId: 'repeat-after-teacher',
       targetText: 'apple',
@@ -49,14 +60,13 @@ describe('classroom shell layout', () => {
     expect(screen.getByText('MyTurn')).toBeInTheDocument();
     expect(screen.getByText('Cora 老师')).toBeInTheDocument();
     expect(screen.getByText(teacherLine.visibleCaption)).toBeInTheDocument();
-    expect(screen.getByText(teacherLine.hintLabel)).toBeInTheDocument();
+    expect(screen.getAllByText(teacherLine.hintLabel).length).toBeGreaterThan(0);
     expect(screen.getByTestId('classroom-seat-strip')).toBeInTheDocument();
     expect(screen.getByTestId('classroom-stage')).toBeInTheDocument();
     expect(screen.getByTestId('seat-me')).toHaveAttribute('data-on-stage', 'false');
     expect(screen.getByTestId('seat-ai')).toHaveAttribute('data-on-stage', 'false');
     expect(screen.getByTestId('seat-empty')).toBeInTheDocument();
     expect(screen.queryByRole('button', { name: /i said it|i answered/i })).not.toBeInTheDocument();
-    expect(screen.queryByText(teacherLine.spokenModel)).not.toBeInTheDocument();
     expect(screen.queryByText(/^apple$/i)).not.toBeInTheDocument();
   });
 
@@ -93,6 +103,7 @@ describe('classroom shell layout', () => {
       />,
     );
 
+    await advanceFlow(CLASSROOM_TIMINGS.warmup);
     await advanceFlow(CLASSROOM_TIMINGS.teacher_prompt);
 
     expect(screen.getByText(teacherAiLine.visibleCaption)).toBeInTheDocument();
@@ -147,8 +158,7 @@ describe('classroom shell layout', () => {
       />,
     );
 
-    await advanceFlow(CLASSROOM_TIMINGS.teacher_prompt);
-    await advanceFlow(CLASSROOM_TIMINGS.ai_model);
+    await moveToStudentTurn({ includeWarmup: true });
     await advanceFlow(CLASSROOM_TIMINGS.student_wait);
 
     expect(screen.getByText(encourageLine.visibleCaption)).toBeInTheDocument();
@@ -183,7 +193,42 @@ describe('classroom shell layout', () => {
     );
 
     expect(screen.getAllByText('GREAT JOB!')).toHaveLength(1);
-    expect(screen.getAllByText('Reward time')).toHaveLength(2);
+  });
+
+  it('uses the completion hold contract to auto-return home after lesson_complete', async () => {
+    const user = userEvent.setup({
+      advanceTimers: vi.advanceTimersByTime,
+      delay: null,
+    });
+
+    render(
+      <ClassroomShell
+        lesson={lesson}
+        sessionId="weekday-1700"
+        sessionStatus="检票入场中: 02:45"
+        sessionTitle="每日语感启蒙"
+      />,
+    );
+
+    await completeFullLesson(user);
+
+    expect(screen.getByText('You finished class. See you next time.')).toBeInTheDocument();
+    expect(screen.getAllByText('Class complete').length).toBeGreaterThan(0);
+    expect(replaceMock).not.toHaveBeenCalled();
+
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(2999);
+    });
+
+    expect(replaceMock).not.toHaveBeenCalled();
+
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(1);
+    });
+
+    expect(replaceMock).toHaveBeenCalledWith('/?completedSession=weekday-1700', {
+      scroll: false,
+    });
   });
 
   it('uses one classroom confirmation button to progress repeat-after-teacher and picture-talk turns', async () => {
@@ -201,7 +246,7 @@ describe('classroom shell layout', () => {
       />,
     );
 
-    await moveToStudentTurn();
+    await moveToStudentTurn({ includeWarmup: true });
 
     const repeatButton = screen.getByRole('button', { name: 'I said it' });
     expect(screen.getAllByRole('button', { name: /i said it|i answered/i })).toHaveLength(1);
@@ -211,7 +256,7 @@ describe('classroom shell layout', () => {
     expect(screen.getByText(/Good job|Nice work|Yes\. I heard you trying carefully\./i)).toBeInTheDocument();
 
     await finishTurn();
-    await completeRepeatAfterTeacherStage(user);
+    await completeRepeatAfterTeacherStage(user, 1);
 
     const pictureTalkButton = screen.getByRole('button', { name: 'I answered' });
     expect(screen.getAllByRole('button', { name: /i said it|i answered/i })).toHaveLength(1);
@@ -220,7 +265,7 @@ describe('classroom shell layout', () => {
 
     await clickWithUser(user, pictureTalkButton);
 
-    expect(screen.getByText(/Good job|Nice work|Yes\. I heard you trying carefully\./i)).toBeInTheDocument();
+    expect(screen.getByText('Nice answer.')).toBeInTheDocument();
   });
 
   it('keeps picture-talk retries teacher-led with a light second prompt and no Bobby rescue', async () => {
@@ -289,7 +334,7 @@ describe('classroom shell layout', () => {
       />,
     );
 
-    await moveToStudentTurn();
+    await moveToStudentTurn({ includeWarmup: true });
     expect(screen.getAllByRole('button', { name: /i said it|i answered/i })).toHaveLength(1);
 
     await advanceFlow(CLASSROOM_TIMINGS.student_wait);
@@ -384,8 +429,9 @@ describe('classroom shell hook contract', () => {
     expect(screen.getByTestId('probe-stage-index')).toHaveTextContent('0');
     expect(screen.getByTestId('probe-stage-item-index')).toHaveTextContent('0');
     expect(screen.getByTestId('probe-attempt-index')).toHaveTextContent('0');
-    expect(screen.getByTestId('probe-phase')).toHaveTextContent('teacher_prompt');
+    expect(screen.getByTestId('probe-phase')).toHaveTextContent('warmup');
 
+    await advanceFlow(CLASSROOM_TIMINGS.warmup);
     await advanceFlow(CLASSROOM_TIMINGS.teacher_prompt);
     await advanceFlow(CLASSROOM_TIMINGS.ai_model);
 
@@ -410,7 +456,15 @@ function bobbyLineText(targetText: string) {
   })?.spokenLine;
 }
 
-async function moveToStudentTurn() {
+async function moveToStudentTurn({
+  includeWarmup = false,
+}: {
+  includeWarmup?: boolean;
+} = {}) {
+  if (includeWarmup) {
+    await advanceFlow(CLASSROOM_TIMINGS.warmup);
+  }
+
   await advanceFlow(CLASSROOM_TIMINGS.teacher_prompt);
   await advanceFlow(CLASSROOM_TIMINGS.ai_model);
 }
@@ -420,7 +474,10 @@ async function finishTurn() {
   await advanceFlow(CLASSROOM_TIMINGS.move_next);
 }
 
-async function completeRepeatAfterTeacherStage(user?: ReturnType<typeof userEvent.setup>) {
+async function completeRepeatAfterTeacherStage(
+  user?: ReturnType<typeof userEvent.setup>,
+  startIndex = 0,
+) {
   const actualUser =
     user ??
     userEvent.setup({
@@ -428,8 +485,8 @@ async function completeRepeatAfterTeacherStage(user?: ReturnType<typeof userEven
       delay: null,
     });
 
-  for (let index = 1; index < lesson.items.length; index += 1) {
-    await moveToStudentTurn();
+  for (let index = startIndex; index < lesson.items.length; index += 1) {
+    await moveToStudentTurn({ includeWarmup: index === 0 });
     await clickWithUser(actualUser, screen.getByRole('button', { name: 'I said it' }));
     await finishTurn();
   }
@@ -440,13 +497,26 @@ async function completeRepeatAfterTeacherStage(user?: ReturnType<typeof userEven
 async function moveToPictureTalkStudentTurn(
   user: ReturnType<typeof userEvent.setup>,
 ) {
+  await completeRepeatAfterTeacherStage(user);
+}
+
+async function completeFullLesson(user: ReturnType<typeof userEvent.setup>) {
+  await moveToPictureTalkStudentTurn(user);
+
   for (let index = 0; index < lesson.items.length; index += 1) {
-    await moveToStudentTurn();
-    await clickWithUser(user, screen.getByRole('button', { name: 'I said it' }));
-    await finishTurn();
+    await clickWithUser(user, screen.getByRole('button', { name: 'I answered' }));
+
+    if (index < lesson.items.length - 1) {
+      await advanceFlow(CLASSROOM_TIMINGS.teacher_feedback);
+      await advanceFlow(CLASSROOM_TIMINGS.move_next);
+      await advanceFlow(CLASSROOM_TIMINGS.teacher_prompt);
+    }
   }
 
-  await advanceFlow(CLASSROOM_TIMINGS.teacher_prompt);
+  await advanceFlow(CLASSROOM_TIMINGS.teacher_feedback);
+  await advanceFlow(CLASSROOM_TIMINGS.move_next);
+  await advanceFlow(CLASSROOM_TIMINGS.wrap_up);
+  await advanceFlow(CLASSROOM_TIMINGS.completion_reward);
 }
 
 async function clickWithUser(

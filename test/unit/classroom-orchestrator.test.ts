@@ -445,9 +445,7 @@ describe('useClassroomOrchestrator', () => {
     expect(result.current.completionHoldMs).toBe(LESSON_COMPLETE_HOLD_MS);
     expect(result.current.isLessonComplete).toBe(false);
     expect(result.current.stageBadge).toBe('Class warmup');
-    expect(result.current.stagePrompt).toBe(
-      'Class warmup. Cora is getting everyone ready.',
-    );
+    expect(result.current.stagePrompt).toBe('Say hello. Class is starting.');
   });
 
   it('only advances to teacher_feedback when submitStudentAttempt or the compatibility alias is called during student_wait', async () => {
@@ -663,7 +661,7 @@ describe('useClassroomOrchestrator', () => {
 
     expect(result.current.phase).toBe('wrap_up');
     expect(result.current.stageBadge).toBe('Class closing');
-    expect(result.current.stagePrompt).toBe('Class is done. Time to wave goodbye.');
+    expect(result.current.stagePrompt).toBe('Cora is saying goodbye.');
     expect(vi.getTimerCount()).toBe(1);
 
     await act(async () => {
@@ -672,7 +670,7 @@ describe('useClassroomOrchestrator', () => {
 
     expect(result.current.phase).toBe('completion_reward');
     expect(result.current.stageBadge).toBe('Reward time');
-    expect(result.current.stagePrompt).toBe('Great job. Class is wrapping up.');
+    expect(result.current.stagePrompt).toBe('Celebrate this brave lesson.');
     expect(result.current.rewardVisible).toBe(true);
     expect(vi.getTimerCount()).toBe(1);
 
@@ -683,12 +681,26 @@ describe('useClassroomOrchestrator', () => {
     expect(result.current.phase).toBe('lesson_complete');
     expect(result.current.isLessonComplete).toBe(true);
     expect(result.current.stageBadge).toBe('Class complete');
-    expect(result.current.stagePrompt).toBe('Class complete. See you next time.');
+    expect(result.current.stagePrompt).toBe('See you next time.');
     expect(result.current.rewardVisible).toBe(false);
     expect(result.current.completionHoldMs).toBe(LESSON_COMPLETE_HOLD_MS);
     expect(vi.getTimerCount()).toBe(0);
 
     vi.useRealTimers();
+  });
+
+  it('keeps picture-talk success feedback short before moving directly to the next item', () => {
+    let state = moveToPictureTalkStudentWait();
+
+    state = submitCanonicalAttempt(state);
+
+    expect(state.phase).toBe('teacher_feedback');
+    expect(state.currentStageId).toBe('picture-talk');
+    expect(state.turnResolution).toBe('pass');
+
+    state = classroomOrchestratorReducer(state, { type: 'phase_timer_completed' });
+
+    expect(state.phase).toBe('move_next');
   });
 });
 

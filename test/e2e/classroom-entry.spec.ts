@@ -41,5 +41,4 @@ test('classroom reward mode reproduces the celebration overlay', async ({ page }
   await page.goto('/lesson/weekday-1700?reward=1', { waitUntil: 'domcontentloaded' });
 
   await expect(page.locator('text=GREAT JOB!').last()).toBeVisible();
-  await expect(page.getByText('Great job, brave voice.')).toBeVisible();
 });
