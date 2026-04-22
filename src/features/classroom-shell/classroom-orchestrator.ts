@@ -11,6 +11,7 @@ import {
 } from '@/features/classroom-shell/classroom-judgment';
 
 export type ClassroomOrchestratorPhase =
+  | 'warmup'
   | 'teacher_prompt'
   | 'ai_model'
   | 'student_wait'
@@ -19,7 +20,9 @@ export type ClassroomOrchestratorPhase =
   | 'teacher_echo'
   | 'teacher_feedback'
   | 'move_next'
-  | 'wrap_up';
+  | 'wrap_up'
+  | 'completion_reward'
+  | 'lesson_complete';
 
 export type ClassroomActiveSeat = 'me' | 'ai' | null;
 export type ClassroomSpeaker = 'teacher' | 'ai' | 'student' | null;
@@ -34,10 +37,30 @@ export type HintLevel = 'none' | 'light' | 'fallback';
 export type TurnResolution = 'idle' | 'retry' | 'pass' | 'fallback';
 export type StudentAttemptSource = 'manual' | 'mock_transcript' | 'future_asr';
 
-export const CLASSROOM_TIMINGS: Record<
-  Exclude<ClassroomOrchestratorPhase, 'wrap_up'>,
-  number
-> = {
+export const LESSON_COMPLETE_HOLD_MS = 3000;
+
+type ClassroomTimedPhase = Exclude<ClassroomOrchestratorPhase, 'lesson_complete'>;
+type ClassroomTimingProfile = Record<ClassroomTimedPhase, number>;
+
+const CLASSROOM_TIMING_SCALE = {
+  demo: 1,
+  test: 0.2,
+} as const;
+
+function scaleClassroomTimings(
+  timings: ClassroomTimingProfile,
+  scale: number,
+): ClassroomTimingProfile {
+  return Object.fromEntries(
+    Object.entries(timings).map(([phase, duration]) => [
+      phase,
+      Math.max(1, Math.round(duration * scale)),
+    ]),
+  ) as ClassroomTimingProfile;
+}
+
+const CLASSROOM_TIMING_BASE: ClassroomTimingProfile = {
+  warmup: 2400,
   teacher_prompt: 1800,
   ai_model: 1800,
   student_wait: 2200,
@@ -46,7 +69,22 @@ export const CLASSROOM_TIMINGS: Record<
   teacher_echo: 1400,
   teacher_feedback: 1600,
   move_next: 600,
+  wrap_up: 2200,
+  completion_reward: 1400,
 };
+
+export const CLASSROOM_TIMING_PROFILES: Record<
+  keyof typeof CLASSROOM_TIMING_SCALE,
+  ClassroomTimingProfile
+> = {
+  demo: CLASSROOM_TIMING_BASE,
+  test: scaleClassroomTimings(
+    CLASSROOM_TIMING_BASE,
+    CLASSROOM_TIMING_SCALE.test,
+  ),
+};
+
+export const CLASSROOM_TIMINGS = CLASSROOM_TIMING_PROFILES.demo;
 
 export const GUIDED_STAGE_IDS = ['repeat-after-teacher', 'picture-talk'] as const;
 
@@ -121,7 +159,7 @@ export function createInitialClassroomState(
     guidedStageRuns,
     hintLevel: 'none',
     lesson,
-    phase: 'teacher_prompt',
+    phase: 'warmup',
     participationState: 'idle',
     rewardVisible: false,
     turnResolution: 'idle',
@@ -134,10 +172,12 @@ export function classroomOrchestratorReducer(
 ): ClassroomOrchestratorState {
   switch (event.type) {
     case 'reward_visibility_changed':
-      return {
-        ...state,
-        rewardVisible: event.visible,
-      };
+      return state.phase === 'completion_reward'
+        ? {
+            ...state,
+            rewardVisible: event.visible,
+          }
+        : state;
     case 'student_attempt_submitted':
       if (state.phase === 'teacher_echo') {
         return {
@@ -228,6 +268,16 @@ function advanceTimedPhase(
   state: ClassroomOrchestratorState,
 ): ClassroomOrchestratorState {
   switch (state.phase) {
+    case 'warmup':
+      return {
+        ...state,
+        activeSeat: null,
+        activeSpeaker: 'teacher',
+        hintLevel: 'none',
+        phase: 'teacher_prompt',
+        rewardVisible: false,
+        turnResolution: 'idle',
+      };
     case 'teacher_prompt':
       if (state.currentStageId === 'picture-talk') {
         return {
@@ -296,6 +346,24 @@ function advanceTimedPhase(
     case 'move_next':
       return moveToNextItem(state);
     case 'wrap_up':
+      return {
+        ...state,
+        activeSeat: null,
+        activeSpeaker: 'teacher',
+        participationState: 'idle',
+        phase: 'completion_reward',
+        rewardVisible: true,
+      };
+    case 'completion_reward':
+      return {
+        ...state,
+        activeSeat: null,
+        activeSpeaker: 'teacher',
+        participationState: 'idle',
+        phase: 'lesson_complete',
+        rewardVisible: false,
+      };
+    case 'lesson_complete':
       return state;
     default:
       return state;
@@ -397,6 +465,10 @@ function toWrapUpState(
     ...state,
     activeSeat: null,
     activeSpeaker: 'teacher',
+    hintLevel: 'none',
+    participationState: 'idle',
     phase: 'wrap_up',
+    rewardVisible: false,
+    turnResolution: 'idle',
   };
 }

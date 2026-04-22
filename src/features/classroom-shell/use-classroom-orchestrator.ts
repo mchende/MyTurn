@@ -6,6 +6,7 @@ import type { Lesson } from '@/features/lesson-config/lesson-schema';
 
 import { getBobbyScriptLine } from './bobby-script';
 import {
+  LESSON_COMPLETE_HOLD_MS,
   CLASSROOM_TIMINGS,
   classroomOrchestratorReducer,
   createInitialClassroomState,
@@ -39,14 +40,7 @@ export function useClassroomOrchestrator({
   );
 
   useEffect(() => {
-    dispatch({
-      type: 'reward_visibility_changed',
-      visible: showReward,
-    });
-  }, [showReward]);
-
-  useEffect(() => {
-    if (state.phase === 'wrap_up') {
+    if (state.phase === 'lesson_complete') {
       return;
     }
 
@@ -93,6 +87,8 @@ export function useClassroomOrchestrator({
   return {
     ...state,
     bobbyScriptLine,
+    completionHoldMs: LESSON_COMPLETE_HOLD_MS,
+    isLessonComplete: state.phase === 'lesson_complete',
     podiumViewModel,
     progressCount: state.lesson.items.length,
     stageBadge: getStageBadge({
@@ -116,10 +112,14 @@ export function useClassroomOrchestrator({
     teacherMessage: teacherScriptLine.visibleCaption,
     teacherScriptLine,
     showReward: () => {
-      dispatch({ type: 'reward_visibility_changed', visible: true });
+      if (showReward) {
+        dispatch({ type: 'reward_visibility_changed', visible: true });
+      }
     },
     hideReward: () => {
-      dispatch({ type: 'reward_visibility_changed', visible: false });
+      if (showReward) {
+        dispatch({ type: 'reward_visibility_changed', visible: false });
+      }
     },
     submitStudentAttempt,
     confirmStudentParticipation: () => {
@@ -144,11 +144,19 @@ function getStageBadge({
   currentStageItemIndex: number;
   progressCount: number;
   rewardVisible: boolean;
-  phase: keyof typeof CLASSROOM_TIMINGS | 'wrap_up';
+  phase: keyof typeof CLASSROOM_TIMINGS | 'lesson_complete';
   stageId: GuidedStageId;
 }) {
-  if (rewardVisible) {
-    return 'Reward time';
+  if (phase === 'lesson_complete') {
+    return 'Class complete';
+  }
+
+  if (phase === 'completion_reward') {
+    return rewardVisible ? 'Reward time' : 'Class complete';
+  }
+
+  if (phase === 'warmup') {
+    return 'Class warmup';
   }
 
   if (phase === 'wrap_up') {
@@ -171,12 +179,14 @@ function getStagePrompt({
 }: {
   attemptIndex: number;
   hintLevel: 'none' | 'light' | 'fallback';
-  phase: keyof typeof CLASSROOM_TIMINGS | 'wrap_up';
+  phase: keyof typeof CLASSROOM_TIMINGS | 'lesson_complete';
   participationState: ParticipationState;
   stageId: GuidedStageId;
   turnResolution: 'idle' | 'retry' | 'pass' | 'fallback';
 }) {
   switch (phase) {
+    case 'warmup':
+      return 'Class warmup. Cora is getting everyone ready.';
     case 'teacher_prompt':
       return stageId === 'picture-talk'
         ? 'Look at the picture. A question is coming.'
@@ -209,12 +219,18 @@ function getStagePrompt({
       return 'Eyes on the next picture.';
     case 'wrap_up':
       return 'Class is done. Time to wave goodbye.';
+    case 'completion_reward':
+      return 'Great job. Class is wrapping up.';
+    case 'lesson_complete':
+      return 'Class complete. See you next time.';
     default:
       return '';
   }
 }
 
-function getScheduledEvent(phase: keyof typeof CLASSROOM_TIMINGS): ClassroomOrchestratorEvent {
+function getScheduledEvent(
+  phase: keyof typeof CLASSROOM_TIMINGS,
+): ClassroomOrchestratorEvent {
   if (phase === 'student_wait') {
     return { type: 'student_silent_timeout' };
   }

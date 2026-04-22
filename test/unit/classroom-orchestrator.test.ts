@@ -116,6 +116,7 @@ describe('classroomOrchestratorReducer', () => {
 
     state = classroomOrchestratorReducer(state, { type: 'phase_timer_completed' });
     state = classroomOrchestratorReducer(state, { type: 'phase_timer_completed' });
+    state = classroomOrchestratorReducer(state, { type: 'phase_timer_completed' });
 
     expect(state.phase).toBe('student_wait');
 
@@ -125,6 +126,7 @@ describe('classroomOrchestratorReducer', () => {
     expect(state.activeSeat).toBe(null);
 
     state = createInitialClassroomState(lesson);
+    state = classroomOrchestratorReducer(state, { type: 'phase_timer_completed' });
     state = classroomOrchestratorReducer(state, { type: 'phase_timer_completed' });
     state = classroomOrchestratorReducer(state, { type: 'phase_timer_completed' });
 
@@ -154,10 +156,11 @@ describe('classroomOrchestratorReducer', () => {
     expect(state.turnResolution).toBe('fallback');
   });
 
-  it('keeps reward gating explicit instead of making celebration mandatory', () => {
+  it('keeps reward hidden during turn feedback and only shows it in the end-of-lesson completion chain', () => {
     const lesson = lessonWeek01Lesson01;
     let state = createInitialClassroomState(lesson);
 
+    state = classroomOrchestratorReducer(state, { type: 'phase_timer_completed' });
     state = classroomOrchestratorReducer(state, { type: 'phase_timer_completed' });
     state = classroomOrchestratorReducer(state, { type: 'phase_timer_completed' });
     state = submitCanonicalAttempt(state);
@@ -171,8 +174,14 @@ describe('classroomOrchestratorReducer', () => {
     expect(state.phase).toBe('move_next');
     expect(state.rewardVisible).toBe(false);
 
-    state = classroomOrchestratorReducer(state, { type: 'reward_visibility_changed', visible: true });
+    state = createInitialClassroomState(lesson);
+    state = classroomOrchestratorReducer(state, { type: 'phase_timer_completed' });
+    state = completeLessonThroughFinalPictureItem(state);
+    expect(state.phase).toBe('wrap_up');
 
+    state = classroomOrchestratorReducer(state, { type: 'phase_timer_completed' });
+
+    expect(state.phase).toBe('completion_reward');
     expect(state.rewardVisible).toBe(true);
   });
 
@@ -264,6 +273,7 @@ describe('classroomOrchestratorReducer', () => {
 
     state = classroomOrchestratorReducer(state, { type: 'phase_timer_completed' });
     state = classroomOrchestratorReducer(state, { type: 'phase_timer_completed' });
+    state = classroomOrchestratorReducer(state, { type: 'phase_timer_completed' });
 
     expect(state.currentStageId).toBe('repeat-after-teacher');
     expect(state.phase).toBe('student_wait');
@@ -328,6 +338,7 @@ describe('classroomOrchestratorReducer', () => {
   it('routes second repeat failure into teacher_fallback_model and then final follow before moving next', () => {
     let state = createInitialClassroomState(lessonWeek01Lesson01);
 
+    state = classroomOrchestratorReducer(state, { type: 'phase_timer_completed' });
     state = classroomOrchestratorReducer(state, { type: 'phase_timer_completed' });
     state = classroomOrchestratorReducer(state, { type: 'phase_timer_completed' });
 
@@ -435,15 +446,18 @@ describe('useClassroomOrchestrator', () => {
         source: 'mock_transcript',
       });
     });
-    expect(result.current.phase).toBe('teacher_prompt');
+    expect(result.current.phase).toBe('warmup');
     expect(result.current.attemptIndex).toBe(0);
 
     act(() => {
       result.current.confirmStudentParticipation();
     });
-    expect(result.current.phase).toBe('teacher_prompt');
+    expect(result.current.phase).toBe('warmup');
     expect(result.current.attemptIndex).toBe(0);
 
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(CLASSROOM_TIMINGS.warmup);
+    });
     await act(async () => {
       await vi.advanceTimersByTimeAsync(CLASSROOM_TIMINGS.teacher_prompt);
     });
@@ -491,6 +505,9 @@ describe('useClassroomOrchestrator', () => {
       }),
     );
 
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(CLASSROOM_TIMINGS.warmup);
+    });
     await act(async () => {
       await vi.advanceTimersByTimeAsync(CLASSROOM_TIMINGS.teacher_prompt);
     });
@@ -542,6 +559,9 @@ describe('useClassroomOrchestrator', () => {
 
     expect(vi.getTimerCount()).toBe(1);
 
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(CLASSROOM_TIMINGS.warmup);
+    });
     await act(async () => {
       await vi.advanceTimersByTimeAsync(CLASSROOM_TIMINGS.teacher_prompt);
     });

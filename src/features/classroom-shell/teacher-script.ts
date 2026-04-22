@@ -36,6 +36,18 @@ const SHARED_VARIANTS: Record<
   >,
   readonly TeacherScriptVariant[]
 > = {
+  warmup: [
+    {
+      hintLabel: 'Class warmup',
+      spokenModel: 'Hello class. Eyes here and voices ready.',
+      visibleCaption: 'Hello class. Eyes here and voices ready.',
+    },
+    {
+      hintLabel: 'Ready together',
+      spokenModel: 'Welcome back. We will start together.',
+      visibleCaption: 'Welcome back. We will start together.',
+    },
+  ],
   ai_model: [
     {
       hintLabel: 'Listen to Bobby',
@@ -89,9 +101,24 @@ const SHARED_VARIANTS: Record<
       visibleCaption: 'You worked hard today. Wave goodbye.',
     },
   ],
+  completion_reward: [
+    {
+      hintLabel: 'Great job',
+      spokenModel: 'Great job today. Class is complete.',
+      visibleCaption: 'Great job today. Class is complete.',
+    },
+  ],
+  lesson_complete: [
+    {
+      hintLabel: 'See you next time',
+      spokenModel: 'See you next time.',
+      visibleCaption: 'See you next time.',
+    },
+  ],
 };
 
 const PHASE_HINTS: Record<ClassroomOrchestratorPhase, readonly string[]> = {
+  warmup: ['Class warmup is starting.', 'Cora is bringing the class in.'],
   teacher_prompt: ['Look at the picture.', 'Get your voice ready.'],
   ai_model: ['Listen before you speak.', 'Bobby shows one first.'],
   student_wait: ['Your turn to talk.', 'Speak when you feel ready.'],
@@ -101,6 +128,8 @@ const PHASE_HINTS: Record<ClassroomOrchestratorPhase, readonly string[]> = {
   teacher_feedback: ['The teacher is cheering for you.', 'Keep the class rhythm.'],
   move_next: ['The board is changing.', 'Get ready for the next picture.'],
   wrap_up: ['Class is closing now.', 'Time to wave goodbye.'],
+  completion_reward: ['Class reward is showing now.', 'Celebrate once, then finish.'],
+  lesson_complete: ['Class is complete now.', 'See you next time.'],
 };
 
 export function getTeacherScriptLine({
