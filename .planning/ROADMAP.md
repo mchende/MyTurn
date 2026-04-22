@@ -94,7 +94,7 @@ Verification:
 **Plans**: 3 plans
 
 Plans:
-- [ ] 05-01-PLAN.md — 建立四段式完整 lesson、judged path、中心 pacing 与稳定完成态合同
+- [x] 05-01-PLAN.md — 建立四段式完整 lesson、judged path、中心 pacing 与稳定完成态合同
 - [ ] 05-02-PLAN.md — 建立首页 recently-completed overlay 合同并完成响应式重排
 - [ ] 05-03-PLAN.md — 接通 classroom closeout、lesson 自动回首页与 full-loop 网页验证
 
@@ -109,4 +109,4 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5
 | 2. Cast and Orchestration | 3/3 | Complete | 2026-04-17 |
 | 3. Guided Speaking Flow | 3/3 | Complete (verified) | 2026-04-21 |
 | 4. Hints and Judgment | 3/3 | Complete (verified) | 2026-04-21 |
-| 5. Complete MVP Lesson | 0/2 | Not started | - |
+| 5. Complete MVP Lesson | 1/3 | In Progress | - |

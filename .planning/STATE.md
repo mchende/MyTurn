@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: planning
-stopped_at: Phase 5 context gathered
-last_updated: "2026-04-22T01:19:43.358Z"
-last_activity: 2026-04-21
+status: executing
+stopped_at: Completed 05-01-PLAN.md
+last_updated: "2026-04-22T07:03:06.581Z"
+last_activity: 2026-04-22
 progress:
   total_phases: 5
   completed_phases: 4
-  total_plans: 13
-  completed_plans: 13
-  percent: 87
+  total_plans: 16
+  completed_plans: 14
+  percent: 88
 ---
 
 # Project State
@@ -25,12 +25,12 @@ See: .planning/PROJECT.md (updated 2026-04-15)
 
 ## Current Position
 
-Phase: 05 (complete-mvp-lesson) — READY
-Plan: 0 of 2
-Status: Ready for phase discussion or planning
-Last activity: 2026-04-21
+Phase: 05 (complete-mvp-lesson) — EXECUTING
+Plan: 2 of 3
+Status: Ready to execute
+Last activity: 2026-04-22
 
-Progress: [████████░░] 87%
+Progress: [█████████░] 88%
 
 ## Performance Metrics
 
@@ -64,6 +64,7 @@ Progress: [████████░░] 87%
 | Phase 04 P01 | 6min | 2 tasks | 7 files |
 | Phase 04-hints-and-judgment P02 | 9min | 2 tasks | 10 files |
 | Phase 04-hints-and-judgment P03 | 12min | 2 tasks | 8 files |
+| Phase 05 P01 | 6m | 2 tasks | 7 files |
 
 ## Accumulated Context
 
@@ -104,6 +105,9 @@ Progress: [████████░░] 87%
 - [Phase 04-hints-and-judgment]: Author repeatAccepts and pictureTalk.semanticAccepts in lesson content instead of hardcoding vocabulary in reducer branches.
 - [Phase 04-hints-and-judgment]: Preserve confirmStudentParticipation as a hook-level compatibility alias that dispatches submitStudentAttempt with a stage-safe canonical transcript.
 - [Phase 04-hints-and-judgment]: Reuse teacher_echo as the final follow phase and keep the only child-facing button label as I said it with Cora.
+- [Phase 05]: Keep warmup and wrap-up outside GUIDED_STAGE_IDS so judged speaking stays limited to repeat-after-teacher and picture-talk.
+- [Phase 05]: Derive demo and test pacing from CLASSROOM_TIMING_PROFILES and export LESSON_COMPLETE_HOLD_MS = 3000 as the shared closeout contract.
+- [Phase 05]: Expose lesson_complete state and hold timing from useClassroomOrchestrator so downstream closeout UI can consume one stable contract.
 
 ### Pending Todos
 
@@ -116,6 +120,6 @@ Progress: [████████░░] 87%
 
 ## Session Continuity
 
-Last session: 2026-04-22T01:19:43.343Z
-Stopped at: Phase 5 context gathered
-Resume file: .planning/phases/05-complete-mvp-lesson/05-CONTEXT.md
+Last session: 2026-04-22T07:03:06.577Z
+Stopped at: Completed 05-01-PLAN.md
+Resume file: .planning/phases/05-complete-mvp-lesson/05-02-PLAN.md

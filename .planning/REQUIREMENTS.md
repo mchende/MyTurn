@@ -34,7 +34,7 @@
 ### Speaking and Evaluation
 
 - [x] **SPKG-01**: 用户可以在前期练习轮次中跟随老师复述目标语言
-- [ ] **SPKG-02**: 用户可以在后期练习轮次中根据图片回答老师提问，并允许表达与标准答案意义相近
+- [x] **SPKG-02**: 用户可以在后期练习轮次中根据图片回答老师提问，并允许表达与标准答案意义相近
 - [x] **SPKG-03**: 系统在复述环节使用更贴近目标词句本身的近似匹配规则
 - [x] **SPKG-04**: 系统在看图作答环节使用更宽松的基于语义的匹配规则
 - [x] **SPKG-05**: 系统的判断与纠错方式应服务于信心建立和课堂推进，而不是严格打分
@@ -42,7 +42,7 @@
 ### Platform and Presentation
 
 - [x] **PLAT-01**: 用户看到的界面应首先面向平板横屏设计，同时兼容手机和桌面端使用
-- [ ] **PLAT-02**: 用户无需安装原生 App，就能在网页中完成整节 MVP 课程
+- [x] **PLAT-02**: 用户无需安装原生 App，就能在网页中完成整节 MVP 课程
 
 ## v2 Requirements
 
@@ -94,8 +94,8 @@
 | SPKG-03 | Phase 4 | Complete |
 | SPKG-04 | Phase 4 | Complete |
 | SPKG-05 | Phase 4 | Complete |
-| SPKG-02 | Phase 5 | Pending |
-| PLAT-02 | Phase 5 | Pending |
+| SPKG-02 | Phase 5 | Complete |
+| PLAT-02 | Phase 5 | Complete |
 
 **Coverage:**
 - v1 requirements: 共 21 条
@@ -104,4 +104,4 @@
 
 ---
 *Requirements defined: 2026-04-15*
-*Last updated: 2026-04-21 after Phase 04 verification*
+*Last updated: 2026-04-22 after Phase 05 Plan 01*
