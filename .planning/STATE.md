@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: executing
-stopped_at: Completed 05-01-PLAN.md
-last_updated: "2026-04-22T07:03:06.581Z"
+status: verified
+stopped_at: Completed 05-VERIFICATION.md
+last_updated: "2026-04-22T08:05:00.000Z"
 last_activity: 2026-04-22
 progress:
   total_phases: 5
-  completed_phases: 4
+  completed_phases: 5
   total_plans: 16
-  completed_plans: 14
-  percent: 88
+  completed_plans: 16
+  percent: 100
 ---
 
 # Project State
@@ -21,16 +21,16 @@ progress:
 See: .planning/PROJECT.md (updated 2026-04-15)
 
 **Core value:** 孩子在整节课里都应真实地感受到自己“正在上一节英语小班课”，并且持续愿意开口说。
-**Current focus:** Phase 05 — complete-mvp-lesson
+**Current focus:** Milestone verified
 
 ## Current Position
 
-Phase: 05 (complete-mvp-lesson) — EXECUTING
-Plan: 2 of 3
-Status: Ready to execute
+Phase: 05 (complete-mvp-lesson) — VERIFIED
+Plan: 3 of 3
+Status: Verification passed
 Last activity: 2026-04-22
 
-Progress: [█████████░] 88%
+Progress: [██████████] 100%
 
 ## Performance Metrics
 
@@ -65,6 +65,8 @@ Progress: [█████████░] 88%
 | Phase 04-hints-and-judgment P02 | 9min | 2 tasks | 10 files |
 | Phase 04-hints-and-judgment P03 | 12min | 2 tasks | 8 files |
 | Phase 05 P01 | 6m | 2 tasks | 7 files |
+| Phase 05 P02 | 8m | 2 tasks | 6 files |
+| Phase 05 P03 | 19m | 2 tasks | 10 files |
 
 ## Accumulated Context
 
@@ -108,6 +110,9 @@ Progress: [█████████░] 88%
 - [Phase 05]: Keep warmup and wrap-up outside GUIDED_STAGE_IDS so judged speaking stays limited to repeat-after-teacher and picture-talk.
 - [Phase 05]: Derive demo and test pacing from CLASSROOM_TIMING_PROFILES and export LESSON_COMPLETE_HOLD_MS = 3000 as the shared closeout contract.
 - [Phase 05]: Expose lesson_complete state and hold timing from useClassroomOrchestrator so downstream closeout UI can consume one stable contract.
+- [Phase 05]: Keep recently-completed as a homepage overlay instead of extending the real schedule access-state enum.
+- [Phase 05]: Let ClassroomShell own the only lesson-complete redirect timer and return straight to `/?completedSession=...`.
+- [Phase 05]: Keep picture-talk success feedback to one short `Nice answer.` so the class keeps moving.
 
 ### Pending Todos
 
@@ -120,6 +125,6 @@ Progress: [█████████░] 88%
 
 ## Session Continuity
 
-Last session: 2026-04-22T07:03:06.577Z
-Stopped at: Completed 05-01-PLAN.md
-Resume file: .planning/phases/05-complete-mvp-lesson/05-02-PLAN.md
+Last session: 2026-04-22T08:05:00.000Z
+Stopped at: Completed 05-VERIFICATION.md
+Resume file: .planning/phases/05-complete-mvp-lesson/05-VERIFICATION.md

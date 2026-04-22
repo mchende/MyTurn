@@ -1,7 +1,7 @@
 ---
 phase: 05
 slug: complete-mvp-lesson
-status: draft
+status: passed
 nyquist_compliant: true
 wave_0_complete: true
 created: 2026-04-22
@@ -38,12 +38,12 @@ created: 2026-04-22
 
 | Task ID | Plan | Wave | Requirement | Test Type | Automated Command | File Exists | Status |
 |---------|------|------|-------------|-----------|-------------------|-------------|--------|
-| 05-01-01 | 05-01 | 1 | SPKG-02 | unit | `npm run test:unit -- test/unit/classroom-orchestrator.test.ts test/unit/classroom-judgment.test.ts test/unit/lesson-schema.test.ts` | ✅ partial | ⬜ pending |
-| 05-01-02 | 05-01 | 1 | PLAT-02 | unit | `npm run test:unit -- test/unit/classroom-orchestrator.test.ts` | ✅ partial | ⬜ pending |
-| 05-02-01 | 05-02 | 2 | PLAT-02 | unit | `npm run test:unit -- test/unit/get-today-schedule-view-model.test.ts` | ❌ planned in task | ⬜ pending |
-| 05-02-02 | 05-02 | 2 | PLAT-02 | unit + homepage integration | `npm run test:unit -- test/unit/homepage-shell.test.tsx` | ❌ planned in task | ⬜ pending |
-| 05-03-01 | 05-03 | 3 | PLAT-02 | unit | `npm run test:unit -- test/unit/classroom-orchestrator.test.ts test/unit/teacher-script.test.ts test/unit/classroom-shell.test.tsx` | ✅ / ❌ planned in task | ⬜ pending |
-| 05-03-02 | 05-03 | 3 | SPKG-02, PLAT-02 | focused smoke + e2e | `npm run test:e2e -- test/e2e/guided-speaking-flow.spec.ts && npm run test:e2e -- test/e2e/classroom-entry.spec.ts test/e2e/complete-mvp-lesson.spec.ts` | ✅ / ❌ planned in task | ⬜ pending |
+| 05-01-01 | 05-01 | 1 | SPKG-02 | unit | `npm run test:unit -- test/unit/classroom-orchestrator.test.ts test/unit/classroom-judgment.test.ts test/unit/lesson-schema.test.ts` | ✅ partial | ✅ green |
+| 05-01-02 | 05-01 | 1 | PLAT-02 | unit | `npm run test:unit -- test/unit/classroom-orchestrator.test.ts` | ✅ partial | ✅ green |
+| 05-02-01 | 05-02 | 2 | PLAT-02 | unit | `npm run test:unit -- test/unit/get-today-schedule-view-model.test.ts` | ✅ | ✅ green |
+| 05-02-02 | 05-02 | 2 | PLAT-02 | unit + homepage integration | `npm run test:unit -- test/unit/homepage-shell.test.tsx` | ✅ | ✅ green |
+| 05-03-01 | 05-03 | 3 | PLAT-02 | unit | `npm run test:unit -- test/unit/classroom-orchestrator.test.ts test/unit/teacher-script.test.ts test/unit/classroom-shell.test.tsx` | ✅ | ✅ green |
+| 05-03-02 | 05-03 | 3 | SPKG-02, PLAT-02 | focused smoke + e2e | `npm run test:e2e -- test/e2e/guided-speaking-flow.spec.ts && npm run test:e2e -- test/e2e/classroom-entry.spec.ts test/e2e/complete-mvp-lesson.spec.ts` | ✅ | ✅ green |
 
 *Status: ⬜ pending · ✅ green · ❌ red · ⚠️ flaky*
 
@@ -75,4 +75,4 @@ created: 2026-04-22
 - [x] Feedback latency < 140s
 - [x] `nyquist_compliant: true` set in frontmatter
 
-**Approval:** pending
+**Approval:** passed (2026-04-22)
