@@ -19,6 +19,8 @@ import { buildCanonicalManualTranscript } from './classroom-judgment';
 import { buildPodiumViewModel } from './podium-view-model';
 import { getTeacherScriptLine } from './teacher-script';
 
+export { LESSON_COMPLETE_HOLD_MS } from './classroom-orchestrator';
+
 type UseClassroomOrchestratorOptions = {
   lesson: Lesson;
   showReward?: boolean;
