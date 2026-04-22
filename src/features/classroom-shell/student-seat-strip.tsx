@@ -9,8 +9,8 @@ type StudentSeatStripProps = {
 
 export function StudentSeatStrip({ seats, sessionId }: StudentSeatStripProps) {
   return (
-    <section className="w-full max-w-[420px]" data-testid="classroom-seat-strip">
-      <div className="flex items-center gap-4 rounded-[24px] border border-white/5 bg-white/5 p-2 backdrop-blur-md">
+    <section className="w-full xl:max-w-[420px]" data-testid="classroom-seat-strip">
+      <div className="flex items-center justify-center gap-3 rounded-[24px] border border-white/5 bg-white/5 p-2 backdrop-blur-md sm:gap-4">
         {seats.map((seat) =>
           seat.isEmpty ? (
             <div
@@ -54,22 +54,22 @@ function SeatAvatar({
   testId?: string;
 }) {
   return (
-    <div className="relative" data-on-stage={isOnStage} data-testid={testId}>
+    <div className="relative shrink-0" data-on-stage={isOnStage} data-testid={testId}>
       <div
-        className={`flex h-14 w-14 items-center justify-center rounded-2xl p-0.5 ${
+        className={`flex h-12 w-12 items-center justify-center rounded-2xl p-0.5 sm:h-14 sm:w-14 ${
           isOnStage ? 'border-2 border-[#10B981] bg-[#10B981] opacity-50' : 'border border-slate-700 bg-slate-800'
         }`}
       >
         <img
           alt={imageAlt}
-          className={`h-full w-full rounded-[14px] ${isOnStage ? 'bg-white grayscale' : 'bg-slate-800'}`}
+          className={`aspect-square h-full w-full rounded-[14px] object-contain ${isOnStage ? 'bg-white grayscale' : 'bg-slate-800'}`}
           src={imageSrc}
         />
       </div>
 
       {isOnStage ? (
         <div className="absolute inset-0 flex items-center justify-center">
-          <span className="rounded bg-black/60 px-1.5 py-0.5 text-[8px] font-black uppercase text-white">
+          <span className="rounded bg-black/60 px-1.5 py-0.5 text-[7px] font-black uppercase text-white sm:text-[8px]">
             讲台中
           </span>
         </div>

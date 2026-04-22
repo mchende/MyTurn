@@ -37,27 +37,25 @@ export function LessonBoard({
         className="absolute inset-0 h-full w-full scale-110 object-cover opacity-15 blur-3xl"
         src={currentItem.imageSrc}
       />
-      <div className="absolute inset-0 bg-black/10" />
+      <div className="absolute inset-0 bg-black/5" />
 
       <div
-        className="absolute left-8 top-8 inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/8 px-4 py-2 text-xs font-black tracking-[0.18em] text-white/85 backdrop-blur-md"
+        className="absolute left-4 top-4 z-20 inline-flex max-w-[calc(100%-2rem)] items-center gap-2 rounded-full border border-white/10 bg-white/8 px-3 py-2 text-[10px] font-black tracking-[0.12em] text-white/85 backdrop-blur-md sm:left-6 sm:top-6 sm:px-4 sm:text-xs sm:tracking-[0.18em]"
         data-testid="lesson-stage-badge"
       >
-        <span className="h-2 w-2 rounded-full bg-[#10B981]" />
-        {stageBadge}
+        <span className="h-2 w-2 shrink-0 rounded-full bg-[#10B981]" />
+        <span className="truncate">{stageBadge}</span>
       </div>
 
-      <div className="relative z-10 flex h-full items-center justify-center p-12">
-        <div className="flex h-full w-full items-center justify-center rounded-[40px] border border-white/10 bg-white/[0.04] shadow-[inset_0_1px_0_rgba(255,255,255,0.08)] backdrop-blur-sm">
-          <img
-            alt={currentItem.imageAlt}
-            className="max-h-[76%] max-w-[76%] object-contain drop-shadow-[0_30px_50px_rgba(0,0,0,0.38)]"
-            src={currentItem.imageSrc}
-          />
-        </div>
+      <div className="relative z-10 flex h-full items-center justify-center px-6 pb-24 pt-20 sm:px-10 sm:pb-24 sm:pt-24 xl:px-12">
+        <img
+          alt={currentItem.imageAlt}
+          className="max-h-full max-w-full object-contain drop-shadow-[0_30px_50px_rgba(0,0,0,0.32)]"
+          src={currentItem.imageSrc}
+        />
       </div>
 
-      <div className="absolute bottom-8 left-8 max-w-[520px] rounded-[28px] border border-white/10 bg-slate-950/45 px-6 py-5 backdrop-blur-md">
+      <div className="absolute bottom-5 left-4 right-24 z-20 rounded-[24px] border border-white/10 bg-slate-950/28 px-4 py-3 sm:bottom-6 sm:left-6 sm:right-28 sm:px-5 sm:py-4">
         {shouldShowDebugTarget ? (
           <p className="text-[clamp(2rem,4vw,3.3rem)] font-black uppercase tracking-[-0.06em] text-white">
             {debugTargetText}
@@ -72,7 +70,7 @@ export function LessonBoard({
         </p>
       </div>
 
-      <div className="absolute bottom-8 right-8 flex items-center gap-2.5">
+      <div className="absolute bottom-5 right-4 z-20 flex items-center gap-2.5 sm:bottom-6 sm:right-6">
         {Array.from({ length: progressCount }, (_, index) => {
           const isActive = index === currentItemIndex;
 

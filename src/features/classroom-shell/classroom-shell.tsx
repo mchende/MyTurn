@@ -49,37 +49,37 @@ export function ClassroomShell({
   }, [classroom.phase, router, sessionId]);
 
   return (
-    <main className="relative h-screen overflow-hidden bg-[#0F172A] px-4 py-4 text-white lg:px-6 lg:py-6">
+    <main className="relative min-h-screen overflow-y-auto bg-[#0F172A] px-4 py-4 text-white lg:px-6 lg:py-6 xl:h-screen xl:overflow-hidden">
       <div className="absolute left-0 top-0 h-[36vh] w-[36vw] rounded-full bg-[#10B981]/8 blur-[120px]" />
       <div className="absolute bottom-0 right-0 h-[30vh] w-[24vw] rounded-full bg-sky-500/8 blur-[120px]" />
 
-      <div className="relative z-10 flex h-full flex-col gap-4">
-        <header className="flex h-20 shrink-0 items-center justify-between px-4">
-          <div className="flex w-1/4 min-w-[220px] items-center gap-3">
+      <div className="relative z-10 flex min-h-[calc(100vh-2rem)] flex-col gap-4 xl:h-full xl:min-h-0">
+        <header className="flex shrink-0 flex-wrap items-center justify-between gap-3 px-2 py-1 sm:px-4 xl:h-20 xl:flex-nowrap xl:px-4">
+          <div className="flex min-w-0 items-center gap-3">
             <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#10B981] text-white shadow-lg shadow-emerald-500/20">
               <Sparkles className="h-6 w-6 fill-current" />
             </div>
-            <div>
-              <h1 className="text-xl font-black tracking-[-0.05em]">MyTurn</h1>
+            <div className="min-w-0">
+              <h1 className="truncate text-xl font-black tracking-[-0.05em]">MyTurn</h1>
               <p className="sr-only">{sessionTitle}</p>
             </div>
           </div>
 
-          <div className="flex flex-1 justify-center">
+          <div className="order-3 w-full xl:order-none xl:flex-1">
             <StudentSeatStrip
               seats={classroom.podiumViewModel.seats}
               sessionId={sessionId}
             />
           </div>
 
-          <div className="flex w-1/4 min-w-[220px] items-center justify-end gap-3">
+          <div className="flex items-center justify-end gap-2 sm:gap-3 xl:min-w-[220px]">
             <TopActionButton icon={Settings2} label="设置" />
             <TopActionButton icon={X} label="退出" />
           </div>
         </header>
 
-        <div className="flex min-h-0 flex-1 gap-6">
-          <section className="min-w-0 flex-[3]">
+        <div className="flex flex-1 flex-col gap-4 xl:min-h-0 xl:flex-row xl:gap-6">
+          <section className="min-w-0 xl:flex-[3]">
             <LessonBoard
               currentItem={classroom.currentItem}
               currentItemIndex={classroom.currentItemIndex}
@@ -90,7 +90,10 @@ export function ClassroomShell({
             />
           </section>
 
-          <aside className="flex w-full max-w-[360px] flex-1 flex-col gap-6">
+          <aside
+            className="grid w-full flex-none grid-cols-1 gap-4 md:grid-cols-2 xl:min-h-0 xl:max-w-[360px] xl:flex-1 xl:grid-cols-1 xl:content-start xl:overflow-y-auto"
+            data-testid="classroom-side-panels"
+          >
             <TeacherColumn
               hint={classroom.teacherHint}
               message={classroom.teacherMessage}
@@ -117,7 +120,7 @@ function TopActionButton({
 }) {
   return (
     <button
-      className="inline-flex items-center gap-2 rounded-2xl border border-white/10 bg-white/5 px-5 py-2.5 text-xs font-bold text-white/90 backdrop-blur-md transition-all hover:bg-white/10"
+      className="inline-flex items-center gap-2 rounded-2xl border border-white/10 bg-white/5 px-3 py-2 text-[11px] font-bold text-white/90 backdrop-blur-md transition-all hover:bg-white/10 sm:px-5 sm:py-2.5 sm:text-xs"
       type="button"
     >
       <Icon className="h-4 w-4" />
@@ -134,17 +137,17 @@ function TeacherColumn({
   message: string;
 }) {
   return (
-    <section className="relative flex-[0.8] overflow-hidden rounded-[40px] border-2 border-slate-700 bg-slate-800/80 p-6">
+    <section className="relative min-h-[220px] overflow-hidden rounded-[40px] border-2 border-slate-700 bg-slate-800/80 p-5 sm:min-h-[240px] xl:flex-[0.8] xl:p-6">
       <div className="absolute inset-x-8 top-8 h-24 rounded-full bg-[#10B981]/10 blur-2xl" />
       <div className="relative z-10 flex h-full flex-col items-center justify-center text-center">
         <motion.div
           animate={{ boxShadow: ['0 0 0 0 rgba(16,185,129,0.32)', '0 0 0 18px rgba(16,185,129,0)', '0 0 0 0 rgba(16,185,129,0)'] }}
-          className="relative mb-4 rounded-full bg-emerald-500/20 p-1.5"
+          className="relative mb-4 shrink-0 rounded-full bg-emerald-500/20 p-1.5"
           transition={{ duration: 1.8, repeat: Number.POSITIVE_INFINITY, ease: 'easeOut' }}
         >
           <img
             alt="Cora 老师"
-            className="block h-28 w-28 rounded-full bg-white shadow-xl"
+            className="block h-24 w-24 rounded-full bg-white object-contain shadow-xl sm:h-28 sm:w-28"
             src="/avatars/teacher-cora.svg"
           />
           <motion.div
@@ -158,12 +161,14 @@ function TeacherColumn({
           </motion.div>
         </motion.div>
 
-        <p className="text-[28px] font-black italic tracking-[-0.05em]">Cora 老师</p>
-        <div className="mt-2 inline-flex items-center gap-2 rounded-full border border-[#10B981]/20 bg-[#10B981]/10 px-3 py-2 text-[11px] font-bold text-[#10B981]">
+        <p className="text-[24px] font-black italic tracking-[-0.05em] sm:text-[28px]">Cora 老师</p>
+        <div className="mt-2 inline-flex max-w-full items-center gap-2 rounded-full border border-[#10B981]/20 bg-[#10B981]/10 px-3 py-2 text-[11px] font-bold text-[#10B981]">
           <Volume2 className="h-4 w-4" />
-          <span>{message}</span>
+          <span className="truncate">{message}</span>
         </div>
-        <p className="mt-3 text-xs font-bold tracking-[0.18em] text-white/45">{hint}</p>
+        <p className="mt-3 text-center text-[11px] font-bold tracking-[0.14em] text-white/45 sm:text-xs sm:tracking-[0.18em]">
+          {hint}
+        </p>
       </div>
     </section>
   );
@@ -183,13 +188,13 @@ function PodiumColumn({
 
   return (
     <section
-      className={`relative flex-1 overflow-hidden rounded-[40px] border-4 bg-slate-800 p-2 ${
+      className={`relative min-h-[320px] overflow-hidden rounded-[40px] border-4 bg-slate-800 p-2 sm:min-h-[360px] xl:flex-1 ${
         isStudentTurn
           ? 'border-[#10B981] shadow-[0_0_40px_rgba(16,185,129,0.18)]'
           : 'border-white/15 shadow-[0_0_24px_rgba(15,23,42,0.32)]'
       }`}
     >
-      <div className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full bg-[#10B981] px-4 py-1 text-[10px] font-black text-white shadow-lg">
+      <div className="absolute left-1/2 top-3 z-20 max-w-[calc(100%-2rem)] -translate-x-1/2 rounded-full bg-[#10B981] px-3 py-1 text-[10px] font-black text-white shadow-lg sm:px-4">
         {podiumViewModel.turnLabel}
       </div>
 
@@ -203,13 +208,13 @@ function PodiumColumn({
           <span className="text-[10px] font-black uppercase tracking-[0.18em] text-white/80">LIVE</span>
         </div>
 
-        <div className="flex flex-1 items-center justify-center bg-[radial-gradient(circle_at_50%_10%,rgba(255,255,255,0.06),transparent_32%),linear-gradient(180deg,#111827_0%,#0b1220_100%)]">
-          <div className="flex h-[76%] w-[76%] flex-col items-center justify-center rounded-[32px] border border-white/5 bg-[#162238]">
+        <div className="flex flex-1 items-center justify-center px-5 pb-20 pt-14 bg-[radial-gradient(circle_at_50%_10%,rgba(255,255,255,0.06),transparent_32%),linear-gradient(180deg,#111827_0%,#0b1220_100%)] sm:px-6 sm:pb-24">
+          <div className="flex aspect-[4/5] w-full max-w-[220px] flex-col items-center justify-center rounded-[32px] border border-white/5 bg-[#162238] px-4 py-5">
             <AnimatePresence mode="wait">
               <motion.img
                 alt={podiumViewModel.liveAvatarAlt}
                 animate={{ opacity: 0.9, scale: 1 }}
-                className="h-[82%] w-[82%] object-contain"
+                className="aspect-square h-auto w-[78%] max-w-[150px] object-contain"
                 exit={{ opacity: 0, scale: 0.96 }}
                 initial={{ opacity: 0, scale: 0.98 }}
                 key={podiumViewModel.liveAvatarSrc}
@@ -223,15 +228,15 @@ function PodiumColumn({
           </div>
         </div>
 
-        <div className="absolute bottom-16 left-6 right-6 flex items-center justify-center">
+        <div className="absolute bottom-16 left-4 right-4 flex items-center justify-center sm:left-6 sm:right-6">
           <div className="flex flex-col items-center gap-3">
-            <p className="rounded-full border border-white/10 bg-black/30 px-3 py-1.5 text-[11px] font-bold text-white/70">
+            <p className="max-w-full rounded-full border border-white/10 bg-black/30 px-3 py-1.5 text-center text-[11px] font-bold text-white/70">
               {podiumViewModel.podiumStatus}
             </p>
             {podiumViewModel.showConfirmationButton &&
             podiumViewModel.confirmationButtonLabel ? (
               <button
-                className="inline-flex items-center justify-center rounded-full border border-emerald-300/40 bg-emerald-400/15 px-5 py-2 text-sm font-black tracking-[0.02em] text-emerald-50 shadow-[0_12px_24px_rgba(16,185,129,0.18)] transition hover:bg-emerald-400/25"
+                className="inline-flex items-center justify-center rounded-full border border-emerald-300/40 bg-emerald-400/15 px-5 py-2 text-center text-sm font-black tracking-[0.02em] text-emerald-50 shadow-[0_12px_24px_rgba(16,185,129,0.18)] transition hover:bg-emerald-400/25"
                 onClick={onConfirmParticipation}
                 type="button"
               >
@@ -241,7 +246,7 @@ function PodiumColumn({
           </div>
         </div>
 
-        <div className="absolute bottom-6 left-6 right-6 flex h-12 items-end justify-center gap-1.5">
+        <div className="absolute bottom-6 left-5 right-5 flex h-12 items-end justify-center gap-1.5 sm:left-6 sm:right-6">
           {bars.map((bar, index) => (
             <motion.div
               animate={{ height: [`${Math.max(bar * 70, 20)}%`, `${Math.min(bar * 100 + 12, 100)}%`, `${Math.max(bar * 62, 24)}%`] }}

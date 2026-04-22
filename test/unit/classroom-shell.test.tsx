@@ -70,6 +70,55 @@ describe('classroom shell layout', () => {
     expect(screen.queryByText(/^apple$/i)).not.toBeInTheDocument();
   });
 
+  it('keeps the side panels responsive and the podium label inside a safe layout slot', () => {
+    const { container } = render(
+      <ClassroomShell
+        lesson={lesson}
+        sessionId="weekday-1700"
+        sessionStatus="检票入场中: 02:45"
+        sessionTitle="每日语感启蒙"
+      />,
+    );
+
+    const sidePanels = screen.getByTestId('classroom-side-panels');
+    const stageBadge = screen.getByTestId('lesson-stage-badge');
+    const teacherAvatar = screen.getByAltText('Cora 老师');
+
+    expect(sidePanels).toHaveClass('grid');
+    expect(sidePanels).toHaveClass('md:grid-cols-2');
+    expect(sidePanels).toHaveClass('xl:grid-cols-1');
+    expect(stageBadge).toHaveClass('max-w-[calc(100%-2rem)]');
+    expect(teacherAvatar).toHaveClass('object-contain');
+
+    const liveAvatar = container.querySelector('img[alt="我的摄像头占位"]');
+    expect(liveAvatar).toHaveClass('aspect-square');
+    expect(liveAvatar).toHaveClass('object-contain');
+  });
+
+  it('lets the classroom page scroll on smaller screens instead of clipping the lower panels', () => {
+    const { container } = render(
+      <ClassroomShell
+        lesson={lesson}
+        sessionId="weekday-1700"
+        sessionStatus="检票入场中: 02:45"
+        sessionTitle="每日语感启蒙"
+      />,
+    );
+
+    const main = container.querySelector('main');
+    const shell = main?.querySelector('div.relative.z-10');
+    const seatStrip = screen.getByTestId('classroom-seat-strip');
+    const sidePanels = screen.getByTestId('classroom-side-panels');
+
+    expect(main).toHaveClass('min-h-screen');
+    expect(main).toHaveClass('overflow-y-auto');
+    expect(main).toHaveClass('xl:overflow-hidden');
+    expect(shell).toHaveClass('min-h-[calc(100vh-2rem)]');
+    expect(shell).toHaveClass('xl:h-full');
+    expect(seatStrip).toHaveClass('xl:max-w-[420px]');
+    expect(sidePanels).toHaveClass('xl:overflow-y-auto');
+  });
+
   it('keeps three fixed seats while Bobby demos before the student turn', async () => {
     const bobbyLine = getBobbyScriptLine({
       currentItemIndex: 0,
