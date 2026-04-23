@@ -128,7 +128,7 @@ Verification:
 **Plans**: 3 plans
 
 Plans:
-- [ ] 06-01-PLAN.md — 选定老师/Bobby TTS 与浏览器音频运行时策略，建立播放/录音状态和 contract 测试基线
+- [x] 06-01-PLAN.md — 选定老师/Bobby TTS 与浏览器音频运行时策略，建立播放/录音状态和 contract 测试基线
 - [ ] 06-02-PLAN.md — 接入老师/Bobby 发声、首次音频预检与单 CTA 语音入口，并补齐失败/静音兜底 UI
 - [ ] 06-03-PLAN.md — 在课堂页完成音频模式响应式回归与 runtime 调度验证，并补 focused unit/e2e 覆盖
 
@@ -175,7 +175,7 @@ Current milestone execution: 6 -> 7 -> 8
 | 3. Guided Speaking Flow | 3/3 | Complete (verified) | 2026-04-21 |
 | 4. Hints and Judgment | 3/3 | Complete (verified) | 2026-04-21 |
 | 5. Complete MVP Lesson | 3/3 | Complete (verified) | 2026-04-22 |
-| 6. Audio Classroom Runtime | 0/3 | Not started | — |
+| 6. Audio Classroom Runtime | 1/3 | In Progress | — |
 | 7. Speech Recognition Wiring | 0/3 | Not started | — |
 | 8. Usable 15-Minute Voice Lesson | 0/3 | Not started | — |
 
