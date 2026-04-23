@@ -3,8 +3,8 @@ gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: voice-enabled-usable-mvp
 status: planning
-stopped_at: Expanded v1.1 scope to full audio classroom MVP
-last_updated: "2026-04-23T09:20:00.000Z"
+stopped_at: Phase 6 context gathered
+last_updated: "2026-04-23T10:05:00.000Z"
 last_activity: 2026-04-23
 progress:
   total_phases: 3
@@ -21,13 +21,13 @@ progress:
 See: .planning/PROJECT.md (updated 2026-04-23)
 
 **Core value:** 孩子在整节课里都应真实地感受到自己“正在上一节英语小班课”，并且持续愿意开口说。
-**Current focus:** Start v1.1 full audio classroom MVP planning
+**Current focus:** Phase 6 context captured, ready for planning
 
 ## Current Position
 
 Phase: 06 (audio-classroom-runtime) — NOT STARTED
 Plan: 0 of 3
-Status: Milestone scope expanded, ready for discuss/planning
+Status: Context captured, ready for plan-phase
 Last activity: 2026-04-23
 
 Progress: [----------] 0%
@@ -38,8 +38,8 @@ Progress: [----------] 0%
 
 **Next execution target:**
 
-- Start Phase 06 discussion/planning
-- Confirm teacher/Bobby audio output, browser speech capture and transcription strategy
+- Start Phase 06 planning
+- Break audio runtime into executable plans
 - Preserve existing classroom contracts while adding full audio runtime
 
 ## Accumulated Context
@@ -59,10 +59,10 @@ Progress: [----------] 0%
 
 ### Pending Todos
 
-- 确定老师/Bobby 语音输出、浏览器语音采集与转写技术路线
-- 规划音频预检、语音失败、无权限、静音和延迟过高时的课堂兜底策略
-- 定义最小 focused unit / e2e 验证集合，覆盖完整音频课堂闭环
-- 确定 15 分钟 pacing 预算和可观测指标
+- 把 Phase 6 context 拆成可执行计划
+- 确定老师/Bobby 语音输出、浏览器语音采集与音频运行时的具体技术路线
+- 定义最小 focused unit / e2e 验证集合，覆盖 Phase 6 runtime
+- 为 Phase 7 预留 transcript / judgment 接线接口
 
 ### Blockers/Concerns
 
@@ -74,5 +74,5 @@ Progress: [----------] 0%
 ## Session Continuity
 
 Last session: 2026-04-23
-Stopped at: Expanded v1.1 scope to full audio classroom MVP
-Resume file: .planning/ROADMAP.md
+Stopped at: Phase 6 context gathered
+Resume file: .planning/phases/06-audio-classroom-runtime/06-CONTEXT.md
