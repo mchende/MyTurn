@@ -7,15 +7,22 @@ import { motion, AnimatePresence } from 'framer-motion';
 
 import type { Lesson } from '@/features/lesson-config/lesson-schema';
 
+import { AudioPreflightCard } from './audio-preflight-card';
 import { LessonBoard } from './lesson-board';
 import type { PodiumViewModel } from './podium-view-model';
 import { StudentSeatStrip } from './student-seat-strip';
+import {
+  useClassroomAudioRuntime,
+  type ClassroomAudioRuntimeOverrides,
+} from './use-classroom-audio-runtime';
 import {
   LESSON_COMPLETE_HOLD_MS,
   useClassroomOrchestrator,
 } from './use-classroom-orchestrator';
 
 type ClassroomShellProps = {
+  audioRuntimeOverrides?: ClassroomAudioRuntimeOverrides;
+  forceAudioPreflight?: boolean;
   lesson: Lesson;
   sessionId: string;
   sessionTitle: string;
@@ -24,6 +31,8 @@ type ClassroomShellProps = {
 };
 
 export function ClassroomShell({
+  audioRuntimeOverrides,
+  forceAudioPreflight = false,
   lesson,
   sessionId,
   sessionTitle,
@@ -34,6 +43,16 @@ export function ClassroomShell({
   const classroom = useClassroomOrchestrator({
     lesson,
     showReward,
+  });
+  const audio = useClassroomAudioRuntime({
+    activeSeat: classroom.activeSeat,
+    bobbyScriptLine: classroom.bobbyScriptLine,
+    forcePreflight: forceAudioPreflight,
+    onRecordingAccepted: classroom.confirmStudentParticipation,
+    phase: classroom.phase,
+    runtimeOverrides: audioRuntimeOverrides,
+    stageId: classroom.currentStageId,
+    teacherScriptLine: classroom.teacherScriptLine,
   });
 
   useEffect(() => {
@@ -47,6 +66,45 @@ export function ClassroomShell({
 
     return () => window.clearTimeout(timer);
   }, [classroom.phase, router, sessionId]);
+
+  if (audio.preflightVisible) {
+    return (
+      <main className="relative min-h-screen overflow-y-auto bg-[#0F172A] px-4 py-4 text-white lg:px-6 lg:py-6">
+        <div className="absolute left-0 top-0 h-[36vh] w-[36vw] rounded-full bg-[#10B981]/8 blur-[120px]" />
+        <div className="absolute bottom-0 right-0 h-[30vh] w-[24vw] rounded-full bg-sky-500/8 blur-[120px]" />
+
+        <div className="relative z-10 flex min-h-[calc(100vh-2rem)] flex-col gap-6">
+          <header className="flex flex-wrap items-center justify-between gap-3 px-2 py-1 sm:px-4">
+            <div className="flex min-w-0 items-center gap-3">
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#10B981] text-white shadow-lg shadow-emerald-500/20">
+                <Sparkles className="h-6 w-6 fill-current" />
+              </div>
+              <div className="min-w-0">
+                <h1 className="truncate text-xl font-black tracking-[-0.05em]">MyTurn</h1>
+                <p className="text-xs font-bold tracking-[0.16em] text-white/55">
+                  {sessionTitle}
+                </p>
+              </div>
+            </div>
+            <p className="text-right text-xs font-bold tracking-[0.16em] text-white/55">
+              {sessionStatus}
+            </p>
+          </header>
+
+          <div className="flex flex-1 items-center justify-center py-4">
+            <AudioPreflightCard
+              message={audio.runtimeSnapshot.lastError?.message}
+              microphoneReady={audio.runtimeSnapshot.preflight.microphoneReady}
+              onCheckMicrophone={audio.preflightActions.checkMicrophone}
+              onCheckSpeaker={audio.preflightActions.checkSpeaker}
+              onSkip={audio.preflightActions.skip}
+              speakerReady={audio.runtimeSnapshot.preflight.speakerReady}
+            />
+          </div>
+        </div>
+      </main>
+    );
+  }
 
   return (
     <main className="relative min-h-screen overflow-y-auto bg-[#0F172A] px-4 py-4 text-white lg:px-6 lg:py-6 xl:h-screen xl:overflow-hidden">
@@ -78,6 +136,15 @@ export function ClassroomShell({
           </div>
         </header>
 
+        {audio.preflightWarning ? (
+          <div
+            className="mx-2 rounded-[28px] border border-amber-300/20 bg-amber-300/10 px-4 py-3 text-sm text-amber-50/90 sm:mx-4"
+            data-testid="classroom-audio-warning"
+          >
+            {audio.preflightWarning}
+          </div>
+        ) : null}
+
         <div className="flex flex-1 flex-col gap-4 xl:min-h-0 xl:flex-row xl:gap-6">
           <section className="min-w-0 xl:flex-[3]">
             <LessonBoard
@@ -95,12 +162,33 @@ export function ClassroomShell({
             data-testid="classroom-side-panels"
           >
             <TeacherColumn
+              audioEnabled={audio.audioEnabled}
+              audioStateLabel={audio.audioStateLabel}
               hint={classroom.teacherHint}
+              lastAudioError={audio.runtimeSnapshot.lastError?.message ?? null}
               message={classroom.teacherMessage}
+              onRetryAudio={audio.retryAudioStep}
+              showRetryButton={audio.showRetryButton && !audio.showRecordingButton}
+              showTeacherPlaybackPulse={audio.showTeacherPlaybackPulse}
             />
             <PodiumColumn
-              onConfirmParticipation={classroom.confirmStudentParticipation}
+              actionButtonLabel={
+                audio.controlButtonLabel ??
+                classroom.podiumViewModel.confirmationButtonLabel
+              }
+              audioModeActive={audio.audioModeActive}
+              audioStateLabel={audio.audioStateLabel}
+              onPrimaryAction={
+                audio.showRecordingButton
+                  ? () => void audio.studentAction()
+                  : classroom.confirmStudentParticipation
+              }
               podiumViewModel={classroom.podiumViewModel}
+              recordingStatusLabel={audio.recordingStatusLabel}
+              showPrimaryButton={
+                audio.showRecordingButton ||
+                classroom.podiumViewModel.showConfirmationButton
+              }
             />
           </aside>
         </div>
@@ -130,11 +218,23 @@ function TopActionButton({
 }
 
 function TeacherColumn({
+  audioEnabled,
+  audioStateLabel,
   hint,
+  lastAudioError,
   message,
+  onRetryAudio,
+  showRetryButton,
+  showTeacherPlaybackPulse,
 }: {
+  audioEnabled: boolean;
+  audioStateLabel: string;
   hint: string;
+  lastAudioError: string | null;
   message: string;
+  onRetryAudio: () => Promise<void>;
+  showRetryButton: boolean;
+  showTeacherPlaybackPulse: boolean;
 }) {
   return (
     <section className="relative min-h-[220px] overflow-hidden rounded-[40px] border-2 border-slate-700 bg-slate-800/80 p-5 sm:min-h-[240px] xl:flex-[0.8] xl:p-6">
@@ -162,10 +262,40 @@ function TeacherColumn({
         </motion.div>
 
         <p className="text-[24px] font-black italic tracking-[-0.05em] sm:text-[28px]">Cora 老师</p>
+        {audioEnabled ? (
+          <div className="mt-2 flex max-w-full flex-wrap items-center justify-center gap-2">
+            <div
+              className={`inline-flex max-w-full items-center gap-2 rounded-full border px-3 py-2 text-[11px] font-bold ${
+                showTeacherPlaybackPulse
+                  ? 'border-emerald-300/30 bg-emerald-400/12 text-emerald-50'
+                  : 'border-white/10 bg-white/6 text-white/78'
+              }`}
+              data-testid="teacher-audio-status"
+            >
+              <Volume2 className="h-4 w-4" />
+              <span className="truncate">{audioStateLabel}</span>
+            </div>
+            {showRetryButton ? (
+              <button
+                className="inline-flex items-center rounded-full border border-white/12 bg-white/6 px-3 py-2 text-[11px] font-bold text-white/82 transition hover:bg-white/10"
+                data-testid="teacher-audio-retry"
+                onClick={() => void onRetryAudio()}
+                type="button"
+              >
+                Retry audio
+              </button>
+            ) : null}
+          </div>
+        ) : null}
         <div className="mt-2 inline-flex max-w-full items-center gap-2 rounded-full border border-[#10B981]/20 bg-[#10B981]/10 px-3 py-2 text-[11px] font-bold text-[#10B981]">
           <Volume2 className="h-4 w-4" />
           <span className="truncate">{message}</span>
         </div>
+        {lastAudioError ? (
+          <p className="mt-3 max-w-xs text-center text-[11px] font-medium text-amber-100/85">
+            {lastAudioError}
+          </p>
+        ) : null}
         <p className="mt-3 text-center text-[11px] font-bold tracking-[0.14em] text-white/45 sm:text-xs sm:tracking-[0.18em]">
           {hint}
         </p>
@@ -175,16 +305,31 @@ function TeacherColumn({
 }
 
 function PodiumColumn({
-  onConfirmParticipation,
+  actionButtonLabel,
+  audioModeActive,
+  audioStateLabel,
+  onPrimaryAction,
   podiumViewModel,
+  recordingStatusLabel,
+  showPrimaryButton,
 }: {
-  onConfirmParticipation: () => void;
+  actionButtonLabel: string | null;
+  audioModeActive: boolean;
+  audioStateLabel: string;
+  onPrimaryAction: () => void;
   podiumViewModel: PodiumViewModel;
+  recordingStatusLabel: string;
+  showPrimaryButton: boolean;
 }) {
   const bars = [0.42, 0.62, 1, 0.72, 0.5];
   const isStudentTurn = podiumViewModel.seats.some(
     (seat) => seat.id === 'me' && seat.isOnStage,
   );
+  const podiumStatus = isStudentTurn && audioModeActive
+    ? recordingStatusLabel
+    : audioModeActive && podiumViewModel.seats.some((seat) => seat.id === 'ai' && seat.isOnStage)
+      ? audioStateLabel
+      : podiumViewModel.podiumStatus;
 
   return (
     <section
@@ -230,17 +375,20 @@ function PodiumColumn({
 
         <div className="absolute bottom-16 left-4 right-4 flex items-center justify-center sm:left-6 sm:right-6">
           <div className="flex flex-col items-center gap-3">
-            <p className="max-w-full rounded-full border border-white/10 bg-black/30 px-3 py-1.5 text-center text-[11px] font-bold text-white/70">
-              {podiumViewModel.podiumStatus}
+            <p
+              className="max-w-full rounded-full border border-white/10 bg-black/30 px-3 py-1.5 text-center text-[11px] font-bold text-white/70"
+              data-testid="podium-status"
+            >
+              {podiumStatus}
             </p>
-            {podiumViewModel.showConfirmationButton &&
-            podiumViewModel.confirmationButtonLabel ? (
+            {showPrimaryButton && actionButtonLabel ? (
               <button
                 className="inline-flex items-center justify-center rounded-full border border-emerald-300/40 bg-emerald-400/15 px-5 py-2 text-center text-sm font-black tracking-[0.02em] text-emerald-50 shadow-[0_12px_24px_rgba(16,185,129,0.18)] transition hover:bg-emerald-400/25"
-                onClick={onConfirmParticipation}
+                data-testid="podium-primary-action"
+                onClick={onPrimaryAction}
                 type="button"
               >
-                {podiumViewModel.confirmationButtonLabel}
+                {actionButtonLabel}
               </button>
             ) : null}
           </div>

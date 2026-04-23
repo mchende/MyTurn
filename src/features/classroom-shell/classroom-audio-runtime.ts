@@ -342,7 +342,7 @@ export function createClassroomAudioRuntime({
 
     const recordingContext = currentRecorder;
 
-    currentRecorder.stopPromise = new Promise<ClassroomRecordingArtifact>(
+    const stopPromise = new Promise<ClassroomRecordingArtifact>(
       (resolve, reject) => {
         const handleStop = () => {
           const durationMs = Math.max(1, now() - recordingContext.startMs);
@@ -382,8 +382,9 @@ export function createClassroomAudioRuntime({
         recordingContext.recorder.stop();
       },
     );
+    currentRecorder.stopPromise = stopPromise;
 
-    return currentRecorder.stopPromise;
+    return stopPromise;
   }
 
   async function retryLastStep() {
