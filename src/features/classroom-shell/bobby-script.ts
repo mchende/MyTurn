@@ -23,6 +23,8 @@ type BobbyScriptRequest = {
 };
 
 export type BobbyScriptLine = {
+  audioCueKey: string;
+  audioSpeaker: 'bobby';
   hesitationBeatMs: number;
   hintLabel: string;
   leadInPauseMs: number;
@@ -77,6 +79,8 @@ export function getBobbyScriptLine({
     BOBBY_SCRIPT_VARIANTS[currentItemIndex % BOBBY_SCRIPT_VARIANTS.length];
 
   return {
+    audioCueKey: `bobby:${stageId}:${phase}:${currentItemIndex}`,
+    audioSpeaker: 'bobby',
     hesitationBeatMs: BOBBY_RESPONSE_ENVELOPE.hesitationBeatMs,
     hintLabel: variant.hintLabel,
     leadInPauseMs: BOBBY_RESPONSE_ENVELOPE.leadInPauseMs,

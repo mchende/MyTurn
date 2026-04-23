@@ -22,6 +22,8 @@ export type TeacherScriptRequest = {
 };
 
 export type TeacherScriptLine = TeacherScriptVariant & {
+  audioCueKey: string;
+  audioSpeaker: 'teacher';
   debugTargetText: string;
 };
 
@@ -142,6 +144,13 @@ export function getTeacherScriptLine({
   });
 
   return {
+    audioCueKey: buildTeacherAudioCueKey({
+      attemptIndex,
+      currentItemIndex,
+      phase,
+      stageId,
+    }),
+    audioSpeaker: 'teacher',
     ...variant,
     debugTargetText: formatDebugTargetText(targetText),
   };
@@ -445,4 +454,13 @@ function getFinalFollowLine(currentItemIndex: number): TeacherScriptVariant {
 
 function formatDebugTargetText(targetText: string) {
   return targetText.trim().toUpperCase();
+}
+
+function buildTeacherAudioCueKey(input: {
+  attemptIndex: number;
+  currentItemIndex: number;
+  phase: ClassroomOrchestratorPhase;
+  stageId: GuidedStageId;
+}) {
+  return `teacher:${input.phase}:${input.stageId}:${input.currentItemIndex}:${input.attemptIndex}`;
 }
