@@ -111,7 +111,7 @@ Verification:
 - Integer phases (6, 7, 8): Planned milestone work
 - Decimal phases (6.1, 6.2): Urgent insertions (marked with INSERTED)
 
-- [ ] **Phase 6: Audio Classroom Runtime** - 建立老师/Bobby 发声、音频预检、麦克风权限与课堂音频运行时
+- [x] **Phase 6: Audio Classroom Runtime** - 建立老师/Bobby 发声、音频预检、麦克风权限与课堂音频运行时
 - [ ] **Phase 7: Speech Recognition Wiring** - 接通孩子语音转写到既有判断链路，并处理超时、失败和成功率
 - [ ] **Phase 8: Usable 15-Minute Voice Lesson** - 打磨整课节奏、闭环验证和真实可用性门槛
 
@@ -129,8 +129,10 @@ Verification:
 
 Plans:
 - [x] 06-01-PLAN.md — 选定老师/Bobby TTS 与浏览器音频运行时策略，建立播放/录音状态和 contract 测试基线
-- [ ] 06-02-PLAN.md — 接入老师/Bobby 发声、首次音频预检与单 CTA 语音入口，并补齐失败/静音兜底 UI
-- [ ] 06-03-PLAN.md — 在课堂页完成音频模式响应式回归与 runtime 调度验证，并补 focused unit/e2e 覆盖
+- [x] 06-02-PLAN.md — 接入老师/Bobby 发声、首次音频预检与单 CTA 语音入口，并补齐失败/静音兜底 UI
+- [x] 06-03-PLAN.md — 在课堂页完成音频模式响应式回归与 runtime 调度验证，并补 focused unit/e2e 覆盖
+Verification:
+- [x] 06-VERIFICATION.md — focused unit + audio classroom runtime smoke 通过（2026-04-23）
 
 ### Phase 7: Speech Recognition Wiring
 **Goal**: 把孩子语音转成 transcript 并接入既有课堂判断链路，让 repeat 和 picture 两类作答都能真实运行，同时把等待时长和成功率控制在可接受范围。
@@ -175,7 +177,7 @@ Current milestone execution: 6 -> 7 -> 8
 | 3. Guided Speaking Flow | 3/3 | Complete (verified) | 2026-04-21 |
 | 4. Hints and Judgment | 3/3 | Complete (verified) | 2026-04-21 |
 | 5. Complete MVP Lesson | 3/3 | Complete (verified) | 2026-04-22 |
-| 6. Audio Classroom Runtime | 1/3 | In Progress | — |
+| 6. Audio Classroom Runtime | 3/3 | Complete (verified) | 2026-04-23 |
 | 7. Speech Recognition Wiring | 0/3 | Not started | — |
 | 8. Usable 15-Minute Voice Lesson | 0/3 | Not started | — |
 
@@ -193,4 +195,4 @@ Current milestone execution: 6 -> 7 -> 8
 - 老师与 Bobby 的发声、孩子录音和转写等待必须由统一音频运行时协调
 
 ---
-*Last updated: 2026-04-23 after expanding v1.1 to full audio classroom MVP*
+*Last updated: 2026-04-23 after completing Phase 6 audio classroom runtime*

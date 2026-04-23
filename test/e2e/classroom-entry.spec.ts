@@ -1,8 +1,11 @@
 import { expect, test } from '@playwright/test';
 
+import { installFakeBrowserAudio } from './helpers/fake-browser-audio';
+
 test.setTimeout(60_000);
 
-test('home schedule allows lesson entry', async ({ page }) => {
+test('home schedule allows lesson entry', async ({ context, page }) => {
+  await installFakeBrowserAudio(page, context);
   await page.goto('/', { waitUntil: 'domcontentloaded' });
   await expect(page.getByText('每日语感启蒙')).toBeVisible();
   await expect(page.getByText('Bobby 同学')).toBeVisible();
@@ -22,6 +25,8 @@ test('home schedule allows lesson entry', async ({ page }) => {
   await entryLink.click();
 
   await expect(page).toHaveURL(/\/lesson\//);
+  await expect(page.getByTestId('audio-preflight-card')).toBeVisible();
+  await page.getByTestId('preflight-skip-button').click();
   await expect(page.getByText('Cora 老师')).toBeVisible();
   await expect(page.getByText(/Repeat after Cora/i)).toBeVisible();
   await expect(page.getByText('Listen first. Bobby will model one.')).toBeVisible();
@@ -35,9 +40,16 @@ test('home schedule allows lesson entry', async ({ page }) => {
     .toBe('true');
   await expect(page.getByText('Listen to Bobby once, then you speak.')).toBeVisible();
   await expect(page.getByText('Bobby is modeling')).toBeVisible();
+  await expect(page.getByTestId('classroom-audio-warning')).toContainText(
+    'Audio check skipped',
+  );
 });
 
-test('classroom reward mode reproduces the celebration overlay', async ({ page }) => {
+test('classroom reward mode reproduces the celebration overlay', async ({
+  context,
+  page,
+}) => {
+  await installFakeBrowserAudio(page, context);
   await page.goto('/lesson/weekday-1700?reward=1', { waitUntil: 'domcontentloaded' });
 
   await expect(page.locator('text=GREAT JOB!').last()).toBeVisible();

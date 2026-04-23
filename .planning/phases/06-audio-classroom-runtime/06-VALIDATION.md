@@ -1,9 +1,9 @@
 ---
 phase: 06
 slug: audio-classroom-runtime
-status: draft
+status: passed
 nyquist_compliant: true
-wave_0_complete: false
+wave_0_complete: true
 created: 2026-04-23
 ---
 
@@ -38,12 +38,12 @@ created: 2026-04-23
 
 | Task ID | Plan | Wave | Requirements | Test Type | Automated Command | File Exists | Status |
 |---------|------|------|--------------|-----------|-------------------|-------------|--------|
-| 06-01-01 | 06-01 | 1 | AUDIO-01, AUDIO-02, CLAS-05 | unit | `npm run test:unit -- test/unit/classroom-audio-runtime.test.ts test/unit/teacher-script.test.ts test/unit/bobby-script.test.ts` | ⬜ planned | ⬜ pending |
-| 06-01-02 | 06-01 | 1 | VOICE-01, VOICE-03, CLAS-07 | unit | `npm run test:unit -- test/unit/classroom-audio-runtime.test.ts` | ⬜ planned | ⬜ pending |
-| 06-02-01 | 06-02 | 2 | AUDIO-03, VOICE-01, CLAS-07 | unit + integration | `npm run test:unit -- test/unit/classroom-shell.test.tsx test/unit/classroom-audio-runtime.test.ts` | ✅ existing shell + ⬜ runtime | ⬜ pending |
-| 06-02-02 | 06-02 | 2 | VOICE-02, VOICE-03, CLAS-05 | unit + integration | `npm run test:unit -- test/unit/classroom-shell.test.tsx test/unit/classroom-orchestrator.test.ts test/unit/classroom-audio-runtime.test.ts` | ✅ partial | ⬜ pending |
-| 06-03-01 | 06-03 | 3 | PLAT-03, PLAT-04, AUDIO-03 | unit + integration | `npm run test:unit -- test/unit/classroom-shell.test.tsx test/unit/classroom-audio-runtime.test.ts` | ✅ partial | ⬜ pending |
-| 06-03-02 | 06-03 | 3 | AUDIO-01, AUDIO-02, VOICE-01, VOICE-02, VOICE-03, CLAS-05, CLAS-07, PLAT-03, PLAT-04 | focused e2e | `npm run test:e2e -- test/e2e/classroom-entry.spec.ts test/e2e/audio-classroom-runtime.spec.ts` | `classroom-entry` ✅ / `audio-classroom-runtime` ⬜ planned | ⬜ pending |
+| 06-01-01 | 06-01 | 1 | AUDIO-01, AUDIO-02, CLAS-05 | unit | `npm run test:unit -- test/unit/classroom-audio-runtime.test.ts test/unit/teacher-script.test.ts test/unit/bobby-script.test.ts` | ✅ | ✅ green |
+| 06-01-02 | 06-01 | 1 | VOICE-01, VOICE-03, CLAS-07 | unit | `npm run test:unit -- test/unit/classroom-audio-runtime.test.ts` | ✅ | ✅ green |
+| 06-02-01 | 06-02 | 2 | AUDIO-03, VOICE-01, CLAS-07 | unit + integration | `npm run test:unit -- test/unit/classroom-shell.test.tsx test/unit/classroom-audio-runtime.test.ts` | ✅ | ✅ green |
+| 06-02-02 | 06-02 | 2 | VOICE-02, VOICE-03, CLAS-05 | unit + integration | `npm run test:unit -- test/unit/classroom-shell.test.tsx test/unit/classroom-orchestrator.test.ts test/unit/classroom-audio-runtime.test.ts` | ✅ | ✅ green |
+| 06-03-01 | 06-03 | 3 | PLAT-03, PLAT-04, AUDIO-03 | unit + integration | `npm run test:unit -- test/unit/classroom-shell.test.tsx test/unit/classroom-audio-runtime.test.ts` | ✅ | ✅ green |
+| 06-03-02 | 06-03 | 3 | AUDIO-01, AUDIO-02, VOICE-01, VOICE-02, VOICE-03, CLAS-05, CLAS-07, PLAT-03, PLAT-04 | focused e2e | `npm run test:e2e -- test/e2e/classroom-entry.spec.ts test/e2e/audio-classroom-runtime.spec.ts` | `classroom-entry` ✅ / `audio-classroom-runtime` ✅ | ✅ green |
 
 *Status: ⬜ pending · ✅ green · ❌ red · ⚠️ flaky*
 
@@ -51,10 +51,10 @@ created: 2026-04-23
 
 ## Pre-Execution Test Bootstrap
 
-- [ ] `test/unit/classroom-audio-runtime.test.ts` — 覆盖播放顺序、play reject、permission 预读、`MediaRecorder` contract、空录音/失败兜底
-- [ ] `test/unit/bobby-script.test.ts` — 覆盖 Bobby 只在 `repeat-after-teacher` 的 `ai_model` 出声
-- [ ] `test/unit/classroom-shell.test.tsx` — 扩展 preflight gate、轻量播放态、单 CTA 录音态和 failure retry UI
-- [ ] `test/e2e/audio-classroom-runtime.spec.ts` — focused browser smoke，覆盖 preflight -> playback -> record CTA 基本闭环
+- [x] `test/unit/classroom-audio-runtime.test.ts` — 覆盖播放顺序、play reject、permission 预读、`MediaRecorder` contract、空录音/失败兜底
+- [x] `test/unit/bobby-script.test.ts` — 覆盖 Bobby 只在 `repeat-after-teacher` 的 `ai_model` 出声
+- [x] `test/unit/classroom-shell.test.tsx` — 扩展 preflight gate、轻量播放态、单 CTA 录音态和 failure retry UI
+- [x] `test/e2e/audio-classroom-runtime.spec.ts` — focused browser smoke，覆盖 preflight -> playback -> record CTA 基本闭环
 
 ---
 
@@ -78,4 +78,4 @@ created: 2026-04-23
 - [x] Validation map matches real plan waves and per-task verify commands
 - [x] `nyquist_compliant: true` set in frontmatter
 
-**Approval:** Phase 06 validation drafted on 2026-04-23 after completing research-first planning.
+**Approval:** passed (2026-04-23 after executing 06-01 / 06-02 / 06-03).
