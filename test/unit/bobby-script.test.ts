@@ -24,6 +24,8 @@ describe('bobby-script', () => {
     expect(line?.spokenLine).toMatch(/apple/i);
     expect(line?.spokenLine).toMatch(/uh|um/i);
     expect(line?.hintLabel).toMatch(/Bobby/i);
+    expect(line?.audioSpeaker).toBe('bobby');
+    expect(line?.audioCueKey).toBe('bobby:repeat-after-teacher:ai_model:0');
     expect(line?.hesitationBeatMs).toBeGreaterThan(0);
   });
 

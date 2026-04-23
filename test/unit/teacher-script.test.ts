@@ -138,10 +138,32 @@ describe('teacher-script', () => {
 
     expect(warmupLine.hintLabel).toBe('Class hello');
     expect(warmupLine.visibleCaption).toBe('Hello, class. Cora is here.');
+    expect(warmupLine.audioSpeaker).toBe('teacher');
+    expect(warmupLine.audioCueKey).toBe('teacher:warmup:repeat-after-teacher:0:0');
     expect(wrapUpLine.hintLabel).toBe('Class closing');
     expect(wrapUpLine.visibleCaption).toBe('Great work today. Class is all done.');
+    expect(wrapUpLine.audioSpeaker).toBe('teacher');
+    expect(wrapUpLine.audioCueKey).toBe('teacher:wrap_up:picture-talk:0:0');
     expect(completeLine.hintLabel).toBe('Class complete');
     expect(completeLine.visibleCaption).toBe('You finished class. See you next time.');
+    expect(completeLine.audioSpeaker).toBe('teacher');
+    expect(completeLine.audioCueKey).toBe('teacher:lesson_complete:picture-talk:0:0');
+  });
+
+  it('keeps reward-stage spoken contracts audio-ready without changing child-facing copy', () => {
+    const rewardLine = getTeacherScriptLine({
+      currentItemIndex: 0,
+      attemptIndex: 0,
+      participationState: 'idle',
+      phase: 'completion_reward',
+      stageId: 'picture-talk',
+      targetText,
+    });
+
+    expect(rewardLine.audioSpeaker).toBe('teacher');
+    expect(rewardLine.audioCueKey).toBe('teacher:completion_reward:picture-talk:0:0');
+    expect(rewardLine.spokenModel).toBe('Great job today. Class is complete.');
+    expect(rewardLine.visibleCaption).toBe('Great job today. Class is complete.');
   });
 
   it('uses one short Nice answer line for picture-talk success feedback', () => {
