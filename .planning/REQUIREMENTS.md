@@ -46,6 +46,12 @@
 
 ## v1.1 Increment Requirements
 
+### Audio Output
+
+- [ ] **AUDIO-01**: 老师在示范、点名、鼓励、过渡、wrap-up 与 reward 环节具备稳定可播放的英文语音输出
+- [ ] **AUDIO-02**: Bobby 只在 `repeat-after-teacher` 的 `ai_model` 环节发声，并保持可信但不过度完美的同龄感
+- [ ] **AUDIO-03**: 课堂在播放老师/Bobby 语音时提供清晰但轻量的播放状态反馈，不遮挡主课件区域
+
 ### Voice Capture
 
 - [ ] **VOICE-01**: 用户可以在浏览器中授权麦克风，并在课堂里进入可用的语音输入状态
@@ -61,15 +67,19 @@
 
 ### Classroom Experience
 
-- [ ] **CLAS-05**: 听录音、等待转写、出结果和重试过程仍应保持“像一节课”的节奏，而不是出现工具式大遮罩或复杂操作
-- [ ] **CLAS-06**: Bobby 仍只在 `repeat-after-teacher` 的 `ai_model` 出现，reward 仍只在结尾出现一次
-- [ ] **CLAS-07**: 结课后约 3 秒自动回首页，并继续显示刚完成课次的余温状态
+- [ ] **CLAS-05**: 播放老师/Bobby 语音、开始录音、等待转写和给出反馈之间由统一的课堂音频调度控制，避免声音重叠或录音被打断
+- [ ] **CLAS-06**: 听录音、等待转写、出结果和重试过程仍应保持“像一节课”的节奏，而不是出现工具式大遮罩或复杂操作
+- [ ] **CLAS-07**: 用户在第一次正式进课前可以完成轻量的扬声器 / 麦克风可用性检查，而不会打断进入课堂的主路径
+- [ ] **CLAS-08**: Bobby 仍只在 `repeat-after-teacher` 的 `ai_model` 出现，reward 仍只在结尾出现一次
+- [ ] **CLAS-09**: 结课后约 3 秒自动回首页，并继续显示刚完成课次的余温状态
+- [ ] **CLAS-10**: 课堂 pacing 可以稳定落在一节 15 分钟小课的目标区间内，而不是显著偏短或拖长
 
 ### Platform and Usability
 
 - [ ] **PLAT-03**: 产品在平板横屏上完成整节真实语音课堂时，页面布局、老师区、讲台区、图片区和顶部学生区都保持可见与可用
 - [ ] **PLAT-04**: 在桌面和中等宽度视口下，课堂页面应优先保证完整可见与可滚动，而不是因固定高度裁切核心区域
-- [ ] **PLAT-05**: 通过 focused unit / e2e 证明“从首页进课 -> 真实语音作答 -> 结课回首页”的网页闭环成立
+- [ ] **PLAT-05**: 在常见浏览器环境中，老师/Bobby 播放、孩子录音和转写链路具备可接受的成功率与等待体验
+- [ ] **PLAT-06**: 通过 focused unit / e2e 证明“从首页进课 -> 老师/Bobby 发声 -> 真实语音作答 -> 结课回首页”的网页闭环成立
 
 ## Future Milestones
 
@@ -80,8 +90,8 @@
 
 ### Classroom Expansion
 
-- **CLAS-08**: 多个真实孩子可以加入同一节实时课堂
-- **CLAS-09**: 课堂记录与重复上课安排可以跨越多次上课会话
+- **CLAS-11**: 多个真实孩子可以加入同一节实时课堂
+- **CLAS-12**: 课堂记录与重复上课安排可以跨越多次上课会话
 
 ### Business and Ops
 
@@ -130,6 +140,9 @@
 
 | Requirement | Planned Phase | Status |
 |-------------|---------------|--------|
+| AUDIO-01 | Phase 6 | Planned |
+| AUDIO-02 | Phase 6 | Planned |
+| AUDIO-03 | Phase 6 | Planned |
 | VOICE-01 | Phase 6 | Planned |
 | VOICE-02 | Phase 6 | Planned |
 | VOICE-03 | Phase 6 | Planned |
@@ -137,20 +150,24 @@
 | ASR-02 | Phase 7 | Planned |
 | ASR-03 | Phase 7 | Planned |
 | ASR-04 | Phase 7 | Planned |
-| CLAS-05 | Phase 8 | Planned |
+| CLAS-05 | Phase 6, 8 | Planned |
 | CLAS-06 | Phase 8 | Planned |
-| CLAS-07 | Phase 8 | Planned |
+| CLAS-07 | Phase 6 | Planned |
+| CLAS-08 | Phase 8 | Planned |
+| CLAS-09 | Phase 8 | Planned |
+| CLAS-10 | Phase 8 | Planned |
 | PLAT-03 | Phase 6, 8 | Planned |
 | PLAT-04 | Phase 6, 8 | Planned |
-| PLAT-05 | Phase 8 | Planned |
+| PLAT-05 | Phase 7, 8 | Planned |
+| PLAT-06 | Phase 8 | Planned |
 
 **Coverage:**
 - v1.0 requirements: 共 21 条
 - v1.0 mapped to phases: 已映射 21 条
-- v1.1 increment requirements: 共 13 条
-- v1.1 mapped to phases: 已映射 13 条
+- v1.1 increment requirements: 共 20 条
+- v1.1 mapped to phases: 已映射 20 条
 - Unmapped: 0 ✓
 
 ---
 *Requirements defined: 2026-04-15*
-*Last updated: 2026-04-22 after opening v1.1 Voice-Enabled Usable MVP*
+*Last updated: 2026-04-23 after expanding v1.1 to full audio classroom MVP*

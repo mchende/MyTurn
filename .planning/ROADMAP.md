@@ -2,7 +2,7 @@
 
 ## Overview
 
-MyTurn `v1.0` 已经从“可配置的课堂外壳”逐步走到“一节可完整体验的 15 分钟英语口语课”，并完成了课堂原型验证。当前新增的 `v1.1` 将在这个基础上继续推进到“可真实开口使用的网页课堂 MVP”，优先补齐浏览器麦克风、语音转写、等待/失败兜底和整节课可用性验证。
+MyTurn `v1.0` 已经从“可配置的课堂外壳”逐步走到“一节可完整体验的 15 分钟英语口语课”，并完成了课堂原型验证。当前新增的 `v1.1` 将在这个基础上继续推进到“可真实开口使用的完整音频网页课堂 MVP”，优先补齐老师/Bobby 语音输出、浏览器麦克风、语音转写、课堂级音频调度、等待/失败兜底和整节课可用性验证。
 
 ## Milestones
 
@@ -111,56 +111,56 @@ Verification:
 - Integer phases (6, 7, 8): Planned milestone work
 - Decimal phases (6.1, 6.2): Urgent insertions (marked with INSERTED)
 
-- [ ] **Phase 6: Voice Capture Classroom Loop** - 建立浏览器麦克风权限、录音中状态和课堂内可用的语音入口
-- [ ] **Phase 7: Speech Recognition Wiring** - 接通语音转写到既有判断链路，并处理超时、失败和重试
-- [ ] **Phase 8: Usable Voice Lesson Verification** - 打磨课堂等待体验、闭环验证和真实可用性门槛
+- [ ] **Phase 6: Audio Classroom Runtime** - 建立老师/Bobby 发声、音频预检、麦克风权限与课堂音频运行时
+- [ ] **Phase 7: Speech Recognition Wiring** - 接通孩子语音转写到既有判断链路，并处理超时、失败和成功率
+- [ ] **Phase 8: Usable 15-Minute Voice Lesson** - 打磨整课节奏、闭环验证和真实可用性门槛
 
 ## v1.1 Phase Details
 
-### Phase 6: Voice Capture Classroom Loop
-**Goal**: 让孩子在被点名时可以在课堂里自然开口，浏览器麦克风、录音反馈和基础失败兜底保持课堂节奏。
+### Phase 6: Audio Classroom Runtime
+**Goal**: 让课堂先真正“发声并能听见”，把老师/Bobby 播放、首次音频预检、浏览器麦克风权限、录音反馈和基础失败兜底组织成统一的课堂音频运行时。
 **Depends on**: v1.0 classroom prototype
-**Requirements**: [VOICE-01, VOICE-02, VOICE-03, PLAT-03, PLAT-04]
+**Requirements**: [AUDIO-01, AUDIO-02, AUDIO-03, VOICE-01, VOICE-02, VOICE-03, CLAS-05, CLAS-07, PLAT-03, PLAT-04]
 **Success Criteria** (what must be TRUE):
-  1. 用户可以在网页里授权麦克风，并在被点名时进入清晰、单一的说话入口。
-  2. 课堂界面会明确展示录音中、未录到声音、权限失败等基础状态，而不破坏课堂感。
-  3. 平板横屏和中等宽度视口下，顶部学生区、图片区、老师区和讲台区在语音模式下仍完整可见。
+  1. 老师与 Bobby 在各自允许的环节都能稳定播放语音，并保持既有角色边界。
+  2. 用户可以在正式进课前完成轻量的音频预检，并在被点名时进入清晰、单一的说话入口。
+  3. 播放、录音和等待之间由统一音频调度控制，平板横屏和中等宽度视口下课堂区域仍完整可见。
 **Plans**: 3 plans
 
 Plans:
-- [ ] 06-01-PLAN.md — 选定浏览器语音采集策略，建立麦克风权限、录音状态和 hook/contract 测试基线
-- [ ] 06-02-PLAN.md — 把单 CTA 讲台入口接成真实语音输入交互，并补齐失败/静音兜底 UI
-- [ ] 06-03-PLAN.md — 在课堂页完成语音模式响应式回归，并补 focused unit/e2e 覆盖
+- [ ] 06-01-PLAN.md — 选定老师/Bobby TTS 与浏览器音频运行时策略，建立播放/录音状态和 contract 测试基线
+- [ ] 06-02-PLAN.md — 接入老师/Bobby 发声、首次音频预检与单 CTA 语音入口，并补齐失败/静音兜底 UI
+- [ ] 06-03-PLAN.md — 在课堂页完成音频模式响应式回归与 runtime 调度验证，并补 focused unit/e2e 覆盖
 
 ### Phase 7: Speech Recognition Wiring
-**Goal**: 把孩子语音转成 transcript 并接入既有课堂判断链路，让 repeat 和 picture 两类作答都能真实运行。
+**Goal**: 把孩子语音转成 transcript 并接入既有课堂判断链路，让 repeat 和 picture 两类作答都能真实运行，同时把等待时长和成功率控制在可接受范围。
 **Depends on**: Phase 6
-**Requirements**: [ASR-01, ASR-02, ASR-03, ASR-04]
+**Requirements**: [ASR-01, ASR-02, ASR-03, ASR-04, PLAT-05]
 **Success Criteria** (what must be TRUE):
   1. 语音输入会产生可被现有 orchestrator 消费的 transcript，而不是另起一套课堂逻辑。
   2. `repeat-after-teacher` 和 `picture-talk` 分别继续使用既有判断合同，不因语音接入被削弱。
-  3. 语音识别超时、失败或低质量输入时，课堂会进入明确的重试或兜底路径，而不会卡死。
+  3. 语音识别超时、失败或低质量输入时，课堂会进入明确的重试或兜底路径，而不会卡死，并能观测到基本成功率和等待体验。
 **Plans**: 3 plans
 
 Plans:
-- [ ] 07-01-PLAN.md — 建立 transcript adapter 与 Wave 0 识别/判断合同测试
+- [ ] 07-01-PLAN.md — 建立 transcript adapter、超时/成功率观测点与 Wave 0 识别合同测试
 - [ ] 07-02-PLAN.md — 接通 repeat-after-teacher 语音判断链路，并保持 Bobby 角色边界不变
-- [ ] 07-03-PLAN.md — 接通 picture-talk 语音判断链路，并补齐失败/超时回归验证
+- [ ] 07-03-PLAN.md — 接通 picture-talk 语音判断链路，并补齐失败/超时/成功率回归验证
 
-### Phase 8: Usable Voice Lesson Verification
-**Goal**: 让整节课堂在真实语音模式下完成闭环，并用 focused 验证证明这已经是“可正常使用”的 MVP。
+### Phase 8: Usable 15-Minute Voice Lesson
+**Goal**: 让整节课堂在真实音频模式下完成闭环，并用 focused 验证证明这已经是一节可正常使用的 15 分钟小课。
 **Depends on**: Phase 7
-**Requirements**: [CLAS-05, CLAS-06, CLAS-07, PLAT-05]
+**Requirements**: [CLAS-06, CLAS-08, CLAS-09, CLAS-10, PLAT-03, PLAT-04, PLAT-05, PLAT-06]
 **Success Criteria** (what must be TRUE):
-  1. 首页进课、课堂语音作答、结课奖励、3 秒停留和回首页余温态能在真实网页流中闭环。
-  2. 课堂等待、转写和重试时的反馈依然像一节课，而不是被工具态交互打断。
-  3. Focused unit / e2e 与人工走查足以证明语音版课堂可正常使用。
+  1. 首页进课、老师/Bobby 发声、课堂语音作答、结课奖励、3 秒停留和回首页余温态能在真实网页流中闭环。
+  2. 整节课的播放、等待、转写和重试反馈依然像一节课，并且 pacing 能稳定落在目标 15 分钟区间。
+  3. Focused unit / e2e 与人工走查足以证明音频版课堂可正常使用。
 **Plans**: 3 plans
 
 Plans:
-- [ ] 08-01-PLAN.md — 打磨 listening/transcribing/recognition result 的课堂化反馈与 closeout surface
-- [ ] 08-02-PLAN.md — 打通首页到结课回流的完整语音网页闭环，并补 recently-completed 余温态消费
-- [ ] 08-03-PLAN.md — 执行 focused unit/e2e + manual UAT，完成 v1.1 verifier 收尾
+- [ ] 08-01-PLAN.md — 打磨 listening/transcribing/recognition result 与播放反馈的课堂化反馈和 closeout surface
+- [ ] 08-02-PLAN.md — 打通首页到结课回流的完整音频网页闭环，并补 recently-completed 余温态消费
+- [ ] 08-03-PLAN.md — 执行 focused unit/e2e + manual UAT，校准 15 分钟节奏并完成 v1.1 verifier 收尾
 
 ## Progress
 
@@ -175,9 +175,9 @@ Current milestone execution: 6 -> 7 -> 8
 | 3. Guided Speaking Flow | 3/3 | Complete (verified) | 2026-04-21 |
 | 4. Hints and Judgment | 3/3 | Complete (verified) | 2026-04-21 |
 | 5. Complete MVP Lesson | 3/3 | Complete (verified) | 2026-04-22 |
-| 6. Voice Capture Classroom Loop | 0/3 | Not started | — |
+| 6. Audio Classroom Runtime | 0/3 | Not started | — |
 | 7. Speech Recognition Wiring | 0/3 | Not started | — |
-| 8. Usable Voice Lesson Verification | 0/3 | Not started | — |
+| 8. Usable 15-Minute Voice Lesson | 0/3 | Not started | — |
 
 ## Carryover Contracts
 
@@ -190,6 +190,7 @@ Current milestone execution: 6 -> 7 -> 8
 - reward 只在结尾出现一次
 - 首页 `completedSession` overlay / recently-completed contract 已存在
 - 首页与课堂页都应优先保证完整可见或可滚动，而不是依赖固定高度裁切
+- 老师与 Bobby 的发声、孩子录音和转写等待必须由统一音频运行时协调
 
 ---
-*Last updated: 2026-04-22 after opening v1.1 Voice-Enabled Usable MVP*
+*Last updated: 2026-04-23 after expanding v1.1 to full audio classroom MVP*
