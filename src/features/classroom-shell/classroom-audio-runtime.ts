@@ -15,6 +15,15 @@ export type ClassroomAudioErrorReason =
   | 'recording_failed'
   | 'recording_empty';
 
+export type ClassroomTranscriptFailureReason =
+  | 'timeout'
+  | 'empty'
+  | 'unavailable'
+  | 'error'
+  | 'low_confidence';
+
+export type ClassroomTranscriptStatus = 'idle' | 'waiting' | 'resolved' | 'failed';
+
 export type ClassroomAudioRetryableStep =
   | 'playback'
   | 'microphone-check'
@@ -47,6 +56,7 @@ export type ClassroomAudioSnapshot = {
     reason: ClassroomAudioErrorReason;
   } | null;
   lastRecording: ClassroomRecordingArtifact | null;
+  lastTranscript: string | null;
   preflight: {
     microphonePermission: 'unknown' | 'prompt' | 'granted' | 'denied';
     microphoneReady: boolean;
@@ -55,6 +65,9 @@ export type ClassroomAudioSnapshot = {
   };
   retryableStep: ClassroomAudioRetryableStep;
   status: ClassroomAudioStatus;
+  transcriptFailureReason: ClassroomTranscriptFailureReason | null;
+  transcriptLatencyMs: number | null;
+  transcriptStatus: ClassroomTranscriptStatus;
 };
 
 type MediaRecorderCtor = typeof MediaRecorder;
@@ -68,6 +81,7 @@ type CreateClassroomAudioRuntimeOptions = {
   getUserMedia?: ((constraints: MediaStreamConstraints) => Promise<MediaStream>) | null;
   now?: () => number;
   queryPermission?: PermissionQuery | null;
+  transcriptTimeoutMs?: number;
 };
 
 type Listener = (snapshot: ClassroomAudioSnapshot) => void;
@@ -80,6 +94,7 @@ export function createClassroomAudioRuntime({
   getUserMedia = defaultGetUserMedia,
   now = () => Date.now(),
   queryPermission = defaultQueryPermission,
+  transcriptTimeoutMs = 3500,
 }: CreateClassroomAudioRuntimeOptions) {
   const listeners = new Set<Listener>();
 
@@ -89,6 +104,7 @@ export function createClassroomAudioRuntime({
     currentSpeaker: null,
     lastError: null,
     lastRecording: null,
+    lastTranscript: null,
     preflight: {
       microphonePermission: 'unknown',
       microphoneReady: false,
@@ -97,6 +113,9 @@ export function createClassroomAudioRuntime({
     },
     retryableStep: null,
     status: 'idle',
+    transcriptFailureReason: null,
+    transcriptLatencyMs: null,
+    transcriptStatus: 'idle',
   };
   let currentRecorder:
     | {
@@ -109,6 +128,8 @@ export function createClassroomAudioRuntime({
       }
     | null = null;
   let retryAction: (() => Promise<unknown>) | null = null;
+  let transcriptTimeoutHandle: ReturnType<typeof setTimeout> | null = null;
+  let transcriptWaitStartedAt: number | null = null;
 
   function emit(nextSnapshot: ClassroomAudioSnapshot) {
     snapshot = nextSnapshot;
@@ -119,6 +140,25 @@ export function createClassroomAudioRuntime({
     updater: (current: ClassroomAudioSnapshot) => ClassroomAudioSnapshot,
   ) {
     emit(updater(snapshot));
+  }
+
+  function clearTranscriptTimeout() {
+    if (transcriptTimeoutHandle) {
+      clearTimeout(transcriptTimeoutHandle);
+      transcriptTimeoutHandle = null;
+    }
+  }
+
+  function resetTranscriptTelemetry() {
+    clearTranscriptTimeout();
+    transcriptWaitStartedAt = null;
+    patchSnapshot((current) => ({
+      ...current,
+      lastTranscript: null,
+      transcriptFailureReason: null,
+      transcriptLatencyMs: null,
+      transcriptStatus: 'idle',
+    }));
   }
 
   function markReady() {
@@ -149,6 +189,65 @@ export function createClassroomAudioRuntime({
       lastError: { message, reason },
       retryableStep,
       status,
+    }));
+  }
+
+  function beginTranscriptWait(artifact: ClassroomRecordingArtifact) {
+    clearTranscriptTimeout();
+    transcriptWaitStartedAt = now();
+    patchSnapshot((current) => ({
+      ...current,
+      canStartRecording: false,
+      currentCue: null,
+      currentSpeaker: null,
+      lastError: null,
+      lastRecording: artifact,
+      retryableStep: null,
+      status: 'awaiting_transcript',
+      transcriptFailureReason: null,
+      transcriptLatencyMs: null,
+      transcriptStatus: 'waiting',
+    }));
+
+    transcriptTimeoutHandle = setTimeout(() => {
+      failTranscript('timeout');
+    }, transcriptTimeoutMs);
+  }
+
+  function resolveTranscript(transcript: string) {
+    clearTranscriptTimeout();
+    const latencyMs =
+      transcriptWaitStartedAt === null ? null : Math.max(0, now() - transcriptWaitStartedAt);
+    transcriptWaitStartedAt = null;
+    patchSnapshot((current) => ({
+      ...current,
+      canStartRecording: true,
+      currentCue: null,
+      currentSpeaker: null,
+      retryableStep: null,
+      status: 'ready',
+      lastTranscript: transcript,
+      transcriptFailureReason: null,
+      transcriptLatencyMs: latencyMs,
+      transcriptStatus: 'resolved',
+    }));
+  }
+
+  function failTranscript(reason: ClassroomTranscriptFailureReason) {
+    clearTranscriptTimeout();
+    const latencyMs =
+      transcriptWaitStartedAt === null ? null : Math.max(0, now() - transcriptWaitStartedAt);
+    transcriptWaitStartedAt = null;
+    patchSnapshot((current) => ({
+      ...current,
+      canStartRecording: true,
+      currentCue: null,
+      currentSpeaker: null,
+      retryableStep: 'recording',
+      status: 'ready',
+      transcriptFailureReason: reason,
+      transcriptLatencyMs: latencyMs,
+      transcriptStatus: 'failed',
     }));
   }
 
@@ -273,6 +372,7 @@ export function createClassroomAudioRuntime({
     }
 
     retryAction = () => startStudentRecording();
+    resetTranscriptTelemetry();
 
     if (!getUserMedia || !MediaRecorderCtor) {
       const error = new Error('Recording is unavailable in this browser.');
@@ -365,16 +465,7 @@ export function createClassroomAudioRuntime({
             mimeType: recordingContext.mimeType,
           };
 
-          patchSnapshot((current) => ({
-            ...current,
-            canStartRecording: false,
-            currentCue: null,
-            currentSpeaker: null,
-            lastError: null,
-            lastRecording: artifact,
-            retryableStep: null,
-            status: 'awaiting_transcript',
-          }));
+          beginTranscriptWait(artifact);
           resolve(artifact);
         };
 
@@ -419,6 +510,7 @@ export function createClassroomAudioRuntime({
 
   function dispose() {
     cleanupRecorder();
+    clearTranscriptTimeout();
     audioService.stop?.();
     listeners.clear();
   }
@@ -434,6 +526,8 @@ export function createClassroomAudioRuntime({
     skipPreflight,
     startStudentRecording,
     stopStudentRecording,
+    failTranscript,
+    resolveTranscript,
     subscribe(listener: Listener) {
       listeners.add(listener);
       return () => listeners.delete(listener);

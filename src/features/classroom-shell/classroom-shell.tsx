@@ -145,6 +145,23 @@ export function ClassroomShell({
           </div>
         ) : null}
 
+        {audio.showDebugHud ? (
+          <div
+            className="mx-2 flex flex-wrap items-center gap-2 rounded-[22px] border border-white/8 bg-slate-950/45 px-4 py-2 text-[11px] font-medium text-white/68 sm:mx-4"
+            data-testid="classroom-audio-debug"
+          >
+            <span data-testid="debug-transcript-status">
+              transcript: {audio.runtimeSnapshot.transcriptStatus}
+            </span>
+            <span data-testid="debug-transcript-latency">
+              latency: {audio.runtimeSnapshot.transcriptLatencyMs ?? 'n/a'}
+            </span>
+            <span data-testid="debug-transcript-reason">
+              reason: {audio.runtimeSnapshot.transcriptFailureReason ?? 'none'}
+            </span>
+          </div>
+        ) : null}
+
         <div className="flex flex-1 flex-col gap-4 xl:min-h-0 xl:flex-row xl:gap-6">
           <section className="min-w-0 xl:flex-[3]">
             <LessonBoard

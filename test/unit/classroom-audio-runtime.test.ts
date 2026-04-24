@@ -183,6 +183,51 @@ describe('classroom-audio-runtime', () => {
     expect(artifact.blob.size).toBeGreaterThan(0);
     expect(fakeStream.track.stop).toHaveBeenCalledTimes(1);
     expect(runtime.getSnapshot().status).toBe('awaiting_transcript');
+    expect(runtime.getSnapshot().transcriptStatus).toBe('waiting');
+    expect(runtime.getSnapshot().transcriptFailureReason).toBeNull();
+    expect(runtime.getSnapshot().transcriptLatencyMs).toBeNull();
+  });
+
+  it('times out transcript waiting with explicit telemetry instead of staying stuck', async () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(0);
+    FakeMediaRecorder.instances = [];
+
+    try {
+      const fakeStream = createFakeStream();
+      const runtime = createClassroomAudioRuntime({
+        audioService: {
+          playCue: vi.fn(async () => {}),
+        },
+        getUserMedia: vi.fn(async () => fakeStream.stream),
+        MediaRecorderCtor: FakeMediaRecorder as unknown as typeof MediaRecorder,
+        transcriptTimeoutMs: 3500,
+      });
+
+      await runtime.startStudentRecording();
+
+      const recorder = FakeMediaRecorder.instances.at(-1);
+      const stopPromise = runtime.stopStudentRecording();
+      recorder?.emit('dataavailable', {
+        data: new Blob(['hello'], { type: 'audio/webm;codecs=opus' }),
+      });
+      recorder?.emit('stop');
+
+      await stopPromise;
+
+      expect(runtime.getSnapshot().status).toBe('awaiting_transcript');
+      expect(runtime.getSnapshot().transcriptStatus).toBe('waiting');
+
+      await vi.advanceTimersByTimeAsync(3500);
+
+      expect(runtime.getSnapshot().status).toBe('ready');
+      expect(runtime.getSnapshot().retryableStep).toBe('recording');
+      expect(runtime.getSnapshot().transcriptStatus).toBe('failed');
+      expect(runtime.getSnapshot().transcriptFailureReason).toBe('timeout');
+      expect(runtime.getSnapshot().transcriptLatencyMs).toBe(3500);
+    } finally {
+      vi.useRealTimers();
+    }
   });
 
   it('treats empty recordings as retryable student-audio failures', async () => {

@@ -7,6 +7,7 @@ import {
   type ClassroomAudioCue,
   type ClassroomAudioErrorReason,
   type ClassroomAudioRuntime,
+  type ClassroomAudioSnapshot,
 } from './classroom-audio-runtime';
 import {
   createSpeechSynthesisAudioService,
@@ -29,6 +30,7 @@ export type ClassroomAudioRuntimeOverrides = {
   ) => Promise<{
     state: 'prompt' | 'granted' | 'denied';
   }> | null;
+  transcriptTimeoutMs?: number;
 };
 
 type UseClassroomAudioRuntimeOptions = {
@@ -100,6 +102,7 @@ export function useClassroomAudioRuntime({
         (navigator.permissions?.query
           ? navigator.permissions.query.bind(navigator.permissions)
           : null),
+      transcriptTimeoutMs: runtimeOverrides?.transcriptTimeoutMs,
     });
   }
 
@@ -173,7 +176,8 @@ export function useClassroomAudioRuntime({
   const audioModeActive = shouldUseAudioRuntime && preflightDismissed;
   const showRecordingButton =
     studentTurnActive &&
-    (audioModeActive || snapshot.retryableStep === 'recording');
+    ((audioModeActive && snapshot.transcriptStatus !== 'waiting') ||
+      snapshot.retryableStep === 'recording');
   const controlButtonLabel = showRecordingButton
     ? getRecordingButtonLabel(snapshot.retryableStep, snapshot.status)
     : null;
@@ -193,7 +197,7 @@ export function useClassroomAudioRuntime({
   return {
     audioEnabled: shouldUseAudioRuntime,
     audioModeActive,
-    audioStateLabel: getAudioStateLabel(snapshot.status, snapshot.lastError?.reason),
+    audioStateLabel: getAudioStateLabel(snapshot),
     controlButtonLabel,
     preflightActions: {
       checkMicrophone: async () => {
@@ -224,7 +228,12 @@ export function useClassroomAudioRuntime({
     },
     preflightVisible: shouldUseAudioRuntime && !preflightDismissed,
     preflightWarning,
-    recordingStatusLabel: getRecordingStatusLabel(snapshot.status, snapshot.lastError?.reason),
+    recordingStatusLabel: getRecordingStatusLabel(
+      snapshot.status,
+      snapshot.lastError?.reason,
+      snapshot.transcriptStatus,
+    ),
+    showDebugHud: process.env.NODE_ENV !== 'production' && audioModeActive,
     retryAudioStep: async () => {
       await runtimeRef.current?.retryLastStep();
     },
@@ -248,7 +257,6 @@ export function useClassroomAudioRuntime({
       if (snapshot.status === 'recording_student') {
         try {
           await runtimeRef.current.stopStudentRecording();
-          onRecordingAccepted();
         } catch {
           // runtime snapshot already carries the retryable error state
         }
@@ -317,12 +325,8 @@ function resolvePhaseCue(input: {
 }
 
 function getRecordingButtonLabel(
-  retryableStep: ClassroomAudioRuntime['getSnapshot'] extends () => infer T
-    ? T['retryableStep']
-    : never,
-  status: ClassroomAudioRuntime['getSnapshot'] extends () => infer T
-    ? T['status']
-    : never,
+  retryableStep: ClassroomAudioSnapshot['retryableStep'],
+  status: ClassroomAudioSnapshot['status'],
 ) {
   if (status === 'recording_student') {
     return 'Listening... tap again';
@@ -336,11 +340,14 @@ function getRecordingButtonLabel(
 }
 
 function getAudioStateLabel(
-  status: ClassroomAudioRuntime['getSnapshot'] extends () => infer T
-    ? T['status']
-    : never,
-  lastErrorReason: ClassroomAudioErrorReason | undefined,
+  snapshot: ClassroomAudioSnapshot,
 ) {
+  const { status } = snapshot;
+
+  if (snapshot.transcriptStatus === 'waiting') {
+    return 'Cora is listening carefully';
+  }
+
   if (status === 'playing_teacher') {
     return 'Cora is speaking';
   }
@@ -353,11 +360,11 @@ function getAudioStateLabel(
     return 'Listening to your voice';
   }
 
-  if (lastErrorReason === 'playback_blocked') {
+  if (snapshot.lastError?.reason === 'playback_blocked') {
     return 'Tap retry to hear this line';
   }
 
-  if (lastErrorReason) {
+  if (snapshot.lastError?.reason || snapshot.transcriptStatus === 'failed') {
     return 'Audio needs one more try';
   }
 
@@ -369,7 +376,16 @@ function getRecordingStatusLabel(
     ? T['status']
     : never,
   lastErrorReason: ClassroomAudioErrorReason | undefined,
+  transcriptStatus?: ClassroomAudioSnapshot['transcriptStatus'],
 ) {
+  if (transcriptStatus === 'waiting') {
+    return 'One more second...';
+  }
+
+  if (transcriptStatus === 'failed') {
+    return 'Let us try that once more.';
+  }
+
   if (status === 'recording_student') {
     return 'Listening... tap again when you finish.';
   }
@@ -404,5 +420,9 @@ function createIdleSnapshot() {
     },
     retryableStep: null,
     status: 'idle' as const,
+    lastTranscript: null,
+    transcriptFailureReason: null,
+    transcriptLatencyMs: null,
+    transcriptStatus: 'idle' as const,
   };
 }

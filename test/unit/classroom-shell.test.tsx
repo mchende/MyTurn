@@ -29,10 +29,11 @@ beforeEach(() => {
   FakeMediaRecorder.instances = [];
 });
 
-afterEach(() => {
-  cleanup();
-  vi.useRealTimers();
-});
+  afterEach(() => {
+    cleanup();
+    vi.useRealTimers();
+    vi.unstubAllEnvs();
+  });
 
 async function advanceFlow(duration: number) {
   await act(async () => {
@@ -75,10 +76,6 @@ describe('classroom shell layout', () => {
   });
 
   it('wires auto playback and one recording CTA into the classroom shell without exposing Bobby in picture-talk', async () => {
-    const user = userEvent.setup({
-      advanceTimers: vi.advanceTimersByTime,
-      delay: null,
-    });
     const runtimeOverrides = createAudioRuntimeOverrides();
     const playCueMock = runtimeOverrides.audioService?.playCue;
 
@@ -129,15 +126,19 @@ describe('classroom shell layout', () => {
     expect(
       screen.queryByRole('button', { name: /tap to talk|listening\.\.\. tap again/i }),
     ).not.toBeInTheDocument();
-
+    expect(screen.getByTestId('podium-status')).toHaveTextContent(
+      'One more second...',
+    );
+    expect(screen.getByTestId('teacher-audio-status')).toHaveTextContent(
+      'Cora is listening carefully',
+    );
+    expect(screen.getByTestId('classroom-audio-debug')).toBeInTheDocument();
+    expect(screen.getByTestId('debug-transcript-status')).toHaveTextContent(
+      'transcript: waiting',
+    );
   });
 
   it('keeps retry feedback lightweight when the student recording is empty', async () => {
-    const user = userEvent.setup({
-      advanceTimers: vi.advanceTimersByTime,
-      delay: null,
-    });
-
     FakeMediaRecorder.emitEmptyChunk = true;
     renderAudioClassroom();
 
@@ -160,6 +161,17 @@ describe('classroom shell layout', () => {
       'No voice came through. Try again.',
     );
     expect(screen.queryByTestId('audio-preflight-card')).not.toBeInTheDocument();
+  });
+
+  it('hides the transcript debug HUD in production while keeping classroom copy intact', async () => {
+    vi.stubEnv('NODE_ENV', 'production');
+
+    renderAudioClassroom();
+
+    await clickAudioControl(screen.getByTestId('preflight-skip-button'));
+
+    expect(screen.getByText('Cora 老师')).toBeInTheDocument();
+    expect(screen.queryByTestId('classroom-audio-debug')).not.toBeInTheDocument();
   });
 
   it('renders the immersive shell with fixed seats and teacher-script copy', () => {
