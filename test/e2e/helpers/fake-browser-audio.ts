@@ -1,5 +1,10 @@
 import type { BrowserContext, Page } from '@playwright/test';
 
+export type FakeRecognitionResult = {
+  reason?: 'timeout' | 'empty' | 'unavailable' | 'error';
+  transcript: string | null;
+};
+
 export async function installFakeBrowserAudio(
   page: Page,
   context: BrowserContext,
@@ -68,6 +73,72 @@ export async function installFakeBrowserAudio(
       }
     }
 
+    const recognitionQueue: Array<{
+      reason?: 'timeout' | 'empty' | 'unavailable' | 'error';
+      transcript: string | null;
+    }> = [];
+
+    class FakeSpeechRecognition {
+      continuous = false;
+      interimResults = false;
+      lang = 'en-US';
+      maxAlternatives = 1;
+
+      private listeners = new Map<string, Set<(event?: unknown) => void>>();
+
+      addEventListener(name: string, listener: (event?: unknown) => void) {
+        if (!this.listeners.has(name)) {
+          this.listeners.set(name, new Set());
+        }
+
+        this.listeners.get(name)?.add(listener);
+      }
+
+      start() {}
+
+      stop() {
+        const nextResult = recognitionQueue.shift() ?? null;
+
+        if (!nextResult || nextResult.reason === 'timeout') {
+          return;
+        }
+
+        if (
+          nextResult.reason === 'error' ||
+          nextResult.reason === 'unavailable'
+        ) {
+          this.emit('error', {
+            error: nextResult.reason,
+            message: nextResult.reason,
+          });
+          return;
+        }
+
+        const transcript =
+          nextResult.reason === 'empty' ? '' : nextResult.transcript ?? '';
+
+        this.emit('result', {
+          resultIndex: 0,
+          results: [
+            [
+              {
+                confidence: 0.91,
+                transcript,
+              },
+            ],
+          ],
+        });
+      }
+
+      abort() {
+        this.emit('end');
+      }
+
+      private emit(name: string, event?: unknown) {
+        this.listeners.get(name)?.forEach((listener) => listener(event));
+      }
+    }
+
     const fakeSpeechSynthesis = {
       cancel() {},
       getVoices() {
@@ -91,6 +162,23 @@ export async function installFakeBrowserAudio(
     Object.defineProperty(window, 'MediaRecorder', {
       configurable: true,
       value: FakeMediaRecorder,
+    });
+    Object.defineProperty(window, 'SpeechRecognition', {
+      configurable: true,
+      value: FakeSpeechRecognition,
+    });
+    Object.defineProperty(window, 'webkitSpeechRecognition', {
+      configurable: true,
+      value: FakeSpeechRecognition,
+    });
+    Object.defineProperty(window, '__pushFakeRecognitionResult', {
+      configurable: true,
+      value: (result: {
+        reason?: 'timeout' | 'empty' | 'unavailable' | 'error';
+        transcript: string | null;
+      }) => {
+        recognitionQueue.push(result);
+      },
     });
 
     const originalMediaDevices = navigator.mediaDevices;
@@ -119,4 +207,17 @@ export async function installFakeBrowserAudio(
       },
     });
   });
+}
+
+export async function queueFakeRecognitionResult(
+  page: Page,
+  result: FakeRecognitionResult,
+) {
+  await page.evaluate((nextResult) => {
+    (
+      window as typeof window & {
+        __pushFakeRecognitionResult?: (result: FakeRecognitionResult) => void;
+      }
+    ).__pushFakeRecognitionResult?.(nextResult);
+  }, result);
 }
