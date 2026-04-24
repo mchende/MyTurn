@@ -146,7 +146,7 @@ Verification:
 
 Plans:
 - [x] 07-01-PLAN.md — 建立 transcript adapter、超时/成功率观测点与 Wave 0 识别合同测试
-- [ ] 07-02-PLAN.md — 接通 repeat-after-teacher 语音判断链路，并保持 Bobby 角色边界不变
+- [x] 07-02-PLAN.md — 接通 repeat-after-teacher 语音判断链路，并保持 Bobby 角色边界不变
 - [ ] 07-03-PLAN.md — 接通 picture-talk 语音判断链路，并补齐失败/超时/成功率回归验证
 
 ### Phase 8: Usable 15-Minute Voice Lesson
@@ -178,7 +178,7 @@ Current milestone execution: 6 -> 7 -> 8
 | 4. Hints and Judgment | 3/3 | Complete (verified) | 2026-04-21 |
 | 5. Complete MVP Lesson | 3/3 | Complete (verified) | 2026-04-22 |
 | 6. Audio Classroom Runtime | 3/3 | Complete (verified) | 2026-04-23 |
-| 7. Speech Recognition Wiring | 0/3 | Not started | — |
+| 7. Speech Recognition Wiring | 2/3 | In Progress | — |
 | 8. Usable 15-Minute Voice Lesson | 0/3 | Not started | — |
 
 ## Carryover Contracts
