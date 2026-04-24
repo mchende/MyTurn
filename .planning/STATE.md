@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: voice-enabled-usable-mvp
 status: executing
-stopped_at: Completed 07-03-PLAN.md
-last_updated: "2026-04-24T11:40:00.000+08:00"
-last_activity: 2026-04-24 -- Planned Phase 07 speech recognition wiring
+stopped_at: Completed 07-01-PLAN.md
+last_updated: "2026-04-24T20:07:10.5138213+08:00"
+last_activity: 2026-04-24 -- Completed 07-01 transcript foundation and prepared 07-02 repeat wiring
 progress:
   total_phases: 3
   completed_phases: 1
   total_plans: 9
-  completed_plans: 3
-  percent: 33
+  completed_plans: 4
+  percent: 44
 ---
 
 # Project State
@@ -21,16 +21,16 @@ progress:
 See: .planning/PROJECT.md (updated 2026-04-23)
 
 **Core value:** 孩子在整节课里都应真实地感受到自己“正在上一节英语小班课”，并且持续愿意开口说。
-**Current focus:** Phase 07 planned — ready for execution
+**Current focus:** Phase 07 executing — 07-02 repeat recognition wiring
 
 ## Current Position
 
-Phase: 07 (speech-recognition-wiring) — PLANNED
-Plan: 3 of 3
-Status: Phase 06 verified, Phase 07 planned and ready for execution
-Last activity: 2026-04-24 -- Planned Phase 07 speech recognition wiring
+Phase: 07 (speech-recognition-wiring) — EXECUTING
+Plan: 2 of 3
+Status: Completed 07-01 transcript foundation; continuing 07-02 repeat wiring
+Last activity: 2026-04-24 -- Completed 07-01 transcript foundation and prepared 07-02 repeat wiring
 
-Progress: [###-------] 33%
+Progress: [####------] 44%
 
 ## Performance Metrics
 
@@ -38,9 +38,9 @@ Progress: [###-------] 33%
 
 **Next execution target:**
 
-- Start Phase 07 transcript adapter and timeout/success instrumentation
-- Reuse Phase 06 audio runtime instead of reopening playback/recording shell wiring
-- Keep Bobby / reward / lesson-complete carryover contracts unchanged while ASR connects in
+- Execute 07-02: wire repeat-after-teacher transcript -> submitStudentAttempt -> lexical judgment
+- Keep Bobby boundaries, single CTA, and teacher-led fallback intact during recognition waiting/failure
+- Reuse the new transcript telemetry/runtime base from 07-01 instead of reopening preflight or shell layout work
 
 ## Accumulated Context
 
@@ -63,8 +63,8 @@ Progress: [###-------] 33%
 
 ### Pending Todos
 
-- 启动 07-01：建立 transcript adapter、timeout / success instrumentation 与 Wave 0 识别合同测试
 - 启动 07-02：接通 repeat-after-teacher 语音判断链路
+- 启动 07-03：接通 picture-talk transcript 链路并补 focused regression
 - 为 Phase 08 预留整课节奏校准与人工 UAT 门
 
 ### Blockers/Concerns
@@ -76,5 +76,5 @@ Progress: [###-------] 33%
 ## Session Continuity
 
 Last session: 2026-04-24
-Stopped at: Completed 07-03-PLAN.md
-Resume file: .planning/phases/07-speech-recognition-wiring/07-01-PLAN.md
+Stopped at: Completed 07-01-PLAN.md
+Resume file: .planning/phases/07-speech-recognition-wiring/07-02-PLAN.md

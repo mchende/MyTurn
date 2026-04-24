@@ -145,7 +145,7 @@ Verification:
 **Plans**: 3 plans
 
 Plans:
-- [ ] 07-01-PLAN.md — 建立 transcript adapter、超时/成功率观测点与 Wave 0 识别合同测试
+- [x] 07-01-PLAN.md — 建立 transcript adapter、超时/成功率观测点与 Wave 0 识别合同测试
 - [ ] 07-02-PLAN.md — 接通 repeat-after-teacher 语音判断链路，并保持 Bobby 角色边界不变
 - [ ] 07-03-PLAN.md — 接通 picture-talk 语音判断链路，并补齐失败/超时/成功率回归验证
 
