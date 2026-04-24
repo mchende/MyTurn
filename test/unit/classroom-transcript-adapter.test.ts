@@ -16,6 +16,7 @@ describe('classroom transcript adapter', () => {
   it('does not rewrite wrong answers into correct answers', () => {
     expect(adaptRecognizedTranscript('banana')).toBe('banana');
     expect(adaptRecognizedTranscript('uh banana')).not.toBe('apple');
+    expect(adaptRecognizedTranscript('red banana')).not.toBe('red apple');
   });
 
   it('does not fabricate an answer from empty recognition text', () => {

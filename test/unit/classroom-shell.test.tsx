@@ -216,6 +216,43 @@ describe('classroom shell layout', () => {
     ).toHaveLength(1);
   });
 
+  it('runs picture-talk through the same audio transcript path and keeps one CTA', async () => {
+    const recognitionController = createRecognitionController();
+
+    renderAudioClassroom(
+      createAudioRuntimeOverrides({
+        recognitionService: recognitionController.service,
+      }),
+    );
+
+    await clickAudioControl(screen.getByTestId('preflight-skip-button'));
+    await completeAudioRepeatStage(recognitionController);
+
+    expect(screen.getByText('Picture talk · 1/5')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Tap to talk' })).toBeInTheDocument();
+    expect(
+      screen.queryByText(/Bobby goes first|Listen to Bobby|Bobby shows one/i),
+    ).not.toBeInTheDocument();
+
+    await clickAudioControl(screen.getByRole('button', { name: 'Tap to talk' }));
+    await clickAudioControl(screen.getByRole('button', { name: 'Listening... tap again' }));
+
+    await act(async () => {
+      recognitionController.resolveNext({ transcript: 'red apple' });
+      await Promise.resolve();
+    });
+
+    expect(screen.getByText('Nice answer.')).toBeInTheDocument();
+    expect(
+      screen.queryByText(/Bobby goes first|Listen to Bobby|Bobby shows one/i),
+    ).not.toBeInTheDocument();
+
+    await advanceFlow(CLASSROOM_TIMINGS.teacher_feedback);
+    await advanceFlow(CLASSROOM_TIMINGS.move_next);
+
+    expect(screen.getByText('Picture talk · 2/5')).toBeInTheDocument();
+  });
+
   it('hides the transcript debug HUD in production while keeping classroom copy intact', async () => {
     vi.stubEnv('NODE_ENV', 'production');
 
@@ -845,6 +882,28 @@ async function completeRepeatAfterTeacherStage(
     await moveToStudentTurn({ includeWarmup: index === 0 });
     await clickWithUser(actualUser, screen.getByRole('button', { name: 'I said it' }));
     await finishTurn();
+  }
+
+  await advanceFlow(CLASSROOM_TIMINGS.teacher_prompt);
+}
+
+async function completeAudioRepeatStage(
+  recognitionController: ReturnType<typeof createRecognitionController>,
+) {
+  for (let index = 0; index < lesson.items.length; index += 1) {
+    await moveToStudentTurn({ includeWarmup: index === 0 });
+    await clickAudioControl(screen.getByRole('button', { name: 'Tap to talk' }));
+    await clickAudioControl(screen.getByRole('button', { name: 'Listening... tap again' }));
+
+    await act(async () => {
+      recognitionController.resolveNext({
+        transcript: lesson.items[index]?.text ?? null,
+      });
+      await Promise.resolve();
+    });
+
+    await advanceFlow(CLASSROOM_TIMINGS.teacher_feedback);
+    await advanceFlow(CLASSROOM_TIMINGS.move_next);
   }
 
   await advanceFlow(CLASSROOM_TIMINGS.teacher_prompt);

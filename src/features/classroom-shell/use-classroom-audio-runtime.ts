@@ -192,6 +192,9 @@ export function useClassroomAudioRuntime({
   const studentTurnActive =
     activeSeat === 'me' && (phase === 'student_wait' || phase === 'teacher_echo');
   const audioModeActive = shouldUseAudioRuntime && preflightDismissed;
+  const recognitionTurnActive =
+    phase === 'student_wait' &&
+    (stageId === 'repeat-after-teacher' || stageId === 'picture-talk');
   const showRecordingButton =
     studentTurnActive &&
     ((audioModeActive && snapshot.transcriptStatus !== 'waiting') ||
@@ -276,11 +279,7 @@ export function useClassroomAudioRuntime({
         try {
           await runtimeRef.current.stopStudentRecording();
 
-          if (
-            stageId === 'repeat-after-teacher' &&
-            phase === 'student_wait' &&
-            recognitionServiceRef.current
-          ) {
+          if (recognitionTurnActive && recognitionServiceRef.current) {
             await recognitionServiceRef.current.stop();
             const result = await recognitionServiceRef.current.getFinalResult();
 
@@ -321,11 +320,7 @@ export function useClassroomAudioRuntime({
       }
 
       try {
-        if (
-          stageId === 'repeat-after-teacher' &&
-          phase === 'student_wait' &&
-          recognitionServiceRef.current
-        ) {
+        if (recognitionTurnActive && recognitionServiceRef.current) {
           await recognitionServiceRef.current.start();
         }
 
