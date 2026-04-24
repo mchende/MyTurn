@@ -1,9 +1,9 @@
 ---
 phase: 07
 slug: speech-recognition-wiring
-status: draft
+status: human_needed
 nyquist_compliant: true
-wave_0_complete: false
+wave_0_complete: true
 created: 2026-04-24
 ---
 
@@ -38,21 +38,21 @@ created: 2026-04-24
 
 | Task ID | Plan | Wave | Requirements | Test Type | Automated Command | File Exists | Status |
 |---------|------|------|--------------|-----------|-------------------|-------------|--------|
-| 07-01-01 | 07-01 | 1 | ASR-01, ASR-04 | unit | `npm run test:unit -- test/unit/classroom-transcript-adapter.test.ts test/unit/classroom-speech-recognition.test.ts` | ❌ W0 | ⬜ pending |
-| 07-01-02 | 07-01 | 1 | ASR-01, ASR-04, PLAT-05 | unit + integration | `npm run test:unit -- test/unit/classroom-audio-runtime.test.ts test/unit/classroom-shell.test.tsx` | ✅ / ❌ W0 | ⬜ pending |
-| 07-02-01 | 07-02 | 2 | ASR-01, ASR-02 | unit + integration | `npm run test:unit -- test/unit/classroom-shell.test.tsx test/unit/classroom-orchestrator.test.ts test/unit/classroom-audio-runtime.test.ts` | ✅ | ⬜ pending |
-| 07-02-02 | 07-02 | 2 | ASR-02, ASR-04, PLAT-05 | unit | `npm run test:unit -- test/unit/classroom-shell.test.tsx test/unit/classroom-speech-recognition.test.ts test/unit/classroom-orchestrator.test.ts` | ✅ / ❌ W0 | ⬜ pending |
-| 07-03-01 | 07-03 | 3 | ASR-01, ASR-03, ASR-04 | unit + integration | `npm run test:unit -- test/unit/classroom-shell.test.tsx test/unit/classroom-orchestrator.test.ts test/unit/classroom-transcript-adapter.test.ts` | ✅ / ❌ W0 | ⬜ pending |
-| 07-03-02 | 07-03 | 3 | ASR-01, ASR-02, ASR-03, ASR-04, PLAT-05 | focused e2e | `npm run test:e2e -- test/e2e/audio-classroom-runtime.spec.ts` | ✅ | ⬜ pending |
+| 07-01-01 | 07-01 | 1 | ASR-01, ASR-04 | unit | `npm run test:unit -- test/unit/classroom-transcript-adapter.test.ts test/unit/classroom-speech-recognition.test.ts` | ✅ | ✅ green |
+| 07-01-02 | 07-01 | 1 | ASR-01, ASR-04, PLAT-05 | unit + integration | `npm run test:unit -- test/unit/classroom-audio-runtime.test.ts test/unit/classroom-shell.test.tsx` | ✅ | ✅ green |
+| 07-02-01 | 07-02 | 2 | ASR-01, ASR-02 | unit + integration | `npm run test:unit -- test/unit/classroom-shell.test.tsx test/unit/classroom-orchestrator.test.ts test/unit/classroom-audio-runtime.test.ts` | ✅ | ✅ green |
+| 07-02-02 | 07-02 | 2 | ASR-02, ASR-04, PLAT-05 | unit | `npm run test:unit -- test/unit/classroom-shell.test.tsx test/unit/classroom-speech-recognition.test.ts test/unit/classroom-orchestrator.test.ts` | ✅ | ✅ green |
+| 07-03-01 | 07-03 | 3 | ASR-01, ASR-03, ASR-04 | unit + integration | `npm run test:unit -- test/unit/classroom-shell.test.tsx test/unit/classroom-orchestrator.test.ts test/unit/classroom-transcript-adapter.test.ts` | ✅ | ✅ green |
+| 07-03-02 | 07-03 | 3 | ASR-01, ASR-02, ASR-03, ASR-04, PLAT-05 | focused e2e | `npm run test:e2e -- test/e2e/audio-classroom-runtime.spec.ts` | ✅ | ⚠️ blocked locally (`next dev` listen EACCES) |
 
-*Status: ⬜ pending · ✅ green · ❌ red · ⚠️ flaky*
+*Status: ✅ green · ❌ red · ⚠️ blocked/flaky*
 
 ---
 
 ## Pre-Execution Test Bootstrap
 
-- [ ] `test/unit/classroom-transcript-adapter.test.ts` — adapter 只做轻去噪、不做强改写
-- [ ] `test/unit/classroom-speech-recognition.test.ts` — recognition service start/stop/result/error/timeout contract
+- [x] `test/unit/classroom-transcript-adapter.test.ts` — adapter 只做轻去噪、不做强改写
+- [x] `test/unit/classroom-speech-recognition.test.ts` — recognition service start/stop/result/error/timeout contract
 - [x] `test/unit/classroom-audio-runtime.test.ts` — Phase 6 runtime 基线，待扩 waiting transcript telemetry
 - [x] `test/unit/classroom-shell.test.tsx` — Phase 6 shell / CTA / retry 基线，待扩 recognition waiting / dev HUD / repeat/picture transcript path
 - [x] `test/e2e/audio-classroom-runtime.spec.ts` — fake browser audio smoke，待扩 fake recognition transcript 闭环
@@ -79,4 +79,4 @@ created: 2026-04-24
 - [x] Validation map matches real plan waves and per-task verify commands
 - [x] `nyquist_compliant: true` set in frontmatter
 
-**Approval:** pending
+**Approval:** human verification required in a runnable browser environment

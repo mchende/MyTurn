@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: voice-enabled-usable-mvp
-status: executing
-stopped_at: Completed 07-02-PLAN.md
-last_updated: "2026-04-24T20:13:33.0000000+08:00"
-last_activity: 2026-04-24 -- Completed 07-02 repeat recognition wiring and prepared 07-03 picture regression
+status: verifying
+stopped_at: Completed 07-03-PLAN.md
+last_updated: "2026-04-24T20:20:22.0000000+08:00"
+last_activity: 2026-04-24 -- Completed Phase 07 plans; verifier blocked on local Next.js listen EACCES during e2e smoke
 progress:
   total_phases: 3
   completed_phases: 1
   total_plans: 9
-  completed_plans: 5
-  percent: 56
+  completed_plans: 6
+  percent: 67
 ---
 
 # Project State
@@ -21,16 +21,16 @@ progress:
 See: .planning/PROJECT.md (updated 2026-04-23)
 
 **Core value:** 孩子在整节课里都应真实地感受到自己“正在上一节英语小班课”，并且持续愿意开口说。
-**Current focus:** Phase 07 executing — 07-03 picture recognition and focused regression
+**Current focus:** Phase 07 verifying — rerun browser smoke in runnable local-server environment
 
 ## Current Position
 
-Phase: 07 (speech-recognition-wiring) — EXECUTING
+Phase: 07 (speech-recognition-wiring) — VERIFYING
 Plan: 3 of 3
-Status: Completed 07-02 repeat recognition wiring; continuing 07-03 picture recognition and regression
-Last activity: 2026-04-24 -- Completed 07-02 repeat recognition wiring and prepared 07-03 picture regression
+Status: All Phase 07 plans completed; final verdict waiting on runnable browser smoke environment
+Last activity: 2026-04-24 -- Completed Phase 07 plans; verifier blocked on local Next.js listen EACCES during e2e smoke
 
-Progress: [######----] 56%
+Progress: [#######---] 67%
 
 ## Performance Metrics
 
@@ -38,9 +38,9 @@ Progress: [######----] 56%
 
 **Next execution target:**
 
-- Execute 07-03: wire picture-talk transcript -> semantic judgment and close the browser regression loop
-- Reuse the repeat `future_asr` bridge and fake recognition harness instead of reopening repeat logic
-- Add only focused unit/e2e proof for preflight -> repeat recognition -> picture recognition
+- In a runnable local-server environment, execute `npm run test:e2e -- test/e2e/audio-classroom-runtime.spec.ts`
+- Complete one real-browser manual walkthrough for repeat and picture transcript flows
+- After browser evidence is collected, finalize Phase 07 verdict and move to Phase 08
 
 ## Accumulated Context
 
@@ -63,8 +63,8 @@ Progress: [######----] 56%
 
 ### Pending Todos
 
-- 启动 07-03：接通 picture-talk transcript 链路并补 focused regression
-- 完成 Phase 07 verifier、更新 validation/state/roadmap
+- 在可监听本地端口的环境里补跑 `audio-classroom-runtime.spec.ts`
+- 完成 Phase 07 的 real-browser / manual verification sign-off
 - 为 Phase 08 预留整课节奏校准与人工 UAT 门
 
 ### Blockers/Concerns
@@ -76,5 +76,5 @@ Progress: [######----] 56%
 ## Session Continuity
 
 Last session: 2026-04-24
-Stopped at: Completed 07-02-PLAN.md
-Resume file: .planning/phases/07-speech-recognition-wiring/07-03-PLAN.md
+Stopped at: Completed 07-03-PLAN.md
+Resume file: .planning/phases/07-speech-recognition-wiring/07-VERIFICATION.md

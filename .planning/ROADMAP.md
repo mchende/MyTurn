@@ -112,7 +112,7 @@ Verification:
 - Decimal phases (6.1, 6.2): Urgent insertions (marked with INSERTED)
 
 - [x] **Phase 6: Audio Classroom Runtime** - 建立老师/Bobby 发声、音频预检、麦克风权限与课堂音频运行时
-- [ ] **Phase 7: Speech Recognition Wiring** - 接通孩子语音转写到既有判断链路，并处理超时、失败和成功率
+- [ ] **Phase 7: Speech Recognition Wiring** - 接通孩子语音转写到既有判断链路，并处理超时、失败和成功率（plans complete, verification pending）
 - [ ] **Phase 8: Usable 15-Minute Voice Lesson** - 打磨整课节奏、闭环验证和真实可用性门槛
 
 ## v1.1 Phase Details
@@ -147,7 +147,7 @@ Verification:
 Plans:
 - [x] 07-01-PLAN.md — 建立 transcript adapter、超时/成功率观测点与 Wave 0 识别合同测试
 - [x] 07-02-PLAN.md — 接通 repeat-after-teacher 语音判断链路，并保持 Bobby 角色边界不变
-- [ ] 07-03-PLAN.md — 接通 picture-talk 语音判断链路，并补齐失败/超时/成功率回归验证
+- [x] 07-03-PLAN.md — 接通 picture-talk 语音判断链路，并补齐失败/超时/成功率回归验证
 
 ### Phase 8: Usable 15-Minute Voice Lesson
 **Goal**: 让整节课堂在真实音频模式下完成闭环，并用 focused 验证证明这已经是一节可正常使用的 15 分钟小课。
@@ -178,7 +178,7 @@ Current milestone execution: 6 -> 7 -> 8
 | 4. Hints and Judgment | 3/3 | Complete (verified) | 2026-04-21 |
 | 5. Complete MVP Lesson | 3/3 | Complete (verified) | 2026-04-22 |
 | 6. Audio Classroom Runtime | 3/3 | Complete (verified) | 2026-04-23 |
-| 7. Speech Recognition Wiring | 2/3 | In Progress | — |
+| 7. Speech Recognition Wiring | 3/3 | In Progress (verification pending) | — |
 | 8. Usable 15-Minute Voice Lesson | 0/3 | Not started | — |
 
 ## Carryover Contracts
