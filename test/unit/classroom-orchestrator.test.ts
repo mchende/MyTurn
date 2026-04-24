@@ -159,6 +159,58 @@ describe('classroomOrchestratorReducer', () => {
     expect(state.turnResolution).toBe('fallback');
   });
 
+  it('accepts repeat transcripts from future_asr and keeps the existing lexical judgment path', () => {
+    let state = createInitialClassroomState(lessonWeek01Lesson01);
+
+    state = classroomOrchestratorReducer(state, { type: 'phase_timer_completed' });
+    state = classroomOrchestratorReducer(state, { type: 'phase_timer_completed' });
+    state = classroomOrchestratorReducer(state, { type: 'phase_timer_completed' });
+
+    expect(state.phase).toBe('student_wait');
+    expect(state.currentStageId).toBe('repeat-after-teacher');
+
+    state = classroomOrchestratorReducer(state, {
+      type: 'student_attempt_submitted',
+      transcript: 'apple',
+      source: 'future_asr',
+    });
+
+    expect(state.phase).toBe('teacher_feedback');
+    expect(state.turnResolution).toBe('pass');
+    expect(state.participationState).toBe('spoke');
+  });
+
+  it('routes failed repeat transcripts from future_asr into teacher encourage then fallback', () => {
+    let state = createInitialClassroomState(lessonWeek01Lesson01);
+
+    state = classroomOrchestratorReducer(state, { type: 'phase_timer_completed' });
+    state = classroomOrchestratorReducer(state, { type: 'phase_timer_completed' });
+    state = classroomOrchestratorReducer(state, { type: 'phase_timer_completed' });
+
+    state = classroomOrchestratorReducer(state, {
+      type: 'student_attempt_submitted',
+      transcript: null,
+      source: 'future_asr',
+    });
+
+    expect(state.phase).toBe('teacher_encourage');
+    expect(state.turnResolution).toBe('retry');
+
+    state = classroomOrchestratorReducer(state, { type: 'phase_timer_completed' });
+
+    expect(state.phase).toBe('student_wait');
+    expect(state.attemptIndex).toBe(1);
+
+    state = classroomOrchestratorReducer(state, {
+      type: 'student_attempt_submitted',
+      transcript: null,
+      source: 'future_asr',
+    });
+
+    expect(state.phase).toBe('teacher_fallback_model');
+    expect(state.turnResolution).toBe('fallback');
+  });
+
   it('keeps reward hidden during turn feedback and only shows it in the end-of-lesson completion chain', () => {
     const lesson = lessonWeek01Lesson01;
     let state = createInitialClassroomState(lesson);

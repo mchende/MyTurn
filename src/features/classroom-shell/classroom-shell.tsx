@@ -49,6 +49,7 @@ export function ClassroomShell({
     bobbyScriptLine: classroom.bobbyScriptLine,
     forcePreflight: forceAudioPreflight,
     onRecordingAccepted: classroom.confirmStudentParticipation,
+    onSubmitStudentAttempt: classroom.submitStudentAttempt,
     phase: classroom.phase,
     runtimeOverrides: audioRuntimeOverrides,
     stageId: classroom.currentStageId,

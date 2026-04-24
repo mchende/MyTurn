@@ -13,11 +13,17 @@ import {
   createSpeechSynthesisAudioService,
   type ClassroomAudioService,
 } from './classroom-audio-service';
+import { buildRecognitionAttemptPayload } from './classroom-transcript-adapter';
+import {
+  createBrowserSpeechRecognitionService,
+  type ClassroomSpeechRecognitionService,
+} from './classroom-speech-recognition';
 import type { BobbyScriptLine } from './bobby-script';
 import type {
   ClassroomActiveSeat,
   ClassroomOrchestratorPhase,
   GuidedStageId,
+  StudentAttemptSource,
 } from './classroom-orchestrator';
 import type { TeacherScriptLine } from './teacher-script';
 
@@ -30,6 +36,7 @@ export type ClassroomAudioRuntimeOverrides = {
   ) => Promise<{
     state: 'prompt' | 'granted' | 'denied';
   }> | null;
+  recognitionService?: ClassroomSpeechRecognitionService | null;
   transcriptTimeoutMs?: number;
 };
 
@@ -38,6 +45,10 @@ type UseClassroomAudioRuntimeOptions = {
   bobbyScriptLine: BobbyScriptLine | null;
   forcePreflight?: boolean;
   onRecordingAccepted: () => void;
+  onSubmitStudentAttempt: (input: {
+    source: StudentAttemptSource;
+    transcript: string | null;
+  }) => void;
   phase: ClassroomOrchestratorPhase;
   runtimeOverrides?: ClassroomAudioRuntimeOverrides;
   stageId: GuidedStageId;
@@ -49,6 +60,7 @@ export function useClassroomAudioRuntime({
   bobbyScriptLine,
   forcePreflight = false,
   onRecordingAccepted,
+  onSubmitStudentAttempt,
   phase,
   runtimeOverrides,
   stageId,
@@ -58,6 +70,7 @@ export function useClassroomAudioRuntime({
   const audioSupported = hasHydrated && canUseClassroomAudio(runtimeOverrides);
   const shouldUseAudioRuntime = forcePreflight || audioSupported;
   const runtimeRef = useRef<ClassroomAudioRuntime | null>(null);
+  const recognitionServiceRef = useRef<ClassroomSpeechRecognitionService | null>(null);
   const activeCueKeyRef = useRef<string | null>(null);
   const [snapshot, setSnapshot] = useState(createIdleSnapshot);
   const [preflightDismissed, setPreflightDismissed] = useState(
@@ -104,6 +117,11 @@ export function useClassroomAudioRuntime({
           : null),
       transcriptTimeoutMs: runtimeOverrides?.transcriptTimeoutMs,
     });
+  }
+
+  if (!recognitionServiceRef.current && shouldUseAudioRuntime) {
+    recognitionServiceRef.current =
+      runtimeOverrides?.recognitionService ?? createBrowserSpeechRecognitionService();
   }
 
   useEffect(() => {
@@ -257,6 +275,45 @@ export function useClassroomAudioRuntime({
       if (snapshot.status === 'recording_student') {
         try {
           await runtimeRef.current.stopStudentRecording();
+
+          if (
+            stageId === 'repeat-after-teacher' &&
+            phase === 'student_wait' &&
+            recognitionServiceRef.current
+          ) {
+            await recognitionServiceRef.current.stop();
+            const result = await recognitionServiceRef.current.getFinalResult();
+
+            if (!result.transcript) {
+              runtimeRef.current.failTranscript(result.reason ?? 'empty');
+              onSubmitStudentAttempt({
+                source: 'future_asr',
+                transcript: null,
+              });
+              return;
+            }
+
+            const attemptPayload = buildRecognitionAttemptPayload(result.transcript);
+
+            if (!attemptPayload.cleanedTranscript) {
+              runtimeRef.current.failTranscript('empty');
+              onSubmitStudentAttempt({
+                source: 'future_asr',
+                transcript: null,
+              });
+              return;
+            }
+
+            runtimeRef.current.resolveTranscript(attemptPayload.cleanedTranscript);
+            onSubmitStudentAttempt({
+              source: attemptPayload.source,
+              transcript: attemptPayload.cleanedTranscript,
+            });
+            return;
+          }
+
+          runtimeRef.current.resolveTranscript('manual-confirmed');
+          onRecordingAccepted();
         } catch {
           // runtime snapshot already carries the retryable error state
         }
@@ -264,8 +321,17 @@ export function useClassroomAudioRuntime({
       }
 
       try {
+        if (
+          stageId === 'repeat-after-teacher' &&
+          phase === 'student_wait' &&
+          recognitionServiceRef.current
+        ) {
+          await recognitionServiceRef.current.start();
+        }
+
         await runtimeRef.current.startStudentRecording();
       } catch {
+        recognitionServiceRef.current?.cancel();
         // runtime snapshot already carries the retryable error state
       }
     },
