@@ -4,6 +4,10 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { ClassroomShell } from '@/features/classroom-shell/classroom-shell';
 import type { ClassroomAudioRuntimeOverrides } from '@/features/classroom-shell/use-classroom-audio-runtime';
+import type {
+  ClassroomSpeechRecognitionResult,
+  ClassroomSpeechRecognitionService,
+} from '@/features/classroom-shell/classroom-speech-recognition';
 import { CLASSROOM_TIMINGS } from '@/features/classroom-shell/classroom-orchestrator';
 import { getBobbyScriptLine } from '@/features/classroom-shell/bobby-script';
 import { getTeacherScriptLine } from '@/features/classroom-shell/teacher-script';
@@ -29,11 +33,11 @@ beforeEach(() => {
   FakeMediaRecorder.instances = [];
 });
 
-  afterEach(() => {
-    cleanup();
-    vi.useRealTimers();
-    vi.unstubAllEnvs();
-  });
+afterEach(() => {
+  cleanup();
+  vi.useRealTimers();
+  vi.unstubAllEnvs();
+});
 
 async function advanceFlow(duration: number) {
   await act(async () => {
@@ -77,7 +81,9 @@ describe('classroom shell layout', () => {
 
   it('wires auto playback and one recording CTA into the classroom shell without exposing Bobby in picture-talk', async () => {
     const runtimeOverrides = createAudioRuntimeOverrides();
+    const recognitionController = createRecognitionController();
     const playCueMock = runtimeOverrides.audioService?.playCue;
+    runtimeOverrides.recognitionService = recognitionController.service;
 
     renderAudioClassroom(runtimeOverrides);
 
@@ -136,6 +142,16 @@ describe('classroom shell layout', () => {
     expect(screen.getByTestId('debug-transcript-status')).toHaveTextContent(
       'transcript: waiting',
     );
+
+    await act(async () => {
+      recognitionController.resolveNext({ transcript: 'apple' });
+      await Promise.resolve();
+    });
+
+    expect(screen.getByText(/Good job|Nice work|Yes\. I heard you trying carefully\./i)).toBeInTheDocument();
+    expect(
+      screen.queryByText(/Bobby goes first|Listen to Bobby|Bobby shows one/i),
+    ).not.toBeInTheDocument();
   });
 
   it('keeps retry feedback lightweight when the student recording is empty', async () => {
@@ -161,6 +177,43 @@ describe('classroom shell layout', () => {
       'No voice came through. Try again.',
     );
     expect(screen.queryByTestId('audio-preflight-card')).not.toBeInTheDocument();
+  });
+
+  it('routes repeat recognition failures back into teacher-led encouragement with one CTA', async () => {
+    const recognitionController = createRecognitionController();
+
+    renderAudioClassroom(
+      createAudioRuntimeOverrides({
+        recognitionService: recognitionController.service,
+      }),
+    );
+
+    await clickAudioControl(screen.getByTestId('preflight-skip-button'));
+    await moveToStudentTurn({ includeWarmup: true });
+
+    await clickAudioControl(screen.getByRole('button', { name: 'Tap to talk' }));
+    await clickAudioControl(screen.getByRole('button', { name: 'Listening... tap again' }));
+
+    await act(async () => {
+      recognitionController.resolveNext({ transcript: null, reason: 'timeout' });
+      await Promise.resolve();
+    });
+
+    expect(screen.getByText('Say it with me. Nice and slow.')).toBeInTheDocument();
+    expect(screen.getByTestId('podium-status')).not.toHaveTextContent(
+      /provider|timeout|confidence/i,
+    );
+    expect(screen.getByTestId('teacher-audio-status')).not.toHaveTextContent(
+      /provider|timeout|confidence/i,
+    );
+
+    await advanceFlow(CLASSROOM_TIMINGS.teacher_encourage);
+
+    expect(
+      screen.getAllByRole('button', {
+        name: /tap to talk|i said it|i answered/i,
+      }),
+    ).toHaveLength(1);
   });
 
   it('hides the transcript debug HUD in production while keeping classroom copy intact', async () => {
@@ -714,7 +767,9 @@ function renderAudioClassroom(
   );
 }
 
-function createAudioRuntimeOverrides(): ClassroomAudioRuntimeOverrides {
+function createAudioRuntimeOverrides(
+  overrides: Partial<ClassroomAudioRuntimeOverrides> = {},
+): ClassroomAudioRuntimeOverrides {
   return {
     MediaRecorderCtor: FakeMediaRecorder as unknown as typeof MediaRecorder,
     audioService: {
@@ -724,6 +779,36 @@ function createAudioRuntimeOverrides(): ClassroomAudioRuntimeOverrides {
     queryPermission: vi.fn(async () => ({
       state: 'granted',
     })),
+    ...overrides,
+  };
+}
+
+function createRecognitionController() {
+  const resolvers: Array<(result: ClassroomSpeechRecognitionResult) => void> = [];
+
+  const service: ClassroomSpeechRecognitionService = {
+    cancel: vi.fn(),
+    getFinalResult: vi.fn(
+      () =>
+        new Promise<ClassroomSpeechRecognitionResult>((resolve) => {
+          resolvers.push(resolve);
+        }),
+    ),
+    start: vi.fn(async () => {}),
+    stop: vi.fn(async () => {}),
+  };
+
+  return {
+    resolveNext(result: ClassroomSpeechRecognitionResult) {
+      const nextResolver = resolvers.shift();
+
+      if (!nextResolver) {
+        throw new Error('No pending recognition result to resolve.');
+      }
+
+      nextResolver(result);
+    },
+    service,
   };
 }
 
