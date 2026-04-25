@@ -1,8 +1,12 @@
-import { expect, test } from '@playwright/test';
+import { expect, test, type Page } from '@playwright/test';
 
 import { installFakeBrowserAudio } from './helpers/fake-browser-audio';
 
 test.setTimeout(60_000);
+
+async function waitForClassroomShellHydration(page: Page) {
+  await expect(page.getByTestId('classroom-shell')).toHaveAttribute('data-hydrated', 'true');
+}
 
 test('home schedule allows lesson entry', async ({ context, page }) => {
   await installFakeBrowserAudio(page, context);
@@ -25,6 +29,7 @@ test('home schedule allows lesson entry', async ({ context, page }) => {
   await entryLink.click();
 
   await expect(page).toHaveURL(/\/lesson\//);
+  await waitForClassroomShellHydration(page);
   await expect(page.getByTestId('audio-preflight-card')).toBeVisible();
   await page.getByTestId('preflight-skip-button').click();
   await expect(page.getByText('Cora 老师')).toBeVisible();

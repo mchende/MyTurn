@@ -36,6 +36,7 @@ export default async function LessonPage({ params, searchParams }: LessonPagePro
 
   return (
     <ClassroomShell
+      forceAudioPreflight={resolvedSearchParams.reward !== '1'}
       lesson={lesson}
       sessionId={session.sessionId}
       showReward={resolvedSearchParams.reward === '1'}

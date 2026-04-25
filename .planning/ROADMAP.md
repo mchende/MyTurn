@@ -112,7 +112,7 @@ Verification:
 - Decimal phases (6.1, 6.2): Urgent insertions (marked with INSERTED)
 
 - [x] **Phase 6: Audio Classroom Runtime** - 建立老师/Bobby 发声、音频预检、麦克风权限与课堂音频运行时
-- [ ] **Phase 7: Speech Recognition Wiring** - 接通孩子语音转写到既有判断链路，并处理超时、失败和成功率（plans complete, verification pending）
+- [ ] **Phase 7: Speech Recognition Wiring** - 接通孩子语音转写到既有判断链路，并处理超时、失败和成功率（focused browser smoke passed; manual verification pending）
 - [ ] **Phase 8: Usable 15-Minute Voice Lesson** - 打磨整课节奏、闭环验证和真实可用性门槛
 
 ## v1.1 Phase Details
@@ -178,7 +178,7 @@ Current milestone execution: 6 -> 7 -> 8
 | 4. Hints and Judgment | 3/3 | Complete (verified) | 2026-04-21 |
 | 5. Complete MVP Lesson | 3/3 | Complete (verified) | 2026-04-22 |
 | 6. Audio Classroom Runtime | 3/3 | Complete (verified) | 2026-04-23 |
-| 7. Speech Recognition Wiring | 3/3 | In Progress (verification pending) | — |
+| 7. Speech Recognition Wiring | 3/3 | In Progress (manual verification pending) | — |
 | 8. Usable 15-Minute Voice Lesson | 0/3 | Not started | — |
 
 ## Carryover Contracts
@@ -195,4 +195,4 @@ Current milestone execution: 6 -> 7 -> 8
 - 老师与 Bobby 的发声、孩子录音和转写等待必须由统一音频运行时协调
 
 ---
-*Last updated: 2026-04-24 after completing Phase 7 plans and recording verification blocker*
+*Last updated: 2026-04-25 after clearing the Phase 7 focused browser smoke blocker*

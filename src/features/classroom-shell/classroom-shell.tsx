@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Settings2, Sparkles, Volume2, X } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -40,6 +40,7 @@ export function ClassroomShell({
   showReward = false,
 }: ClassroomShellProps) {
   const router = useRouter();
+  const [hasMounted, setHasMounted] = useState(false);
   const classroom = useClassroomOrchestrator({
     lesson,
     showReward,
@@ -57,6 +58,10 @@ export function ClassroomShell({
   });
 
   useEffect(() => {
+    setHasMounted(true);
+  }, []);
+
+  useEffect(() => {
     if (classroom.phase !== 'lesson_complete') {
       return;
     }
@@ -70,7 +75,11 @@ export function ClassroomShell({
 
   if (audio.preflightVisible) {
     return (
-      <main className="relative min-h-screen overflow-y-auto bg-[#0F172A] px-4 py-4 text-white lg:px-6 lg:py-6">
+      <main
+        className="relative min-h-screen overflow-y-auto bg-[#0F172A] px-4 py-4 text-white lg:px-6 lg:py-6"
+        data-hydrated={hasMounted ? 'true' : 'false'}
+        data-testid="classroom-shell"
+      >
         <div className="absolute left-0 top-0 h-[36vh] w-[36vw] rounded-full bg-[#10B981]/8 blur-[120px]" />
         <div className="absolute bottom-0 right-0 h-[30vh] w-[24vw] rounded-full bg-sky-500/8 blur-[120px]" />
 
@@ -108,7 +117,11 @@ export function ClassroomShell({
   }
 
   return (
-    <main className="relative min-h-screen overflow-y-auto bg-[#0F172A] px-4 py-4 text-white lg:px-6 lg:py-6 xl:h-screen xl:overflow-hidden">
+    <main
+      className="relative min-h-screen overflow-y-auto bg-[#0F172A] px-4 py-4 text-white lg:px-6 lg:py-6 xl:h-screen xl:overflow-hidden"
+      data-hydrated={hasMounted ? 'true' : 'false'}
+      data-testid="classroom-shell"
+    >
       <div className="absolute left-0 top-0 h-[36vh] w-[36vw] rounded-full bg-[#10B981]/8 blur-[120px]" />
       <div className="absolute bottom-0 right-0 h-[30vh] w-[24vw] rounded-full bg-sky-500/8 blur-[120px]" />
 

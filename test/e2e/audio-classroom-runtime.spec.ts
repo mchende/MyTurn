@@ -1,4 +1,4 @@
-import { expect, test } from '@playwright/test';
+import { expect, test, type Page } from '@playwright/test';
 
 import {
   installFakeBrowserAudio,
@@ -11,8 +11,13 @@ test.beforeEach(async ({ context, page }) => {
   await installFakeBrowserAudio(page, context);
 });
 
+async function waitForClassroomShellHydration(page: Page) {
+  await expect(page.getByTestId('classroom-shell')).toHaveAttribute('data-hydrated', 'true');
+}
+
 test('preflight checks pass before the classroom shell appears', async ({ page }) => {
   await page.goto('/lesson/weekday-1700', { waitUntil: 'domcontentloaded' });
+  await waitForClassroomShellHydration(page);
 
   await expect(page.getByTestId('audio-preflight-card')).toBeVisible();
   await expect(page.getByText("Let's check your audio.")).toBeVisible();
@@ -30,6 +35,7 @@ test('classroom can pass preflight, finish repeat recognition, and enter picture
   page,
 }) => {
   await page.goto('/lesson/weekday-1700', { waitUntil: 'domcontentloaded' });
+  await waitForClassroomShellHydration(page);
 
   await page.getByTestId('preflight-speaker-check').click();
   await page.getByTestId('preflight-microphone-check').click();
@@ -66,6 +72,7 @@ test('repeat recognition empty results return to teacher-led retry without expos
   page,
 }) => {
   await page.goto('/lesson/weekday-1700', { waitUntil: 'domcontentloaded' });
+  await waitForClassroomShellHydration(page);
 
   await page.getByTestId('preflight-skip-button').click();
 

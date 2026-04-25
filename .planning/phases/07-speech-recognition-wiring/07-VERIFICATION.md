@@ -1,7 +1,7 @@
 ---
 phase: 07-speech-recognition-wiring
 status: human_needed
-verified_on: 2026-04-24
+verified_on: 2026-04-25
 requirements:
   - ASR-01
   - ASR-02
@@ -32,26 +32,18 @@ source_plans:
 
 ```bash
 npm run test:unit -- test/unit/classroom-transcript-adapter.test.ts test/unit/classroom-speech-recognition.test.ts test/unit/classroom-audio-runtime.test.ts test/unit/classroom-shell.test.tsx test/unit/classroom-orchestrator.test.ts
-npx playwright test test/e2e/audio-classroom-runtime.spec.ts --list
+npm run test:e2e -- test/e2e/audio-classroom-runtime.spec.ts test/e2e/classroom-entry.spec.ts
 ```
 
 Result:
 
 - unit: passed on 2026-04-24 (`49/49`)
-- playwright listing: passed on 2026-04-24 (`3` smoke tests discovered)
+- focused playwright smoke: passed on 2026-04-25 (`5/5`)
 
-## Blocked Check
+## Remaining Manual Check
 
-```bash
-npm run test:e2e -- test/e2e/audio-classroom-runtime.spec.ts
-```
-
-Blocked on 2026-04-24 in the current desktop environment:
-
-- `next dev` fails to bind a local port with `listen EACCES: permission denied 127.0.0.1:3201`
-- the same error reproduces when launching `npx next dev --hostname 127.0.0.1 --port 3201` directly
-
-This is an environment/runtime restriction, not a known application assertion failure.
+- Focused browser smoke no longer blocks locally.
+- Remaining gap is a real-browser manual walkthrough with live microphone input, because automated coverage still relies on fake browser audio / recognition.
 
 ## Evidence
 
@@ -62,11 +54,10 @@ This is an environment/runtime restriction, not a known application assertion fa
 
 ## Human Verification Needed
 
-1. Run `npm run test:e2e -- test/e2e/audio-classroom-runtime.spec.ts` in an environment where Next.js can listen on a local port.
-2. In a real target browser, manually walk one repeat and one picture answer with actual microphone input to confirm browser-native recognition availability and classroom pacing.
+1. In a real target browser, manually walk one repeat and one picture answer with actual microphone input to confirm browser-native recognition availability and classroom pacing.
 
 ## Verdict
 
 human_needed
 
-Phase 07 implementation is ready for final smoke/manual verification, but this session cannot issue a full `passed` verdict because the local environment blocks the Playwright web server from starting.
+Phase 07 no longer has a local automation blocker: focused browser smoke now passes. The only remaining sign-off is a real-browser manual walkthrough for live microphone behavior, so the verdict stays `human_needed` rather than `passed`.

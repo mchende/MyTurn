@@ -43,7 +43,7 @@ created: 2026-04-24
 | 07-02-01 | 07-02 | 2 | ASR-01, ASR-02 | unit + integration | `npm run test:unit -- test/unit/classroom-shell.test.tsx test/unit/classroom-orchestrator.test.ts test/unit/classroom-audio-runtime.test.ts` | ✅ | ✅ green |
 | 07-02-02 | 07-02 | 2 | ASR-02, ASR-04, PLAT-05 | unit | `npm run test:unit -- test/unit/classroom-shell.test.tsx test/unit/classroom-speech-recognition.test.ts test/unit/classroom-orchestrator.test.ts` | ✅ | ✅ green |
 | 07-03-01 | 07-03 | 3 | ASR-01, ASR-03, ASR-04 | unit + integration | `npm run test:unit -- test/unit/classroom-shell.test.tsx test/unit/classroom-orchestrator.test.ts test/unit/classroom-transcript-adapter.test.ts` | ✅ | ✅ green |
-| 07-03-02 | 07-03 | 3 | ASR-01, ASR-02, ASR-03, ASR-04, PLAT-05 | focused e2e | `npm run test:e2e -- test/e2e/audio-classroom-runtime.spec.ts` | ✅ | ⚠️ blocked locally (`next dev` listen EACCES) |
+| 07-03-02 | 07-03 | 3 | ASR-01, ASR-02, ASR-03, ASR-04, PLAT-05 | focused e2e | `npm run test:e2e -- test/e2e/audio-classroom-runtime.spec.ts test/e2e/classroom-entry.spec.ts` | ✅ | ✅ green |
 
 *Status: ✅ green · ❌ red · ⚠️ blocked/flaky*
 
@@ -79,4 +79,4 @@ created: 2026-04-24
 - [x] Validation map matches real plan waves and per-task verify commands
 - [x] `nyquist_compliant: true` set in frontmatter
 
-**Approval:** human verification required in a runnable browser environment
+**Approval:** focused automation is green; live-browser manual verification still required before `passed`
